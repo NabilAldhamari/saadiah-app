@@ -1,0 +1,46 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:recommended", ":semanticCommits", ":dependencyDashboard"],
+  schedule: ["before 6am on monday"],
+  timezone: "Europe/London",
+  prConcurrentLimit: 3,
+  labels: ["dependencies"],
+  commitMessagePrefix: "build(deps):",
+  lockFileMaintenance: {
+    enabled: true,
+    schedule: ["before 6am on monday"],
+  },
+  packageRules: [
+    {
+      matchManagers: ["gradle"],
+      matchPackagePatterns: ["^org\\.jetbrains\\.kotlin"],
+      groupName: "kotlin",
+    },
+    {
+      matchManagers: ["gradle"],
+      matchPackagePatterns: ["^androidx\\.compose"],
+      groupName: "compose",
+    },
+    {
+      matchManagers: ["gradle"],
+      matchPackagePatterns: ["^com\\.android\\.tools"],
+      groupName: "android gradle plugin",
+    },
+    {
+      matchPackagePatterns: ["detekt", "spotless", "ktlint", "kover", "roborazzi", "robolectric"],
+      groupName: "dev tooling",
+      matchUpdateTypes: ["minor", "patch"],
+      automerge: true,
+    },
+    {
+      matchManagers: ["github-actions"],
+      groupName: "github actions",
+      matchUpdateTypes: ["minor", "patch"],
+      automerge: true,
+    },
+    {
+      matchUpdateTypes: ["major"],
+      dependencyDashboardApproval: true,
+    },
+  ],
+}
