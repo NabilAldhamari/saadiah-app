@@ -41,7 +41,7 @@ class EnumShapeTest {
     }
 
     @Test
-    fun alarmKindCoversPreAtAndEnd() {
-        assertEquals(expected = 3, actual = AlarmKind.entries.size)
+    fun alarmKindCoversPreAtEndAndReArm() {
+        assertEquals(expected = 4, actual = AlarmKind.entries.size)
     }
 }
