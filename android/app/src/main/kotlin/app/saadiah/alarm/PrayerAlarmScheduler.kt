@@ -19,6 +19,7 @@ import kotlin.time.Duration.Companion.days
 
 const val EXTRA_PRAYER = "app.saadiah.extra.PRAYER"
 const val EXTRA_KIND = "app.saadiah.extra.KIND"
+const val EXTRA_EXPECTED_AT = "app.saadiah.extra.EXPECTED_AT"
 
 private val HORIZON = 3.days
 private val ALERTED_PRAYERS = setOf(Prayer.FAJR, Prayer.DHUHR, Prayer.ASR, Prayer.MAGHRIB, Prayer.ISHA)
@@ -57,8 +58,8 @@ class PrayerAlarmScheduler(
         slot: Int,
         spec: AlarmSpec,
     ) {
-        val pending = pendingIntent(slot, intentFor(slot, spec.prayer, spec.kind))
         val triggerAt = spec.triggerAt.toEpochMilliseconds()
+        val pending = pendingIntent(slot, intentFor(slot, spec.prayer, spec.kind, expectedAt = triggerAt))
         if (canScheduleExactly()) {
             alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(triggerAt, pending), pending)
         } else {
@@ -75,11 +76,13 @@ class PrayerAlarmScheduler(
         slot: Int,
         prayer: Prayer,
         kind: AlarmKind,
+        expectedAt: Long = 0L,
     ): Intent =
         Intent(context, AlarmReceiver::class.java).apply {
             action = "app.saadiah.action.ALARM.$slot"
             putExtra(EXTRA_PRAYER, prayer.name)
             putExtra(EXTRA_KIND, kind.name)
+            putExtra(EXTRA_EXPECTED_AT, expectedAt)
         }
 
     private fun pendingIntent(

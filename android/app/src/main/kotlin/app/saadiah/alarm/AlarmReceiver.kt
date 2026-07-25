@@ -7,8 +7,11 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import app.saadiah.R
+import app.saadiah.doctor.DeliveryLog
 import app.saadiah.model.AlarmKind
 import app.saadiah.model.Prayer
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 
 private const val NOTIFICATION_ID = 1
 
@@ -37,8 +40,22 @@ class AlarmReceiver : BroadcastReceiver() {
 
         if (kind == AlarmKind.AT_TIME && prayer != null) {
             announce(context, prayer)
+            recordDelivery(context, prayer, intent.getLongExtra(EXTRA_EXPECTED_AT, 0L))
         }
         PrayerAlarmScheduler(context).arm()
+    }
+
+    private fun recordDelivery(
+        context: Context,
+        prayer: Prayer,
+        expectedAtMillis: Long,
+    ) {
+        if (expectedAtMillis <= 0L) return
+        DeliveryLog(context).record(
+            prayerName = prayer.name,
+            expected = Instant.fromEpochMilliseconds(expectedAtMillis),
+            actual = Clock.System.now(),
+        )
     }
 
     // Guarded by canPostNotifications, which lint cannot see through.

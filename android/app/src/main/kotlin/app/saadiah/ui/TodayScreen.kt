@@ -46,21 +46,24 @@ import androidx.compose.runtime.LaunchedEffect as ComposeLaunchedEffect
 
 private const val TICK_MILLIS = 1_000L
 
+data class TodayActions(
+    val onChangeCity: () -> Unit,
+    val onOpenDoctor: () -> Unit,
+)
+
 @Composable
 fun TodayScreen(
     city: City,
     profile: TimingProfile,
     tradition: Tradition,
-    onChangeCity: () -> Unit,
+    actions: TodayActions,
 ) {
     val calculator = remember { PrayerCalculator() }
     val now = rememberTickingNow()
     val today = now.toLocalDateTime(city.timeZone).date
     val timings = remember(city, profile, today) { calculator.compute(city, today, profile) }
-    val tomorrow =
-        remember(city, profile, today) {
-            calculator.compute(city, today.plus(1, DateTimeUnit.DAY), profile)
-        }
+    val next = today.plus(1, DateTimeUnit.DAY)
+    val tomorrow = remember(city, profile, today) { calculator.compute(city, next, profile) }
     val hijri = timings.hijriDateAt(now)
     val observances = observancesOn(hijri, tradition).map { it.observance.label }.distinct()
 
@@ -71,13 +74,14 @@ fun TodayScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.section),
         ) {
-            DateHeader(city = city, hijriLabel = hijri.arabicLabel(), onChangeCity = onChangeCity)
+            DateHeader(city = city, hijriLabel = hijri.arabicLabel(), onChangeCity = actions.onChangeCity)
             Spacer(Modifier.height(SaadiahSpacing.section))
             NextPrayerHero(now = now, timings = timings, tomorrow = tomorrow, city = city)
             Spacer(Modifier.height(SaadiahSpacing.section))
             HorizontalDivider()
             Timetable(timings = timings, city = city, next = nextPrayerOf(now, timings))
             ObservanceList(observances = observances)
+            DoctorLink(actions.onOpenDoctor)
         }
     }
 }
@@ -130,6 +134,13 @@ private fun NextPrayerHero(
             color = MaterialTheme.colorScheme.onBackground,
         )
         Caption("in ${(at - now).spelledOut()}", size = SaadiahType.body)
+    }
+}
+
+@Composable
+private fun DoctorLink(onOpenDoctor: () -> Unit) {
+    TextButton(onClick = onOpenDoctor, modifier = Modifier.heightIn(min = MinimumTapTarget)) {
+        Text(text = "Will my alerts arrive?", fontSize = SaadiahType.body)
     }
 }
 
