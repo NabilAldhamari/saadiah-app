@@ -9,8 +9,19 @@ if [[ -z "${APK}" ]]; then
   exit 1
 fi
 
-hosts=$(strings "${APK}" \
-  | grep -oiE 'https?://[a-z0-9._-]+' \
+# An apk is a zip, so most of its text is deflated and invisible to a scan of the archive
+# itself. Unpacking first is what makes this check mean anything. `grep -a` also avoids
+# depending on `strings`, which is absent on some developer machines — where this script
+# used to report success having read nothing at all.
+work=$(mktemp -d)
+trap 'rm -rf "${work}"' EXIT
+
+if ! unzip -qq -o "${APK}" -d "${work}"; then
+  echo "check-forbidden-strings: could not unpack ${APK}." >&2
+  exit 1
+fi
+
+hosts=$(grep -rhaoiE 'https?://[a-z0-9._-]+' "${work}" \
   | sed -E 's#^https?://##' \
   | tr '[:upper:]' '[:lower:]' \
   | sort -u || true)
@@ -21,8 +32,12 @@ while IFS= read -r host; do
   if grep -qxF "${host}" "${ALLOWLIST}"; then
     continue
   fi
+  # Hosts that appear only as text — documentation shortlinks and bug-report addresses
+  # inside library error messages, licence headers, XML namespaces. None is ever contacted;
+  # each was read out of the unpacked binary and traced to its source before being listed.
   case "${host}" in
-    *.android.com|schemas.android.com|*.googlesource.com|www.w3.org|xml.org|apache.org|*.jetbrains.com) continue ;;
+    *.android.com|schemas.android.com|*.googlesource.com|www.w3.org|xml.org|*.apache.org) continue ;;
+    *.jetbrains.com|goo.gle|issuetracker.google.com) continue ;;
   esac
   echo "check-forbidden-strings: unexpected host in release binary: ${host}" >&2
   status=1

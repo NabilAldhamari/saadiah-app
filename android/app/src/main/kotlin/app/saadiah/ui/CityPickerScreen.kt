@@ -19,10 +19,13 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import app.saadiah.data.CityIndex
 import app.saadiah.design.MinimumTapTarget
 import app.saadiah.design.SaadiahSpacing
 import app.saadiah.design.SaadiahType
@@ -34,8 +37,12 @@ fun CityPickerScreen(
     onPick: (City) -> Unit,
     onCancel: () -> Unit,
 ) {
+    val context = LocalContext.current
+    // Reading seven megabytes takes long enough to see, so the field is drawn immediately
+    // and the database arrives behind it rather than the screen opening late.
+    val index by produceState<CityIndex?>(initialValue = null) { value = loadCityIndex(context) }
     var query by remember { mutableStateOf("") }
-    val results = remember(query) { searchCities(query) }
+    val results = remember(query, index) { index?.search(query).orEmpty() }
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(modifier = Modifier.padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.large)) {
@@ -49,7 +56,11 @@ fun CityPickerScreen(
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(SaadiahSpacing.medium))
-            CityResults(results = results, selected = selected, onPick = onPick)
+            when {
+                index == null -> Body("Loading the city list…")
+                query.isBlank() -> Body("Type the name of your city or town.")
+                else -> CityResults(results = results, selected = selected, onPick = onPick)
+            }
         }
     }
 }
@@ -83,7 +94,7 @@ private fun CityResults(
     onPick: (City) -> Unit,
 ) {
     if (results.isEmpty()) {
-        Body("No city matches that name yet. The full database arrives with the offline city pack.")
+        Body("No city or town matches that name.")
         return
     }
     LazyColumn(modifier = Modifier.fillMaxSize()) {

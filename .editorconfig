@@ -21,3 +21,8 @@ indent_size = 2
 
 [*.md]
 trim_trailing_whitespace = false
+
+# Generated data files carry long Arabic strings; wrapping them would corrupt the text.
+[**/generated/**.kt]
+max_line_length = off
+ktlint_standard_max-line-length = disabled
