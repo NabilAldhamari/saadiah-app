@@ -46,26 +46,24 @@ class MosqueSolver(
         observed: Map<Prayer, LocalTime>,
         city: City,
         date: LocalDate,
-    ): List<Candidate> =
-        Method.entries.flatMap { method ->
-            Madhab.entries.map { madhab -> evaluate(method, madhab, observed, city, date) }
+    ): List<Candidate> {
+        fun evaluate(
+            method: Method,
+            madhab: Madhab,
+        ): Candidate {
+            val computed = calculator.compute(city, date, method.toProfile(madhab))
+            val errors =
+                observed.mapValues { (prayer, time) ->
+                    minuteOfDay(time) - minuteOfDay(computed[prayer], city.timeZone)
+                }
+            val mean = errors.values.average()
+            val spread = errors.values.sumOf { abs(it - mean) }
+            return Candidate(method, madhab, errors.mapValues { it.value.minutes }, spread)
         }
 
-    private fun evaluate(
-        method: Method,
-        madhab: Madhab,
-        observed: Map<Prayer, LocalTime>,
-        city: City,
-        date: LocalDate,
-    ): Candidate {
-        val computed = calculator.compute(city, date, method.toProfile(madhab))
-        val errors =
-            observed.mapValues { (prayer, time) ->
-                minuteOfDay(time) - minuteOfDay(computed[prayer], city.timeZone)
-            }
-        val mean = errors.values.average()
-        val spread = errors.values.sumOf { abs(it - mean) }
-        return Candidate(method, madhab, errors.mapValues { it.value.minutes }, spread)
+        return Method.entries.flatMap { method ->
+            Madhab.entries.map { madhab -> evaluate(method, madhab) }
+        }
     }
 }
 

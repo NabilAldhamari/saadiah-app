@@ -22,7 +22,7 @@ while IFS= read -r host; do
     continue
   fi
   case "${host}" in
-    *.android.com|schemas.android.com|www.w3.org|xml.org|apache.org|*.jetbrains.com) continue ;;
+    *.android.com|schemas.android.com|*.googlesource.com|www.w3.org|xml.org|apache.org|*.jetbrains.com) continue ;;
   esac
   echo "check-forbidden-strings: unexpected host in release binary: ${host}" >&2
   status=1

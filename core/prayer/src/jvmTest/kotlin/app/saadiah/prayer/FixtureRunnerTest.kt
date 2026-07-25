@@ -5,11 +5,13 @@ import app.saadiah.model.CityId
 import app.saadiah.model.Coordinates
 import app.saadiah.model.CountryCode
 import app.saadiah.model.Prayer
+import app.saadiah.model.TimingProfile
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlin.test.Test
@@ -38,24 +40,8 @@ class FixtureRunnerTest {
         val root = Json.parseToJsonElement(readResource("/fixtures/$resource")).jsonObject
         val params = root.getValue("params").jsonObject
         val timeZone = TimeZone.of(params.string("timezone"))
-        val city =
-            City(
-                id = CityId(value = 1),
-                name = "fixture",
-                country = CountryCode(value = "ZZ"),
-                admin1 = "",
-                coordinates =
-                    Coordinates(
-                        latitude = params.string("latitude").toDouble(),
-                        longitude = params.string("longitude").toDouble(),
-                    ),
-                timeZone = timeZone,
-            )
-        val profile =
-            methodOf(params.string("method")).toProfile(
-                madhab = madhabOf(params.string("madhab")),
-                highLatitudeRule = highLatitudeRuleOf(params.string("highLatitudeRule")),
-            )
+        val city = cityFrom(params, timeZone)
+        val profile = profileFrom(params)
 
         val rows = root.getValue("times").jsonArray.map { it.jsonObject }
         for (row in rows) {
@@ -71,6 +57,29 @@ class FixtureRunnerTest {
         }
         return rows.size
     }
+
+    private fun cityFrom(
+        params: JsonObject,
+        timeZone: TimeZone,
+    ): City =
+        City(
+            id = CityId(value = 1),
+            name = "fixture",
+            country = CountryCode(value = "ZZ"),
+            admin1 = "",
+            coordinates =
+                Coordinates(
+                    latitude = params.string("latitude").toDouble(),
+                    longitude = params.string("longitude").toDouble(),
+                ),
+            timeZone = timeZone,
+        )
+
+    private fun profileFrom(params: JsonObject): TimingProfile =
+        methodOf(params.string("method")).toProfile(
+            madhab = madhabOf(params.string("madhab")),
+            highLatitudeRule = highLatitudeRuleOf(params.string("highLatitudeRule")),
+        )
 
     private fun instantToMinutes(
         instant: Instant,
