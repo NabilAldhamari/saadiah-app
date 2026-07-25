@@ -1,0 +1,14 @@
+{
+  "params": {
+    "latitude": 35.7750,
+    "longitude": -78.6336,
+    "timezone": "America/New_York",
+    "method": "NorthAmerica",
+    "madhab": "Hanafi",
+    "highLatitudeRule": "MiddleOfTheNight"
+  },
+  "source": "batoulapps/adhan-kotlin PrayerTimesTest.testPrayerTimes (EDT, summer, Hanafi asr)",
+  "times": [
+    { "date": "2015-07-12", "fajr": "4:42 AM", "sunrise": "6:08 AM", "dhuhr": "1:21 PM", "asr": "6:22 PM", "maghrib": "8:32 PM", "isha": "9:57 PM" }
+  ]
+}

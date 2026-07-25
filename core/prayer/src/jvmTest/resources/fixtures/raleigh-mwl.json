@@ -1,0 +1,14 @@
+{
+  "params": {
+    "latitude": 35.7750,
+    "longitude": -78.6336,
+    "timezone": "America/New_York",
+    "method": "MuslimWorldLeague",
+    "madhab": "Shafi",
+    "highLatitudeRule": "MiddleOfTheNight"
+  },
+  "source": "batoulapps/adhan-kotlin PrayerTimesTest.testOffsets (EST, winter)",
+  "times": [
+    { "date": "2015-12-01", "fajr": "5:35 AM", "sunrise": "7:06 AM", "dhuhr": "12:05 PM", "asr": "2:42 PM", "maghrib": "5:01 PM", "isha": "6:26 PM" }
+  ]
+}

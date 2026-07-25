@@ -1,0 +1,25 @@
+{
+  "params": {
+    "latitude": 21.427009,
+    "longitude": 39.828685,
+    "timezone": "Asia/Riyadh",
+    "method": "UmmAlQura",
+    "madhab": "Shafi",
+    "highLatitudeRule": "MiddleOfTheNight"
+  },
+  "source": "batoulapps/adhan-kotlin Shared/Times/Makkah-UmmAlQura.json",
+  "times": [
+    { "date": "2016-01-05", "fajr": "5:38 AM", "sunrise": "7:00 AM", "dhuhr": "12:26 PM", "asr": "3:31 PM", "maghrib": "5:52 PM", "isha": "7:22 PM" },
+    { "date": "2016-02-04", "fajr": "5:39 AM", "sunrise": "6:57 AM", "dhuhr": "12:35 PM", "asr": "3:48 PM", "maghrib": "6:12 PM", "isha": "7:42 PM" },
+    { "date": "2016-03-05", "fajr": "5:22 AM", "sunrise": "6:38 AM", "dhuhr": "12:32 PM", "asr": "3:55 PM", "maghrib": "6:27 PM", "isha": "7:57 PM" },
+    { "date": "2016-04-03", "fajr": "4:55 AM", "sunrise": "6:12 AM", "dhuhr": "12:24 PM", "asr": "3:50 PM", "maghrib": "6:36 PM", "isha": "8:06 PM" },
+    { "date": "2016-05-02", "fajr": "4:28 AM", "sunrise": "5:49 AM", "dhuhr": "12:18 PM", "asr": "3:39 PM", "maghrib": "6:47 PM", "isha": "8:17 PM" },
+    { "date": "2016-06-04", "fajr": "4:11 AM", "sunrise": "5:38 AM", "dhuhr": "12:19 PM", "asr": "3:36 PM", "maghrib": "7:01 PM", "isha": "8:31 PM" },
+    { "date": "2016-07-08", "fajr": "4:18 AM", "sunrise": "5:45 AM", "dhuhr": "12:26 PM", "asr": "3:43 PM", "maghrib": "7:07 PM", "isha": "8:37 PM" },
+    { "date": "2016-08-02", "fajr": "4:31 AM", "sunrise": "5:54 AM", "dhuhr": "12:27 PM", "asr": "3:46 PM", "maghrib": "6:59 PM", "isha": "8:29 PM" },
+    { "date": "2016-09-04", "fajr": "4:47 AM", "sunrise": "6:05 AM", "dhuhr": "12:20 PM", "asr": "3:44 PM", "maghrib": "6:34 PM", "isha": "8:04 PM" },
+    { "date": "2016-10-06", "fajr": "4:57 AM", "sunrise": "6:13 AM", "dhuhr": "12:09 PM", "asr": "3:31 PM", "maghrib": "6:04 PM", "isha": "7:34 PM" },
+    { "date": "2016-11-05", "fajr": "5:08 AM", "sunrise": "6:26 AM", "dhuhr": "12:04 PM", "asr": "3:18 PM", "maghrib": "5:42 PM", "isha": "7:12 PM" },
+    { "date": "2016-12-04", "fajr": "5:23 AM", "sunrise": "6:44 AM", "dhuhr": "12:11 PM", "asr": "3:17 PM", "maghrib": "5:38 PM", "isha": "7:08 PM" }
+  ]
+}
