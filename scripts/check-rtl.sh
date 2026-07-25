@@ -18,7 +18,7 @@ readonly PATTERNS=(
 
 status=0
 for pattern in "${PATTERNS[@]}"; do
-  if matches=$(grep -rnE "${pattern}" --include='*.kt' --include='*.xml' core design android 2>/dev/null); then
+  if matches=$(grep -rnE "${pattern}" --include='*.kt' --include='*.xml' --exclude-dir=build core design android 2>/dev/null); then
     echo "check-rtl: direction-absolute usage found (use start/end instead):" >&2
     echo "${matches}" >&2
     status=1
