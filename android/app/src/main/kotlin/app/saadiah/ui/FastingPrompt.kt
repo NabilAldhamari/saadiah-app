@@ -25,28 +25,35 @@ fun fastingOutlook(
     today: LocalDate,
     hijri: HijriDate,
     tradition: Tradition,
+    strings: Strings,
 ): List<FastingPrompt> =
     listOfNotNull(
-        whiteDaysPrompt(hijri),
-        weeklyPromptForSunniPracticeOnly(today, tradition),
-        hijamaPrompt(hijri),
+        whiteDaysPrompt(hijri, strings),
+        weeklyPromptForSunniPracticeOnly(today, tradition, strings),
+        hijamaPrompt(hijri, strings),
     )
 
-private fun whiteDaysPrompt(hijri: HijriDate): FastingPrompt? {
+private fun whiteDaysPrompt(
+    hijri: HijriDate,
+    strings: Strings,
+): FastingPrompt? {
     val days = daysUntil(hijri, WHITE_DAYS_FIRST) ?: return null
     return FastingPrompt(
-        title = "Ayyām al-Bīḍ",
-        timing = "the 13th, 14th and 15th — ${days.spelledOutDays()}",
+        title = strings.ayyamAlBid,
+        timing = strings.whiteDaysTiming(days.spelledOutDays(strings)),
         marker = ObservanceMarker.RECOMMENDED_FAST,
     )
 }
 
-private fun hijamaPrompt(hijri: HijriDate): FastingPrompt? {
+private fun hijamaPrompt(
+    hijri: HijriDate,
+    strings: Strings,
+): FastingPrompt? {
     val next = HIJAMA_DAYS.firstOrNull { it >= hijri.day } ?: return null
     val days = daysUntil(hijri, next) ?: return null
     return FastingPrompt(
-        title = "Ḥijāmah",
-        timing = "the ${next}th — ${days.spelledOutDays()}, from Maghrib the evening before",
+        title = strings.hijamah,
+        timing = strings.hijamaTiming(next, days.spelledOutDays(strings)),
         marker = ObservanceMarker.HIJAMAH,
     )
 }
@@ -54,13 +61,14 @@ private fun hijamaPrompt(hijri: HijriDate): FastingPrompt? {
 private fun weeklyPromptForSunniPracticeOnly(
     today: LocalDate,
     tradition: Tradition,
+    strings: Strings,
 ): FastingPrompt? {
     if (tradition != Tradition.SUNNI) return null
     val next = nextWeeklyFast(today)
     val days = next.toEpochDays() - today.toEpochDays()
     return FastingPrompt(
-        title = "Monday and Thursday",
-        timing = "${next.dayOfWeek.spelledOut()} — ${days.spelledOutDays()}",
+        title = strings.mondayAndThursday,
+        timing = strings.weeklyTiming(next.dayOfWeek.spelledOut(strings), days.spelledOutDays(strings)),
         marker = ObservanceMarker.RECOMMENDED_FAST,
     )
 }
@@ -82,11 +90,11 @@ private fun daysUntil(
     return target.toGregorianDate().toEpochDays() - hijri.toGregorianDate().toEpochDays()
 }
 
-private fun Int.spelledOutDays(): String =
+private fun Int.spelledOutDays(strings: Strings): String =
     when (this) {
-        0 -> "today"
-        1 -> "tomorrow"
-        else -> "in $this days"
+        0 -> strings.today
+        1 -> strings.tomorrow
+        else -> strings.inDays(this)
     }
 
-private fun DayOfWeek.spelledOut(): String = WEEKDAYS[ordinal]
+private fun DayOfWeek.spelledOut(strings: Strings): String = strings.weekdays[ordinal]

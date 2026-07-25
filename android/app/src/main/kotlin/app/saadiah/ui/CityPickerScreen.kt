@@ -45,20 +45,20 @@ fun CityPickerScreen(
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(modifier = Modifier.padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.large)) {
-            ScreenHeader(title = "Choose your city", onBack = onBack)
-            Caption("Prayer times are calculated for this location. Currently ${selected.name}.")
+            ScreenHeader(title = strings.titleChooseCity, onBack = onBack)
+            Caption("${strings.currentlyCity} ${selected.name}.")
             Spacer(Modifier.height(SaadiahSpacing.medium))
             OutlinedTextField(
                 value = query,
                 onValueChange = { query = it },
-                label = { Text(text = "Search for your city", fontSize = SaadiahType.body.size) },
+                label = { Text(text = strings.searchForYourCity, fontSize = SaadiahType.body.size) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(SaadiahSpacing.medium))
             when {
-                index == null -> Body("Loading the city list…")
-                query.isBlank() -> Body("Type the name of your city or town.")
+                index == null -> Body(strings.loadingCityList)
+                query.isBlank() -> Body(strings.typeYourCity)
                 else -> CityResults(results = results, selected = selected, onPick = onPick)
             }
         }
@@ -72,7 +72,7 @@ private fun CityResults(
     onPick: (City) -> Unit,
 ) {
     if (results.isEmpty()) {
-        Body("No city or town matches that name.")
+        Body(strings.noCityMatches)
         return
     }
     LazyColumn(modifier = Modifier.fillMaxSize()) {

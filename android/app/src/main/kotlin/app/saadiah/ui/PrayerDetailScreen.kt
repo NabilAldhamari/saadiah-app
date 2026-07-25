@@ -40,15 +40,15 @@ fun PrayerDetailScreen(
     ) {
         DetailHeading(detail)
         SectionDivider()
-        Caption("Nawāfil")
+        Caption(strings.nawafil)
         for (nafilah in detail.nawafil) {
             NafilahRow(nafilah)
         }
         if (detail.nawafil.isEmpty()) {
-            Body("No nawāfil accompany this time.")
+            Body(strings.noNawafil)
         }
         SectionDivider()
-        Caption("Duʿāʾ and adhkār")
+        Caption(strings.duaAndAdhkar)
         for (dua in detail.duas) {
             DuaRow(dua)
         }
@@ -56,7 +56,7 @@ fun PrayerDetailScreen(
         Spacer(Modifier.height(SaadiahSpacing.medium))
         LabelledIconButton(
             icon = painterResource(R.drawable.ic_today),
-            label = "Back to today",
+            label = strings.back,
             onClick = onBack,
             modifier = Modifier.fillMaxWidth(),
         )

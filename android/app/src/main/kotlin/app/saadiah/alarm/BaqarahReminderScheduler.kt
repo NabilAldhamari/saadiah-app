@@ -11,6 +11,7 @@ import androidx.core.app.NotificationManagerCompat
 import app.saadiah.R
 import app.saadiah.data.SettingsStore
 import app.saadiah.model.BaqarahReminder
+import app.saadiah.ui.stringsFor
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
@@ -71,14 +72,15 @@ class BaqarahReminderReceiver : BroadcastReceiver() {
         context: Context,
         intent: Intent,
     ) {
+        val words = stringsFor(runBlocking { SettingsStore(context).settings.first() }.language)
         if (canPostNotifications(context)) {
             ensureChannels(context)
             val notification =
                 NotificationCompat
                     .Builder(context, READING_CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_launcher_foreground)
-                    .setContentTitle("سورة البقرة — Sūrat al-Baqarah")
-                    .setContentText("Time for today's reading.")
+                    .setContentTitle(words.baqarahReminderTitle)
+                    .setContentText(words.baqarahReminderBody)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setContentIntent(openAppIntent(context))
                     .setAutoCancel(true)

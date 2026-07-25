@@ -39,20 +39,14 @@ fun BaqarahScreen(
                 .padding(horizontal = SaadiahSpacing.screen)
                 .padding(top = SaadiahSpacing.screen),
     ) {
-        ScreenHeader(title = "Sūrat al-Baqarah", onBack = onBack)
-        Body("Read daily, and memorised over time.")
+        ScreenHeader(title = strings.titleBaqarah, onBack = onBack)
+        Body(strings.baqarahSubtitle)
         SectionDivider()
 
         if (merits.isEmpty()) {
-            Body("Coming in a future update")
+            Body(strings.comingSoon)
             Spacer(Modifier.height(SaadiahSpacing.small))
-            Caption(
-                "The merits of reciting al-Baqarah are reported in hadith. They will be added " +
-                    "here once a verified, openly licensed collection is bundled, each with the " +
-                    "narration it comes from. Nothing is shown in the meantime, because a merit " +
-                    "written from memory and attributed to the Prophet ﷺ would read exactly like " +
-                    "a sourced one.",
-            )
+            Caption(strings.baqarahNotBundled)
         } else {
             for (merit in merits) {
                 MeritCard(merit)

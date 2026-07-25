@@ -10,49 +10,27 @@ import app.saadiah.model.Prayer
  * everything else is pushed on top of one and shows a back button instead.
  */
 sealed interface Screen {
-    val title: String
+    data object Today : Screen
 
-    data object Today : Screen {
-        override val title = "Today"
-    }
+    data object Calendar : Screen
 
-    data object Calendar : Screen {
-        override val title = "Calendar"
-    }
+    data object Adhkar : Screen
 
-    data object Adhkar : Screen {
-        override val title = "Adhkār"
-    }
+    data object More : Screen
 
-    data object More : Screen {
-        override val title = "More"
-    }
+    data object PickingCity : Screen
 
-    data object PickingCity : Screen {
-        override val title = "Choose your city"
-    }
+    data object Doctor : Screen
 
-    data object Doctor : Screen {
-        override val title = "Alert check"
-    }
+    data object Ask : Screen
 
-    data object Ask : Screen {
-        override val title = "Ask"
-    }
+    data object WhyThisTime : Screen
 
-    data object WhyThisTime : Screen {
-        override val title = "Why this time"
-    }
-
-    data object Baqarah : Screen {
-        override val title = "Sūrat al-Baqarah"
-    }
+    data object Baqarah : Screen
 
     data class PrayerDetail(
         val prayer: Prayer,
-    ) : Screen {
-        override val title = "Prayer"
-    }
+    ) : Screen
 }
 
 val Screen.isTabRoot: Boolean

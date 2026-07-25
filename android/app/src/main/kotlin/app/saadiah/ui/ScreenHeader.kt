@@ -32,7 +32,7 @@ fun ScreenHeader(
     Column(modifier = modifier.fillMaxWidth()) {
         LabelledIconButton(
             icon = painterResource(R.drawable.ic_back),
-            label = "Back",
+            label = strings.back,
             onClick = onBack,
         )
         Spacer(Modifier.height(SaadiahSpacing.medium))

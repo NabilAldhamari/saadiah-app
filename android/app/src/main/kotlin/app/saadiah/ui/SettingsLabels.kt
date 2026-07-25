@@ -8,56 +8,47 @@ import app.saadiah.model.Prayer
 import app.saadiah.model.Tradition
 import kotlin.time.Duration
 
-internal fun Tradition.spelledOut(): String =
+/**
+ * These take the table rather than reading it from the composition, so the same label is
+ * available to the pure state builders and to the notification receiver, neither of which
+ * runs inside a composition.
+ */
+internal fun Tradition.spelledOut(strings: Strings): String =
     when (this) {
-        Tradition.SUNNI -> "Sunni"
-        Tradition.TWELVER -> "Twelver"
+        Tradition.SUNNI -> strings.traditionSunni
+        Tradition.TWELVER -> strings.traditionTwelver
     }
 
-internal fun Madhab.spelledOut(): String =
+internal fun Madhab.spelledOut(strings: Strings): String =
     when (this) {
-        Madhab.SHAFI -> "Standard — Shāfiʿī, Mālikī, Ḥanbalī"
-        Madhab.HANAFI -> "Ḥanafī — ʿAṣr begins later"
+        Madhab.SHAFI -> strings.madhabStandard
+        Madhab.HANAFI -> strings.madhabHanafi
     }
 
-internal fun CombineMode.spelledOut(): String =
+internal fun CombineMode.spelledOut(strings: Strings): String =
     when (this) {
-        CombineMode.NONE -> "Show all five prayers"
-        CombineMode.ZUHRAYN_ISHAAYN -> "Combine into Ẓuhrayn and ʿIshāʾayn"
+        CombineMode.NONE -> strings.combineNone
+        CombineMode.ZUHRAYN_ISHAAYN -> strings.combineZuhraynIshaayn
     }
 
-internal fun Duration?.spelledOut(): String =
+internal fun Prayer.spelledOut(strings: Strings): String = strings.prayerNames[ordinal]
+
+internal fun Language.spelledOut(strings: Strings): String =
     when (this) {
-        null -> "Do not warn me"
-        else -> "$inWholeMinutes minutes before"
+        Language.SYSTEM -> strings.followMyPhone
+        Language.ARABIC -> strings.arabicLanguage
+        Language.ENGLISH -> strings.englishLanguage
     }
 
-internal fun Duration?.spelledOutAsClosing(): String =
+internal fun BaqarahReminder.spelledOut(strings: Strings): String =
     when (this) {
-        null -> "Do not warn me"
-        else -> "$inWholeMinutes minutes before it closes"
+        BaqarahReminder.OFF -> strings.doNotRemindMe
+        BaqarahReminder.DAILY -> strings.everyDay
+        BaqarahReminder.WEEKLY -> strings.onceAWeek
     }
 
-internal fun Prayer.spelledOut(): String =
-    when (this) {
-        Prayer.FAJR -> "الفجر — Fajr"
-        Prayer.SUNRISE -> "الشروق — Sunrise"
-        Prayer.DHUHR -> "الظهر — Dhuhr"
-        Prayer.ASR -> "العصر — Asr"
-        Prayer.MAGHRIB -> "المغرب — Maghrib"
-        Prayer.ISHA -> "العشاء — Isha"
-    }
+internal fun Duration?.asWarning(strings: Strings): String =
+    if (this == null) strings.doNotWarnMe else strings.minutesBefore(inWholeMinutes)
 
-internal fun Language.spelledOut(): String =
-    when (this) {
-        Language.SYSTEM -> "Follow my phone"
-        Language.ARABIC -> "العربية — Arabic"
-        Language.ENGLISH -> "English"
-    }
-
-internal fun BaqarahReminder.spelledOut(): String =
-    when (this) {
-        BaqarahReminder.OFF -> "Do not remind me"
-        BaqarahReminder.DAILY -> "Every day"
-        BaqarahReminder.WEEKLY -> "Once a week"
-    }
+internal fun Duration?.asClosingWarning(strings: Strings): String =
+    if (this == null) strings.doNotWarnMe else strings.minutesBeforeClosing(inWholeMinutes)

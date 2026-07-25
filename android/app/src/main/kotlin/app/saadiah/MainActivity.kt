@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
         alarms.arm()
         BaqarahReminderScheduler(this).arm()
 
-        setContent { SaadiahTheme { Saadiah(store, alarms) } }
+        setContent { Saadiah(store, alarms) }
     }
 
     @Composable
@@ -51,17 +51,19 @@ class MainActivity : ComponentActivity() {
         val settings by store.settings.collectAsStateWithLifecycle(initialValue = Settings())
         val navigator = remember { Navigator() }
 
-        SaadiahApp(
-            city = settings.city ?: DEFAULT_CITY,
-            settings = settings,
-            navigator = navigator,
-            actions =
-                AppActions(
-                    onChangeSettings = { changed -> save(store, alarms) { changed } },
-                    onChangeCity = { chosen -> save(store, alarms) { it.copy(city = chosen) } },
-                    onOpenBackgroundSettings = ::openBackgroundSettings,
-                ),
-        )
+        SaadiahTheme(language = settings.language) {
+            SaadiahApp(
+                city = settings.city ?: DEFAULT_CITY,
+                settings = settings,
+                navigator = navigator,
+                actions =
+                    AppActions(
+                        onChangeSettings = { changed -> save(store, alarms) { changed } },
+                        onChangeCity = { chosen -> save(store, alarms) { it.copy(city = chosen) } },
+                        onOpenBackgroundSettings = ::openBackgroundSettings,
+                    ),
+            )
+        }
     }
 
     private fun save(

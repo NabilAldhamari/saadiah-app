@@ -39,23 +39,25 @@ fun calendarState(
     year: Int,
     month: Int,
     tradition: Tradition,
+    strings: Strings,
 ): CalendarState {
     val days =
         (1..DAYS_IN_HIJRI_MONTH).mapNotNull { day ->
             val hijri = runCatching { HijriDate(year = year, month = month, day = day) }.getOrNull()
-            hijri?.let { dayFor(it, tradition) }
+            hijri?.let { dayFor(it, tradition, strings) }
         }
     return CalendarState(
-        monthLabel = HijriDate(year = year, month = month, day = 1).monthLabel(),
-        gregorianSpan = spanFor(year, month),
+        monthLabel = HijriDate(year = year, month = month, day = 1).monthLabel(strings),
+        gregorianSpan = spanFor(year, month, strings),
         days = days,
-        conflictNote = conflictNoteFor(month, days),
+        conflictNote = conflictNoteFor(month, days, strings),
     )
 }
 
 private fun dayFor(
     hijri: HijriDate,
     tradition: Tradition,
+    strings: Strings,
 ): CalendarDay? {
     val rules = observancesOn(hijri, tradition)
     val marker =
@@ -71,42 +73,32 @@ private fun dayFor(
     val gregorian = hijri.toGregorianDate()
     return CalendarDay(
         hijriDay = hijri.day,
-        weekday = gregorian.shortWeekday(),
-        title = rules.title(marker),
-        gregorian = gregorian.dayAndMonth(),
+        weekday = gregorian.shortWeekday(strings),
+        title = rules.title(marker, strings),
+        gregorian = gregorian.dayAndMonth(strings),
         marker = marker,
         alertEnabled = marker != ObservanceMarker.PROHIBITED_FAST,
     )
 }
 
-private fun List<app.saadiah.calendar.ObservanceRule>.title(marker: ObservanceMarker): String {
+private fun List<app.saadiah.calendar.ObservanceRule>.title(
+    marker: ObservanceMarker,
+    strings: Strings,
+): String {
     val named = firstOrNull { it.observance != Observance.HIJAMA }?.observance ?: Observance.HIJAMA
     return when (marker) {
-        ObservanceMarker.RECOMMENDED_FAST -> "Fast — ${named.shortLabel()}"
-        ObservanceMarker.PROHIBITED_FAST -> "Do not fast — ${named.shortLabel()}"
-        ObservanceMarker.HIJAMAH -> "Ḥijāmah day"
+        ObservanceMarker.RECOMMENDED_FAST -> strings.fastOn(named.shortLabel(strings))
+        ObservanceMarker.PROHIBITED_FAST -> strings.doNotFastOn(named.shortLabel(strings))
+        ObservanceMarker.HIJAMAH -> strings.obsHijamahDay
     }
 }
 
-private val SHORT_LABELS =
-    mapOf(
-        Observance.RAMADAN to "Ramaḍān",
-        Observance.EID_AL_FITR to "Eid al-Fiṭr",
-        Observance.EID_AL_ADHA to "Eid al-Aḍḥā",
-        Observance.TASHRIQ to "Tashrīq",
-        Observance.ARAFAH to "ʿArafah",
-        Observance.TASUA to "Tāsūʿāʾ",
-        Observance.ASHURA to "ʿĀshūrāʾ",
-        Observance.AYYAM_AL_BID to "Ayyām al-Bīḍ",
-        Observance.SIX_OF_SHAWWAL to "the six of Shawwāl",
-        Observance.HIJAMA to "Ḥijāmah",
-    )
-
-private fun Observance.shortLabel(): String = SHORT_LABELS.getValue(this)
+private fun Observance.shortLabel(strings: Strings): String = strings.observanceShortLabels.getValue(name)
 
 private fun conflictNoteFor(
     month: Int,
     days: List<CalendarDay>,
+    strings: Strings,
 ): String? {
     if (month != DHU_AL_HIJJAH) return null
     val suppressed =
@@ -115,7 +107,7 @@ private fun conflictNoteFor(
                 it.marker == ObservanceMarker.RECOMMENDED_FAST
         }
     return if (suppressed) {
-        "The 13th is normally Ayyām al-Bīḍ, but it falls in Tashrīq this month."
+        strings.tashriqConflictNote
     } else {
         null
     }
@@ -124,13 +116,14 @@ private fun conflictNoteFor(
 private fun spanFor(
     year: Int,
     month: Int,
+    strings: Strings,
 ): String {
     val first = HijriDate(year = year, month = month, day = 1).toGregorianDate()
     val last = HijriDate(year = year, month = month, day = 29).toGregorianDate()
     return if (first.monthNumber == last.monthNumber) {
-        "${first.monthName()} ${first.year}"
+        "${first.monthName(strings)} ${first.year}"
     } else {
-        "${first.monthName()} – ${last.monthName()} ${last.year}"
+        "${first.monthName(strings)} – ${last.monthName(strings)} ${last.year}"
     }
 }
 

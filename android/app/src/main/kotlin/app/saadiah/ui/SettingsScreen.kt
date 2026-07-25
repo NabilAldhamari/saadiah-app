@@ -72,28 +72,28 @@ fun SettingsScreen(
                 .padding(top = SaadiahSpacing.screen),
     ) {
         Text(
-            text = "Settings",
+            text = strings.titleSettings,
             color = colors.text,
             fontSize = SaadiahType.titleLarge.size,
             lineHeight = SaadiahType.titleLarge.lineHeight,
         )
 
-        Section("Location") {
-            ChoiceRow(cityName, selected = true, stateWord = "change", onSelect = actions.onChangeCity)
+        Section(strings.sectionLocation) {
+            ChoiceRow(cityName, selected = true, stateWord = strings.change, onSelect = actions.onChangeCity)
         }
         LanguageSection(settings, actions.onChange)
         FiqhSections(settings, actions.onChange)
         AlertSections(settings, actions.onChange)
         BaqarahSection(settings, actions)
 
-        Section("Checks") {
-            ChoiceRow("Will my alerts arrive?", false, "open", actions.onOpenDoctor)
+        Section(strings.sectionChecks) {
+            ChoiceRow(strings.alertsArriveQuestion, false, strings.open, actions.onOpenDoctor)
         }
-        Section("About") {
-            Body("Every setting is kept on this device. Nothing is sent anywhere.")
+        Section(strings.sectionAbout) {
+            Body(strings.privacyNote)
             Spacer(Modifier.height(SaadiahSpacing.small))
             // CC BY 4.0 requires the credit to be visible to the reader, not only in the repo.
-            Caption("City and town data from GeoNames (geonames.org), used under CC BY 4.0.")
+            Caption(strings.geoNamesCredit)
         }
         Spacer(Modifier.height(SaadiahSpacing.huge))
     }
@@ -104,16 +104,13 @@ private fun LanguageSection(
     settings: Settings,
     onChange: (Settings) -> Unit,
 ) {
-    Section("Language") {
+    Section(strings.sectionLanguage) {
         for (option in Language.entries) {
-            ChoiceRow(option.spelledOut(), settings.language == option) {
+            ChoiceRow(option.spelledOut(strings), settings.language == option) {
                 onChange(settings.copy(language = option))
             }
         }
-        Caption(
-            "Arabic lays the app out right to left. Saadiah's own wording is still being " +
-                "translated, so most text stays in English for now.",
-        )
+        Caption(strings.languageHint)
     }
 }
 
@@ -122,23 +119,23 @@ private fun FiqhSections(
     settings: Settings,
     onChange: (Settings) -> Unit,
 ) {
-    Section("Tradition", "Scopes which observances and adhkār you are shown.") {
+    Section(strings.sectionTradition, strings.sectionTraditionWhy) {
         for (option in Tradition.entries) {
-            ChoiceRow(option.spelledOut(), settings.tradition == option) {
+            ChoiceRow(option.spelledOut(strings), settings.tradition == option) {
                 onChange(settings.copy(tradition = option))
             }
         }
     }
-    Section("ʿAṣr madhhab", "Changes when ʿAṣr begins.") {
+    Section(strings.sectionMadhab, strings.sectionMadhabWhy) {
         for (option in Madhab.entries) {
-            ChoiceRow(option.spelledOut(), settings.madhab == option) {
+            ChoiceRow(option.spelledOut(strings), settings.madhab == option) {
                 onChange(settings.copy(madhab = option))
             }
         }
     }
-    Section("Combining prayers") {
+    Section(strings.sectionCombining) {
         for (option in CombineMode.entries) {
-            ChoiceRow(option.spelledOut(), settings.combineMode == option) {
+            ChoiceRow(option.spelledOut(strings), settings.combineMode == option) {
                 onChange(settings.copy(combineMode = option))
             }
         }
@@ -150,30 +147,30 @@ private fun AlertSections(
     settings: Settings,
     onChange: (Settings) -> Unit,
 ) {
-    Section("Which prayers alert you") {
+    Section(strings.sectionWhichPrayers) {
         for (prayer in settings.alertablePrayers()) {
             val alerting = prayer in settings.enabledPrayers
             ChoiceRow(
-                label = prayer.spelledOut(),
+                label = prayer.spelledOut(strings),
                 selected = alerting,
-                stateWord = if (alerting) "alerting" else "silent",
+                stateWord = if (alerting) strings.alerting else strings.silent,
                 onSelect = { onChange(settings.copy(enabledPrayers = settings.enabledPrayers.toggle(prayer))) },
             )
         }
         if (settings.enabledPrayers.none { it in settings.alertablePrayers() }) {
-            Body("Every prayer is silent. Saadiah will not alert you at all.")
+            Body(strings.everyPrayerSilent)
         }
     }
-    Section("Warn me before each prayer") {
+    Section(strings.sectionWarnBefore) {
         for (choice in PRE_ALERT_CHOICES) {
-            ChoiceRow(choice.spelledOut(), settings.preAlert == choice) {
+            ChoiceRow(choice.asWarning(strings), settings.preAlert == choice) {
                 onChange(settings.copy(preAlert = choice))
             }
         }
     }
-    Section("Warn me before each window closes") {
+    Section(strings.sectionWarnClosing) {
         for (choice in END_OF_WINDOW_CHOICES) {
-            ChoiceRow(choice.spelledOutAsClosing(), settings.endOfWindow == choice) {
+            ChoiceRow(choice.asClosingWarning(strings), settings.endOfWindow == choice) {
                 onChange(settings.copy(endOfWindow = choice))
             }
         }
@@ -185,13 +182,13 @@ private fun BaqarahSection(
     settings: Settings,
     actions: SettingsActions,
 ) {
-    Section("Sūrat al-Baqarah", "A reminder to keep up the daily reading.") {
+    Section(strings.sectionBaqarah, strings.sectionBaqarahWhy) {
         for (option in BaqarahReminder.entries) {
-            ChoiceRow(option.spelledOut(), settings.baqarahReminder == option) {
+            ChoiceRow(option.spelledOut(strings), settings.baqarahReminder == option) {
                 actions.onChange(settings.copy(baqarahReminder = option))
             }
         }
-        ChoiceRow("Why it is read", false, "open", actions.onOpenBaqarah)
+        ChoiceRow(strings.whyItIsRead, false, strings.open, actions.onOpenBaqarah)
     }
 }
 
@@ -222,7 +219,7 @@ private fun ChoiceRow(
     onSelect: () -> Unit,
 ) {
     val colors = SaadiahTheme.colors
-    val word = stateWord ?: if (selected) "chosen" else ""
+    val word = stateWord ?: if (selected) strings.chosen else ""
     Row(
         modifier =
             Modifier

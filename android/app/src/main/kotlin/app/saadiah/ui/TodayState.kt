@@ -49,11 +49,13 @@ private const val MAX_OBSERVANCES = 2
  * [CombineMode.ZUHRAYN_ISHAAYN] the five rows collapse to three, which is a display
  * concern driven by the profile and never by the tradition.
  */
+@Suppress("LongParameterList")
 fun todayState(
     city: City,
     profile: TimingProfile,
     tradition: Tradition,
     now: Instant,
+    strings: Strings,
 ): TodayState {
     val calculator = PrayerCalculator()
     val today = now.toLocalDateTime(city.timeZone).date
@@ -66,31 +68,33 @@ fun todayState(
     val nextPrayer = next ?: Prayer.FAJR
 
     return TodayState(
-        hijriLabel = hijri.arabicLabel(),
-        gregorianLabel = today.spelledOut(),
+        hijriLabel = hijri.arabicLabel(strings),
+        gregorianLabel = today.spelledOut(strings),
         cityName = city.name,
-        nextPrayerLatin = nextPrayer.latinLabel(profile.combineMode),
-        nextPrayerArabic = nextPrayer.arabicLabel(profile.combineMode),
+        nextPrayerLatin = nextPrayer.latinLabel(profile.combineMode, strings),
+        nextPrayerArabic = nextPrayer.arabicLabel(profile.combineMode, strings),
         nextPrayerTime = nextAt.asClockTime(city.timeZone),
-        remaining = "in ${(nextAt - now).spelledOut()}",
-        rows = rowsFor(timings, city, profile, now),
-        observances = observancesFor(hijri, tradition),
-        fasting = fastingOutlook(today, hijri, tradition),
+        remaining = strings.remainingIn((nextAt - now).spelledOut(strings)),
+        rows = rowsFor(timings, city, profile, now, strings),
+        observances = observancesFor(hijri, tradition, strings),
+        fasting = fastingOutlook(today, hijri, tradition, strings),
     )
 }
 
+@Suppress("LongParameterList")
 private fun rowsFor(
     timings: app.saadiah.model.DayTimings,
     city: City,
     profile: TimingProfile,
     now: Instant,
+    strings: Strings,
 ): List<PrayerRowState> {
     val shown = shownPrayers(profile.combineMode)
     val current = currentPrayerOf(shown, timings, now)
     return shown.map {
         PrayerRowState(
             prayer = it,
-            name = it.latinLabel(profile.combineMode),
+            name = it.latinLabel(profile.combineMode, strings),
             time = timings[it].asClockTime(city.timeZone),
             isCurrent = it == current,
         )
@@ -100,8 +104,9 @@ private fun rowsFor(
 private fun observancesFor(
     hijri: app.saadiah.model.HijriDate,
     tradition: Tradition,
+    strings: Strings,
 ): List<ObservanceState> =
-    observancesOn(hijri, tradition).mapNotNull { it.toState() }.distinctBy { it.title }.take(MAX_OBSERVANCES)
+    observancesOn(hijri, tradition).mapNotNull { it.toState(strings) }.distinctBy { it.title }.take(MAX_OBSERVANCES)
 
 internal fun shownPrayers(combineMode: CombineMode): List<Prayer> =
     if (combineMode == CombineMode.ZUHRAYN_ISHAAYN) {
@@ -116,7 +121,7 @@ private fun currentPrayerOf(
     now: Instant,
 ): Prayer? = shown.lastOrNull { timings[it] <= now }
 
-private fun app.saadiah.calendar.ObservanceRule.toState(): ObservanceState? {
+private fun app.saadiah.calendar.ObservanceRule.toState(strings: Strings): ObservanceState? {
     val marker =
         when (kind) {
             ObservanceKind.RECOMMENDED_FAST -> ObservanceMarker.RECOMMENDED_FAST
@@ -125,38 +130,44 @@ private fun app.saadiah.calendar.ObservanceRule.toState(): ObservanceState? {
             else -> return null
         }
     return ObservanceState(
-        title = observance.label,
-        subtitle = kind.spelledOut(),
+        title = observance.label(strings),
+        subtitle = kind.spelledOut(strings),
         marker = marker,
         alertEnabled = marker != ObservanceMarker.PROHIBITED_FAST,
     )
 }
 
-private fun ObservanceKind.spelledOut(): String =
+private fun ObservanceKind.spelledOut(strings: Strings): String =
     when (this) {
-        ObservanceKind.OBLIGATORY_FAST -> "Fasting is obligatory"
-        ObservanceKind.RECOMMENDED_FAST -> "Fasting is recommended"
-        ObservanceKind.PROHIBITED_FAST -> "Do not fast"
-        ObservanceKind.RECOMMENDED_HIJAMA -> "A recommended day for cupping"
-        ObservanceKind.EID -> "Eid"
+        ObservanceKind.OBLIGATORY_FAST -> strings.fastingObligatory
+        ObservanceKind.RECOMMENDED_FAST -> strings.fastingRecommended
+        ObservanceKind.PROHIBITED_FAST -> strings.doNotFast
+        ObservanceKind.RECOMMENDED_HIJAMA -> strings.cuppingDay
+        ObservanceKind.EID -> strings.eid
     }
 
-private fun Prayer.latinLabel(combineMode: CombineMode): String =
+private fun Prayer.latinLabel(
+    combineMode: CombineMode,
+    strings: Strings,
+): String =
     if (combineMode == CombineMode.ZUHRAYN_ISHAAYN) {
         when (this) {
-            Prayer.DHUHR -> "Ẓuhrayn"
-            Prayer.MAGHRIB -> "ʿIshāʾayn"
-            else -> englishName
+            Prayer.DHUHR -> strings.zuhrayn
+            Prayer.MAGHRIB -> strings.ishaayn
+            else -> latinName(strings)
         }
     } else {
-        englishName
+        latinName(strings)
     }
 
-private fun Prayer.arabicLabel(combineMode: CombineMode): String =
+private fun Prayer.arabicLabel(
+    combineMode: CombineMode,
+    strings: Strings,
+): String =
     if (combineMode == CombineMode.ZUHRAYN_ISHAAYN) {
         when (this) {
-            Prayer.DHUHR -> "الظهرين"
-            Prayer.MAGHRIB -> "العشاءين"
+            Prayer.DHUHR -> strings.zuhraynArabic
+            Prayer.MAGHRIB -> strings.ishaaynArabic
             else -> arabicName
         }
     } else {

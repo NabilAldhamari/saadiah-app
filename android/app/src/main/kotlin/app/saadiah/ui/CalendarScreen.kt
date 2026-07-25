@@ -103,7 +103,7 @@ private fun SwitchOption(
 ) {
     val colors = SaadiahTheme.colors
     Text(
-        text = if (option == CalendarView.LIST) "List" else "Grid",
+        text = if (option == CalendarView.LIST) strings.calendarList else strings.calendarGrid,
         color = if (isSelected) colors.text else colors.textSecondary,
         fontSize = SaadiahType.body.size,
         textAlign = TextAlign.Center,
@@ -170,7 +170,7 @@ private fun ConflictNote(note: String) {
 private fun MonthGrid(state: CalendarState) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "Every marked day, by shape",
+            text = strings.calendarLegend,
             color = SaadiahTheme.colors.textSecondary,
             fontSize = SaadiahType.bodySmall.size,
         )
@@ -203,16 +203,18 @@ private fun LegendNamingEveryMarkerInWords() {
     }
 }
 
+@Composable
 private fun ObservanceMarker.inWords(): String =
     when (this) {
-        ObservanceMarker.RECOMMENDED_FAST -> "A day to fast"
-        ObservanceMarker.PROHIBITED_FAST -> "A day not to fast"
-        ObservanceMarker.HIJAMAH -> "A day for ḥijāmah"
+        ObservanceMarker.RECOMMENDED_FAST -> strings.legendFast
+        ObservanceMarker.PROHIBITED_FAST -> strings.legendDoNotFast
+        ObservanceMarker.HIJAMAH -> strings.legendHijamah
     }
 
+@Composable
 private fun ObservanceMarker.shapeInWords(): String =
     when (this) {
-        ObservanceMarker.RECOMMENDED_FAST -> "filled circle"
-        ObservanceMarker.PROHIBITED_FAST -> "horizontal bar"
-        ObservanceMarker.HIJAMAH -> "ring outline"
+        ObservanceMarker.RECOMMENDED_FAST -> strings.shapeFilledCircle
+        ObservanceMarker.PROHIBITED_FAST -> strings.shapeHorizontalBar
+        ObservanceMarker.HIJAMAH -> strings.shapeRingOutline
     }

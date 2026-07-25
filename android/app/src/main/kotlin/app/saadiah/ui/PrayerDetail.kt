@@ -33,48 +33,62 @@ fun prayerDetail(
     prayer: Prayer,
     time: String,
     tradition: Tradition,
+    strings: Strings,
 ): PrayerDetail =
     PrayerDetail(
-        latin = prayer.englishName,
+        latin = prayer.latinName(strings),
         arabic = prayer.arabicName,
         time = time,
-        nawafil = nawafilFor(prayer, tradition),
+        nawafil = nawafilFor(prayer, tradition, strings),
         duas = duasFor(prayer),
-        sourcingNote = "Wording is not shown until the adhkār corpus is bundled from its source.",
+        sourcingNote = strings.duaWordingWithheld,
     )
 
 private fun nawafilFor(
     prayer: Prayer,
     tradition: Tradition,
+    strings: Strings,
 ): List<Nafilah> =
     when (tradition) {
-        Tradition.SUNNI -> confirmedSunanRawatib(prayer)
-        Tradition.TWELVER -> twelverNawafilDifferingInCountAndPlacement(prayer)
+        Tradition.SUNNI -> confirmedSunanRawatib(prayer, strings)
+        Tradition.TWELVER -> twelverNawafilDifferingInCountAndPlacement(prayer, strings)
     }
 
-private fun confirmedSunanRawatib(prayer: Prayer): List<Nafilah> =
-    when (prayer) {
-        Prayer.FAJR -> listOf(Nafilah("Sunnah of Fajr", "2 rakʿah", "before"))
+@Suppress("MagicNumber")
+private fun confirmedSunanRawatib(
+    prayer: Prayer,
+    s: Strings,
+): List<Nafilah> {
+    val name = s.prayerNames[prayer.ordinal]
+    return when (prayer) {
+        Prayer.FAJR -> listOf(Nafilah(s.sunnahOf(name), s.rakah(2), s.before))
         Prayer.DHUHR ->
             listOf(
-                Nafilah("Sunnah of Ẓuhr", "4 rakʿah", "before"),
-                Nafilah("Sunnah of Ẓuhr", "2 rakʿah", "after"),
+                Nafilah(s.sunnahOf(name), s.rakah(4), s.before),
+                Nafilah(s.sunnahOf(name), s.rakah(2), s.after),
             )
-        Prayer.ASR -> listOf(Nafilah("Nafl before ʿAṣr", "4 rakʿah", "before, not confirmed"))
-        Prayer.MAGHRIB -> listOf(Nafilah("Sunnah of Maghrib", "2 rakʿah", "after"))
-        Prayer.ISHA -> listOf(Nafilah("Sunnah of ʿIshāʾ", "2 rakʿah", "after"))
+        Prayer.ASR -> listOf(Nafilah(s.naflBeforeAsr, s.rakah(4), s.beforeNotConfirmed))
+        Prayer.MAGHRIB -> listOf(Nafilah(s.sunnahOf(name), s.rakah(2), s.after))
+        Prayer.ISHA -> listOf(Nafilah(s.sunnahOf(name), s.rakah(2), s.after))
         Prayer.SUNRISE -> emptyList()
     }
+}
 
-private fun twelverNawafilDifferingInCountAndPlacement(prayer: Prayer): List<Nafilah> =
-    when (prayer) {
-        Prayer.FAJR -> listOf(Nafilah("Nāfilah of Fajr", "2 rakʿah", "before"))
-        Prayer.DHUHR -> listOf(Nafilah("Nāfilah of Ẓuhr", "8 rakʿah", "before"))
-        Prayer.ASR -> listOf(Nafilah("Nāfilah of ʿAṣr", "8 rakʿah", "before"))
-        Prayer.MAGHRIB -> listOf(Nafilah("Nāfilah of Maghrib", "4 rakʿah", "after"))
-        Prayer.ISHA -> listOf(Nafilah("Wutayrah", "2 rakʿah seated", "after"))
+@Suppress("MagicNumber")
+private fun twelverNawafilDifferingInCountAndPlacement(
+    prayer: Prayer,
+    s: Strings,
+): List<Nafilah> {
+    val name = s.prayerNames[prayer.ordinal]
+    return when (prayer) {
+        Prayer.FAJR -> listOf(Nafilah(s.nafilahOf(name), s.rakah(2), s.before))
+        Prayer.DHUHR -> listOf(Nafilah(s.nafilahOf(name), s.rakah(8), s.before))
+        Prayer.ASR -> listOf(Nafilah(s.nafilahOf(name), s.rakah(8), s.before))
+        Prayer.MAGHRIB -> listOf(Nafilah(s.nafilahOf(name), s.rakah(4), s.after))
+        Prayer.ISHA -> listOf(Nafilah(s.wutayrah, "${s.rakah(2)} ${s.seated}", s.after))
         Prayer.SUNRISE -> emptyList()
     }
+}
 
 private fun duasFor(prayer: Prayer): List<NamedDua> =
     when (prayer) {

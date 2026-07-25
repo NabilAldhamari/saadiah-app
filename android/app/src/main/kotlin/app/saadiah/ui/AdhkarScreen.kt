@@ -63,13 +63,9 @@ fun AdhkarScreen(tradition: Tradition) {
         }
         if (entries.isEmpty()) {
             SectionDivider()
-            Body("Coming in a future update")
+            Body(strings.comingSoon)
             Spacer(Modifier.height(SaadiahSpacing.small))
-            Caption(
-                "Adhkār for this tradition are not bundled yet. They will be added once a " +
-                    "verified, openly licensed collection is available. Another tradition's " +
-                    "compilation is not shown here in its place.",
-            )
+            Caption(strings.adhkarNotBundled)
             Spacer(Modifier.height(SaadiahSpacing.huge))
             return@Column
         }
@@ -85,7 +81,7 @@ fun AdhkarScreen(tradition: Tradition) {
             onIncrement = { if (count < dhikr.repetitions) count++ },
             modifier = Modifier.fillMaxWidth().minimumTouchTarget(),
         )
-        Caption("Tap the ring to count", size = SaadiahType.bodySmall.size)
+        Caption(strings.adhkarTapRing, size = SaadiahType.bodySmall.size)
         Spacer(Modifier.height(SaadiahSpacing.medium))
         Steps(
             atStart = index == 0,
@@ -184,14 +180,15 @@ private fun Steps(
     onNext: () -> Unit,
 ) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Pill("Previous", selected = false, modifier = Modifier.weight(1f)) { if (!atStart) onBack() }
+        Pill(strings.adhkarPrevious, selected = false, modifier = Modifier.weight(1f)) { if (!atStart) onBack() }
         Spacer(Modifier.height(SaadiahSpacing.small))
-        Pill("Next", selected = false, modifier = Modifier.weight(1f)) { if (!atEnd) onNext() }
+        Pill(strings.adhkarNext, selected = false, modifier = Modifier.weight(1f)) { if (!atEnd) onNext() }
     }
 }
 
+@Composable
 private fun DhikrCollection.spelledOut(): String =
     when (this) {
-        DhikrCollection.MORNING -> "Morning"
-        DhikrCollection.EVENING -> "Evening"
+        DhikrCollection.MORNING -> strings.adhkarMorning
+        DhikrCollection.EVENING -> strings.adhkarEvening
     }

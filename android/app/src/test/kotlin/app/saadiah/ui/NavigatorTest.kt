@@ -98,21 +98,4 @@ class NavigatorTest {
 
         assertFalse(navigator.current.isTabRoot, "a pushed screen shows a back button, not the tabs")
     }
-
-    @Test
-    fun everyPushedScreenHasATitleForItsHeader() {
-        val pushed =
-            listOf(
-                Screen.PickingCity,
-                Screen.Doctor,
-                Screen.Ask,
-                Screen.WhyThisTime,
-                Screen.Baqarah,
-                Screen.PrayerDetail(Prayer.ASR),
-            )
-
-        for (screen in pushed) {
-            assertTrue(screen.title.isNotBlank(), "$screen has no header title")
-        }
-    }
 }

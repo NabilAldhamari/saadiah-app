@@ -78,14 +78,14 @@ private fun Actions(
     Spacer(Modifier.height(SaadiahSpacing.medium))
     LabelledIconButton(
         icon = painterResource(R.drawable.ic_info),
-        label = "Match my masjid",
+        label = strings.matchMyMasjid,
         onClick = onMatchMasjid,
         modifier = Modifier.fillMaxWidth(),
     )
     Spacer(Modifier.height(SaadiahSpacing.snug))
     LabelledIconButton(
         icon = painterResource(R.drawable.ic_today),
-        label = "Back to today",
+        label = strings.back,
         onClick = onBack,
         modifier = Modifier.fillMaxWidth(),
     )

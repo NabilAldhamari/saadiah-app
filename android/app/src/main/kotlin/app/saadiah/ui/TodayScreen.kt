@@ -51,7 +51,8 @@ fun TodayScreen(
     actions: TodayActions,
 ) {
     val now = rememberTickingNow()
-    val state = remember(city, profile, tradition, now) { todayState(city, profile, tradition, now) }
+    val words = strings
+    val state = remember(city, profile, tradition, now, words) { todayState(city, profile, tradition, now, words) }
     val colors = SaadiahTheme.colors
 
     Column(
@@ -141,12 +142,12 @@ private fun BaqarahStrip(onOpen: () -> Unit) {
                 .padding(vertical = SaadiahSpacing.snug),
     ) {
         Text(
-            text = "سورة البقرة — Sūrat al-Baqarah",
+            text = strings.todaysReading,
             color = colors.text,
             fontSize = SaadiahType.body.size,
             lineHeight = SaadiahType.body.lineHeight,
         )
-        Caption("Today's reading. Tap to read why it is kept up.")
+        Caption(strings.todaysReadingHint)
     }
 }
 
@@ -154,7 +155,7 @@ private fun BaqarahStrip(onOpen: () -> Unit) {
 private fun FastingStrip(prompts: List<FastingPrompt>) {
     if (prompts.isEmpty()) return
     SectionDivider()
-    Caption("Fasting ahead")
+    Caption(strings.fastingAhead)
     for (prompt in prompts) {
         ObservanceRow(
             title = prompt.title,

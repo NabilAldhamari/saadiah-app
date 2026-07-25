@@ -44,7 +44,7 @@ fun DoctorScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.large),
         ) {
-            ScreenHeader(title = "Will my alerts arrive?", onBack = onBack)
+            ScreenHeader(title = strings.alertsArriveQuestion, onBack = onBack)
             Checks(context)
             Spacer(Modifier.height(SaadiahSpacing.large))
             Guidance(onOpenSettings = onOpenSettings)
@@ -56,8 +56,8 @@ fun DoctorScreen(
 
 @Composable
 private fun Checks(context: Context) {
-    CheckRow(label = "Notifications allowed", passing = canPostNotifications(context))
-    CheckRow(label = "Exact alarms allowed", passing = canScheduleExactAlarms(context))
+    CheckRow(label = strings.notificationsAllowed, passing = canPostNotifications(context))
+    CheckRow(label = strings.exactAlarmsAllowed, passing = canScheduleExactAlarms(context))
 }
 
 @Composable
@@ -72,7 +72,7 @@ private fun CheckRow(
                 .heightIn(min = MinimumTapTarget)
                 .padding(vertical = SaadiahSpacing.medium / 2),
     ) {
-        Body(if (passing) "$label — yes" else "$label — no")
+        Body(if (passing) "$label — ${strings.yes}" else "$label — ${strings.no}")
         HorizontalDivider()
     }
 }
@@ -81,24 +81,19 @@ private fun CheckRow(
 private fun Guidance(onOpenSettings: () -> Unit) {
     val restrictive = isKnownRestrictive(Build.MANUFACTURER)
     Caption(
-        if (restrictive) {
-            "${Build.MANUFACTURER} phones stop background apps by default, which can hold prayer " +
-                "alerts back. Open the settings screen and allow Saadiah to run."
-        } else {
-            "If an alert ever arrives late, allow Saadiah to run in the background."
-        },
+        if (restrictive) strings.backgroundAdviceRestrictive(Build.MANUFACTURER) else strings.backgroundAdviceGeneric,
     )
     TextButton(onClick = onOpenSettings, modifier = Modifier.heightIn(min = MinimumTapTarget)) {
-        Text(text = "Open background settings", fontSize = SaadiahType.body.size)
+        Text(text = strings.openBackgroundSettings, fontSize = SaadiahType.body.size)
     }
 }
 
 @Composable
 private fun DeliveryHistory(records: List<DeliveryRecord>) {
-    Caption("Recent alerts")
+    Caption(strings.recentAlerts)
     Spacer(Modifier.height(SaadiahSpacing.medium / 2))
     if (records.isEmpty()) {
-        Body("No alert has arrived yet. Once one does, its timing is recorded here.")
+        Body(strings.noAlertYet)
         return
     }
     for (record in records) {

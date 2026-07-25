@@ -32,6 +32,7 @@ fun whyThisTimeState(
     city: City,
     profile: TimingProfile,
     date: LocalDate,
+    strings: Strings,
 ): WhyThisTimeState {
     val calculator = PrayerCalculator()
     val timings = calculator.compute(city, date, profile)
@@ -44,12 +45,15 @@ fun whyThisTimeState(
         subtitle = "ʿAṣr today in ${city.name}",
         entries =
             listOf(
-                WhyEntry("Fajr / ʿIshāʾ angle", "${profile.angles.fajr}° / ${profile.angles.isha}°"),
-                WhyEntry("ʿAṣr madhhab", profile.madhab.shortName(), isChangeable = true),
-                WhyEntry("High latitude", profile.highLatitudeRule.spelledOut()),
-                WhyEntry("Your tuning", if (profile.adjustments.isEmpty()) "none" else "set"),
+                WhyEntry(strings.whyAngle, "${profile.angles.fajr}° / ${profile.angles.isha}°"),
+                WhyEntry(strings.whyMadhab, profile.madhab.shortName(strings), isChangeable = true),
+                WhyEntry(strings.whyHighLatitude, profile.highLatitudeRule.spelledOut(strings)),
+                WhyEntry(
+                    strings.whyYourTuning,
+                    if (profile.adjustments.isEmpty()) strings.tuningNone else strings.tuningSet,
+                ),
             ),
-        alternative = alternativeSentence(other, otherAsr.asClockTime(city.timeZone), otherAsr - asr),
+        alternative = alternativeSentence(other, otherAsr.asClockTime(city.timeZone), otherAsr - asr, strings),
     )
 }
 
@@ -57,30 +61,29 @@ private fun alternativeSentence(
     other: Madhab,
     time: String,
     difference: kotlin.time.Duration,
+    strings: Strings,
 ): String {
     val minutes = abs(difference.inWholeMinutes)
-    val direction = if (difference.isNegative()) "earlier" else "later"
-    return "The ${other.shortName()} calculation would put ʿAṣr at $time — " +
-        "${minutes.spelledOutMinutes()} $direction. If that matches your masjid, switch the madhhab."
+    return strings.alternativeAsr(
+        madhab = other.shortName(strings),
+        time = time,
+        difference = minutes.spelledOutMinutes(strings),
+        earlier = difference.isNegative(),
+    )
 }
 
-private fun Long.spelledOutMinutes(): String {
-    if (this < MINUTES_PER_HOUR) return "$this ${if (this == 1L) "minute" else "minutes"}"
-    val hours = this / MINUTES_PER_HOUR
-    val minutes = this % MINUTES_PER_HOUR
-    val hourPart = "$hours ${if (hours == 1L) "hour" else "hours"}"
-    return if (minutes == 0L) hourPart else "$hourPart $minutes ${if (minutes == 1L) "minute" else "minutes"}"
-}
+private fun Long.spelledOutMinutes(strings: Strings): String =
+    strings.hoursAndMinutes(this / MINUTES_PER_HOUR, this % MINUTES_PER_HOUR)
 
-private fun Madhab.shortName(): String =
+private fun Madhab.shortName(strings: Strings): String =
     when (this) {
-        Madhab.SHAFI -> "Standard"
-        Madhab.HANAFI -> "Ḥanafī"
+        Madhab.SHAFI -> strings.madhabShortStandard
+        Madhab.HANAFI -> strings.madhabShortHanafi
     }
 
-private fun HighLatitudeRule.spelledOut(): String =
+private fun HighLatitudeRule.spelledOut(strings: Strings): String =
     when (this) {
-        HighLatitudeRule.MIDDLE_OF_NIGHT -> "Middle of the night"
-        HighLatitudeRule.SEVENTH_OF_NIGHT -> "One seventh of the night"
-        HighLatitudeRule.TWILIGHT_ANGLE -> "Twilight angle"
+        HighLatitudeRule.MIDDLE_OF_NIGHT -> strings.middleOfNight
+        HighLatitudeRule.SEVENTH_OF_NIGHT -> strings.seventhOfNight
+        HighLatitudeRule.TWILIGHT_ANGLE -> strings.twilightAngle
     }

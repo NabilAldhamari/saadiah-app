@@ -86,7 +86,7 @@ private fun TabRoot(
     actions: AppActions,
 ) {
     when (navigator.current) {
-        Screen.Calendar -> CalendarScreen(state = thisMonth(city, tradition))
+        Screen.Calendar -> CalendarScreen(state = thisMonth(city, tradition, strings))
         Screen.Adhkar -> AdhkarScreen(tradition = tradition)
         Screen.More ->
             SettingsScreen(
@@ -138,7 +138,7 @@ private fun PushedScreen(
             )
         Screen.WhyThisTime ->
             WhyThisTimeScreen(
-                state = whyThisTimeState(place.city, place.profile, today(place.city)),
+                state = whyThisTimeState(place.city, place.profile, today(place.city), strings),
                 onMatchMasjid = { navigator.go(Screen.Doctor) },
                 onBack = back,
             )
@@ -162,7 +162,7 @@ private fun PrayerDetail(
     val city = place.city
     val timings = PrayerCalculator().compute(city, today(city), place.profile)
     PrayerDetailScreen(
-        detail = prayerDetail(prayer, timings[prayer].asClockTime(city.timeZone), place.tradition),
+        detail = prayerDetail(prayer, timings[prayer].asClockTime(city.timeZone), place.tradition, strings),
         onBack = onBack,
     )
 }
@@ -171,16 +171,16 @@ private fun PrayerDetail(
 private fun tabsFor(navigator: Navigator): List<Tab> {
     val current = navigator.current
     return listOf(
-        Tab("Today", painterResource(R.drawable.ic_today), current == Screen.Today) {
+        Tab(strings.tabToday, painterResource(R.drawable.ic_today), current == Screen.Today) {
             navigator.switchTab(Screen.Today)
         },
-        Tab("Calendar", painterResource(R.drawable.ic_calendar), current == Screen.Calendar) {
+        Tab(strings.tabCalendar, painterResource(R.drawable.ic_calendar), current == Screen.Calendar) {
             navigator.switchTab(Screen.Calendar)
         },
-        Tab("Adhkār", painterResource(R.drawable.ic_adhkar), current == Screen.Adhkar) {
+        Tab(strings.tabAdhkar, painterResource(R.drawable.ic_adhkar), current == Screen.Adhkar) {
             navigator.switchTab(Screen.Adhkar)
         },
-        Tab("More", painterResource(R.drawable.ic_more), current == Screen.More) {
+        Tab(strings.tabMore, painterResource(R.drawable.ic_more), current == Screen.More) {
             navigator.switchTab(Screen.More)
         },
     )
@@ -189,9 +189,10 @@ private fun tabsFor(navigator: Navigator): List<Tab> {
 private fun thisMonth(
     city: City,
     tradition: Tradition,
+    strings: Strings,
 ): CalendarState {
     val hijri = todayHijri(today(city))
-    return calendarState(year = hijri.year, month = hijri.month, tradition = tradition)
+    return calendarState(year = hijri.year, month = hijri.month, tradition = tradition, strings = strings)
 }
 
 private fun today(city: City): LocalDate =
