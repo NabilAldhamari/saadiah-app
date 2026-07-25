@@ -325,4 +325,5 @@ object ArabicStrings : Strings {
     override val remove = "حذف"
     override val noCustomAdhkar = "لم تُضف شيئًا بعد. ما تضيفه هنا يُحفظ على هذا الجهاز."
     override val timesLabel = "عدد المرات"
+    override val bundledAdhkar = "أذكار الصباح والمساء"
 }

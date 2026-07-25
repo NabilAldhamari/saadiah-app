@@ -2,6 +2,7 @@ package app.saadiah.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import app.saadiah.content.Dhikr
@@ -54,6 +56,9 @@ fun AdhkarScreen(
     var collection by rememberSaveable { mutableStateOf(DhikrCollection.MORNING) }
     var index by rememberSaveable(collection) { mutableIntStateOf(0) }
     var count by rememberSaveable(collection, index) { mutableIntStateOf(0) }
+    // Held here rather than inside the section, because a tap anywhere else on the screen
+    // has to be able to close the form, and only this level sees those taps.
+    var drafting by rememberSaveable { mutableStateOf(false) }
 
     val entries = remember(collection, tradition) { adhkar(collection, tradition) }
     val colors = SaadiahTheme.colors
@@ -64,11 +69,26 @@ fun AdhkarScreen(
                 .fillMaxSize()
                 .background(colors.bg)
                 .verticalScroll(rememberScrollState())
+                .pointerInput(drafting) { detectTapGestures { drafting = false } }
                 .padding(horizontal = SaadiahSpacing.screen)
                 .padding(top = SaadiahSpacing.screen),
     ) {
-        MyAdhkar(custom, onChangeCustom)
+        MyAdhkar(
+            custom = custom,
+            drafting = drafting,
+            onDrafting = { drafting = it },
+            onChange = onChangeCustom,
+        )
+
+        Spacer(Modifier.height(SaadiahSpacing.large))
         SectionDivider()
+        Text(
+            text = strings.bundledAdhkar,
+            color = colors.text,
+            fontSize = SaadiahType.titleMedium.size,
+            lineHeight = SaadiahType.titleMedium.lineHeight,
+        )
+        Spacer(Modifier.height(SaadiahSpacing.small))
         SetSwitch(collection) {
             collection = it
         }
@@ -207,36 +227,48 @@ private fun DhikrCollection.spelledOut(): String =
 @Composable
 private fun MyAdhkar(
     custom: List<CustomDhikr>,
+    drafting: Boolean,
+    onDrafting: (Boolean) -> Unit,
     onChange: (List<CustomDhikr>) -> Unit,
 ) {
-    // Above the bundled sets, and visibly the reader's own: these carry no source line
-    // because their author is the reader. Mixing them into the narrated list would blur who
-    // said what, which is the distinction the source line exists to keep.
+    // Above the bundled sets and set on its own surface, because these are the reader's own
+    // words. They carry no source line, and mixing them into the narrated list would blur
+    // who said what — which is the distinction the source line exists to keep.
     val colors = SaadiahTheme.colors
-    var drafting by rememberSaveable { mutableStateOf(false) }
-
-    Text(
-        text = strings.myAdhkar,
-        color = colors.text,
-        fontSize = SaadiahType.titleMedium.size,
-        lineHeight = SaadiahType.titleMedium.lineHeight,
-    )
-    if (custom.isEmpty() && !drafting) {
-        Caption(strings.noCustomAdhkar)
-    }
-    for (dhikr in custom) {
-        CustomRow(dhikr) { onChange(custom - dhikr) }
-    }
-    if (drafting) {
-        DhikrDraft(
-            onCancel = { drafting = false },
-            onSave = { text, repetitions ->
-                onChange(custom + CustomDhikr(id = nextId(custom), text = text, repetitions = repetitions))
-                drafting = false
-            },
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(colors.surface, RoundedCornerShape(SaadiahRadius.sheet))
+                // Swallows taps so the screen's dismiss handler does not fire on them: a tap
+                // inside the section is not a tap outside it.
+                .pointerInput(Unit) { detectTapGestures { } }
+                .padding(SaadiahSpacing.medium),
+    ) {
+        Text(
+            text = strings.myAdhkar,
+            color = colors.text,
+            fontSize = SaadiahType.titleMedium.size,
+            lineHeight = SaadiahType.titleMedium.lineHeight,
         )
-    } else {
-        Pill(strings.addDhikr, selected = false, modifier = Modifier.fillMaxWidth()) { drafting = true }
+        if (custom.isEmpty() && !drafting) {
+            Caption(strings.noCustomAdhkar)
+        }
+        for (dhikr in custom) {
+            CustomRow(dhikr) { onChange(custom - dhikr) }
+        }
+        Spacer(Modifier.height(SaadiahSpacing.small))
+        if (drafting) {
+            DhikrDraft(
+                onCancel = { onDrafting(false) },
+                onSave = { text, repetitions ->
+                    onChange(custom + CustomDhikr(id = nextId(custom), text = text, repetitions = repetitions))
+                    onDrafting(false)
+                },
+            )
+        } else {
+            Pill(strings.addDhikr, selected = false, modifier = Modifier.fillMaxWidth()) { onDrafting(true) }
+        }
     }
 }
 
@@ -249,12 +281,18 @@ private fun CustomRow(
     onRemove: () -> Unit,
 ) {
     val colors = SaadiahTheme.colors
+    SectionDivider()
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = SaadiahSpacing.small),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = dhikr.text, color = colors.text, fontSize = SaadiahType.body.size)
+            Text(
+                text = dhikr.text,
+                color = colors.text,
+                fontSize = SaadiahType.quran.size,
+                lineHeight = SaadiahType.quran.lineHeight,
+            )
             Caption("${strings.timesLabel}: ${dhikr.repetitions}")
         }
         Text(

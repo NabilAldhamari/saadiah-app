@@ -276,6 +276,7 @@ interface Strings {
     val remove: String
     val noCustomAdhkar: String
     val timesLabel: String
+    val bundledAdhkar: String
 }
 
 val LocalStrings: ProvidableCompositionLocal<Strings> = staticCompositionLocalOf { EnglishStrings }

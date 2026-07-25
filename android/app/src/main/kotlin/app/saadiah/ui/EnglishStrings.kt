@@ -321,4 +321,5 @@ object EnglishStrings : Strings {
     override val remove = "Remove"
     override val noCustomAdhkar = "Nothing added yet. What you add here is kept on this device."
     override val timesLabel = "Times"
+    override val bundledAdhkar = "Morning and evening"
 }
