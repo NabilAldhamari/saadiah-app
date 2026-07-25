@@ -1,0 +1,27 @@
+Saadiah is free software, licensed under the GNU Affero General Public
+License version 3, with the additional permission set out below.
+
+ADDITIONAL PERMISSION UNDER AGPL-3.0 SECTION 7
+
+    As an additional permission under section 7, you are allowed to
+    distribute this software through an app store, even if that store has
+    restrictive terms and conditions that are incompatible with the AGPL,
+    provided that the source is also available under the AGPL, with or
+    without this permission, through a channel without those restrictive
+    terms and conditions.
+
+This permission exists because the App Store terms of service impose usage
+restrictions that the AGPL forbids a distributor from adding. Without it,
+Saadiah could not lawfully be published there. Distribution through
+F-Droid and from the project's own release page is, and will remain,
+free of any such restriction.
+
+---
+
+The full text of the GNU Affero General Public License version 3 must be
+appended below this notice. Fetch it once with:
+
+    curl -o /tmp/agpl.txt https://www.gnu.org/licenses/agpl-3.0.txt
+    cat /tmp/agpl.txt >> COPYING
+
+It is omitted here only to keep this scaffold small. Do not ship without it.

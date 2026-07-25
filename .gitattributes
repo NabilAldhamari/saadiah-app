@@ -1,0 +1,12 @@
+* text=auto eol=lf
+
+*.jar binary
+*.png binary
+*.webp binary
+*.ttf binary
+*.otf binary
+*.db binary
+*.bin binary
+
+core/content/src/commonMain/resources/** binary linguist-generated
+gradle/wrapper/gradle-wrapper.jar binary
