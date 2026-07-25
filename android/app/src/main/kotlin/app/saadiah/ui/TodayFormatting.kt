@@ -39,33 +39,11 @@ val Prayer.arabicName: String
             Prayer.ISHA -> "العشاء"
         }
 
-val Prayer.englishName: String
-    get() =
-        when (this) {
-            Prayer.FAJR -> "Fajr"
-            Prayer.SUNRISE -> "Sunrise"
-            Prayer.DHUHR -> "Dhuhr"
-            Prayer.ASR -> "Asr"
-            Prayer.MAGHRIB -> "Maghrib"
-            Prayer.ISHA -> "Isha"
-        }
+fun Prayer.latinName(strings: Strings): String = strings.prayerNames[ordinal]
 
-val Observance.label: String
-    get() =
-        when (this) {
-            Observance.RAMADAN -> "Ramadan — fasting"
-            Observance.EID_AL_FITR -> "Eid al-Fitr"
-            Observance.EID_AL_ADHA -> "Eid al-Adha"
-            Observance.TASHRIQ -> "Days of Tashriq — do not fast"
-            Observance.ARAFAH -> "Day of Arafah — fasting recommended"
-            Observance.TASUA -> "Tasu'a — fasting recommended"
-            Observance.ASHURA -> "Ashura — fasting recommended"
-            Observance.AYYAM_AL_BID -> "White days — fasting recommended"
-            Observance.SIX_OF_SHAWWAL -> "Six of Shawwal — fasting recommended"
-            Observance.HIJAMA -> "Cupping day"
-        }
+fun Observance.label(strings: Strings): String = strings.observanceLabels.getValue(name)
 
-fun HijriDate.arabicLabel(): String = "$day ${HIJRI_MONTHS[month - 1]} $year هـ"
+fun HijriDate.arabicLabel(strings: Strings): String = "$day ${strings.hijriMonths[month - 1]} $year هـ"
 
 fun Instant.asClockTime(zone: TimeZone): String {
     val local = toLocalDateTime(zone)
@@ -76,21 +54,11 @@ fun Instant.asClockTime(zone: TimeZone): String {
 }
 
 /** Durations are spelled out in full; "2h 14m" is not readable at arm's length. */
-fun Duration.spelledOut(): String {
+fun Duration.spelledOut(strings: Strings): String {
     val total = inWholeMinutes
-    if (total <= 0L) return "now"
-    val hours = total / MINUTES_PER_HOUR
-    val minutes = total % MINUTES_PER_HOUR
-    return listOfNotNull(
-        hours.takeIf { it > 0L }?.let { "$it ${plural(it, "hour")}" },
-        minutes.takeIf { it > 0L }?.let { "$it ${plural(it, "minute")}" },
-    ).joinToString(separator = " ")
+    if (total <= 0L) return strings.now
+    return strings.hoursAndMinutes(total / MINUTES_PER_HOUR, total % MINUTES_PER_HOUR)
 }
-
-private fun plural(
-    value: Long,
-    word: String,
-): String = if (value == 1L) word else "${word}s"
 
 internal val WEEKDAYS =
     listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
@@ -112,12 +80,13 @@ internal val MONTHS =
     )
 
 /** "Thursday 24 July" — the day of the week is spelled out, never abbreviated. */
-fun LocalDate.spelledOut(): String = "${WEEKDAYS[dayOfWeek.ordinal]} $dayOfMonth ${MONTHS[monthNumber - 1]}"
+fun LocalDate.spelledOut(strings: Strings): String =
+    "${strings.weekdays[dayOfWeek.ordinal]} $dayOfMonth ${strings.gregorianMonths[monthNumber - 1]}"
 
-fun LocalDate.shortWeekday(): String = WEEKDAYS[dayOfWeek.ordinal].take(n = 3)
+fun LocalDate.shortWeekday(strings: Strings): String = strings.weekdays[dayOfWeek.ordinal].take(n = 3)
 
-fun LocalDate.dayAndMonth(): String = "$dayOfMonth ${MONTHS[monthNumber - 1]}"
+fun LocalDate.dayAndMonth(strings: Strings): String = "$dayOfMonth ${strings.gregorianMonths[monthNumber - 1]}"
 
-fun LocalDate.monthName(): String = MONTHS[monthNumber - 1]
+fun LocalDate.monthName(strings: Strings): String = strings.gregorianMonths[monthNumber - 1]
 
-fun HijriDate.monthLabel(): String = "${HIJRI_MONTHS[month - 1]} $year"
+fun HijriDate.monthLabel(strings: Strings): String = "${strings.hijriMonths[month - 1]} $year"

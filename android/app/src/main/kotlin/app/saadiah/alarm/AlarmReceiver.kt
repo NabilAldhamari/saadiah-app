@@ -7,10 +7,15 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import app.saadiah.R
+import app.saadiah.data.SettingsStore
 import app.saadiah.doctor.DeliveryLog
 import app.saadiah.model.AlarmKind
 import app.saadiah.model.Prayer
+import app.saadiah.ui.Strings
 import app.saadiah.ui.spelledOut
+import app.saadiah.ui.stringsFor
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
@@ -54,9 +59,11 @@ class AlarmReceiver : BroadcastReceiver() {
         val kind = intent.getStringExtra(EXTRA_KIND)?.let(AlarmKind::valueOf) ?: AlarmKind.AT_TIME
         val prayer = intent.getStringExtra(EXTRA_PRAYER)?.let(Prayer::valueOf)
         val lead = intent.getLongExtra(EXTRA_LEAD_MINUTES, 0L).minutes
+        // An alert in a language the reader did not choose is no use to them.
+        val words = stringsFor(runBlocking { SettingsStore(context).settings.first() }.language)
 
         if (prayer != null) {
-            wordingFor(kind, prayer, lead)?.let { announce(context, prayer, it) }
+            wordingFor(kind, prayer, lead, words)?.let { announce(context, prayer, it) }
         }
         if (kind == AlarmKind.AT_TIME && prayer != null) {
             recordDelivery(context, prayer, intent.getLongExtra(EXTRA_EXPECTED_AT, 0L))
@@ -68,12 +75,17 @@ class AlarmReceiver : BroadcastReceiver() {
         kind: AlarmKind,
         prayer: Prayer,
         lead: Duration,
+        words: Strings,
     ): String? =
         // A re-arm says nothing: it exists only to keep the horizon alive.
         when (kind) {
-            AlarmKind.AT_TIME -> "It is time for this prayer."
-            AlarmKind.PRE_ALERT -> "${prayer.plainName} begins in ${lead.spelledOut()}."
-            AlarmKind.END_OF_WINDOW -> "The time for ${prayer.plainName} ends in ${lead.spelledOut()}."
+            AlarmKind.AT_TIME -> words.itIsTimeForThisPrayer
+            AlarmKind.PRE_ALERT -> words.prayerBeginsIn(words.prayerNames[prayer.ordinal], lead.spelledOut(words))
+            AlarmKind.END_OF_WINDOW ->
+                words.prayerWindowEndsIn(
+                    words.prayerNames[prayer.ordinal],
+                    lead.spelledOut(words),
+                )
             AlarmKind.RE_ARM -> null
         }
 
@@ -98,7 +110,7 @@ class AlarmReceiver : BroadcastReceiver() {
         wording: String,
     ) {
         if (!canPostNotifications(context)) return
-        ensurePrayerChannel(context)
+        ensureChannels(context)
         val notification =
             NotificationCompat
                 .Builder(context, PRAYER_CHANNEL_ID)
@@ -107,6 +119,7 @@ class AlarmReceiver : BroadcastReceiver() {
                 .setContentText(wording)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setContentIntent(openAppIntent(context))
                 .setAutoCancel(true)
                 .build()
         NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, notification)

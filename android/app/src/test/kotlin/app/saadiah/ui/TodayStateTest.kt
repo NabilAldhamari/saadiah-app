@@ -38,7 +38,7 @@ class TodayStateTest {
     private fun stateAt(
         now: Instant,
         withProfile: app.saadiah.model.TimingProfile = profile,
-    ) = todayState(CAIRO, withProfile, Tradition.SUNNI, now)
+    ) = todayState(CAIRO, withProfile, Tradition.SUNNI, now, EnglishStrings)
 
     @Test
     fun beforeFajrTheNextPrayerIsFajr() {
@@ -135,7 +135,7 @@ class TodayStateTest {
     @Test
     fun combiningNeverDependsOnTradition() {
         for (tradition in Tradition.entries) {
-            val rows = todayState(CAIRO, combined, tradition, timings[Prayer.FAJR]).rows
+            val rows = todayState(CAIRO, combined, tradition, timings[Prayer.FAJR], EnglishStrings).rows
 
             assertEquals(expected = 3, actual = rows.size, message = "$tradition")
         }

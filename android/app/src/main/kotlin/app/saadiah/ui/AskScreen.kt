@@ -63,11 +63,11 @@ fun AskScreen(
             value = question,
             onValueChange = { question = it },
             enabled = false,
-            label = { Text("Ask a question", fontSize = SaadiahType.body.size) },
+            label = { Text(strings.askAQuestion, fontSize = SaadiahType.body.size) },
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(Modifier.height(SaadiahSpacing.snug))
-        Body("Answering is not connected yet. Nothing you type leaves this device.")
+        Body(strings.askNotConnected)
         BackAction(onBack)
     }
 }
@@ -77,7 +77,7 @@ private fun BackAction(onBack: () -> Unit) {
     Spacer(Modifier.height(SaadiahSpacing.medium))
     LabelledIconButton(
         icon = painterResource(R.drawable.ic_today),
-        label = "Back to today",
+        label = strings.back,
         onClick = onBack,
         modifier = Modifier.fillMaxWidth(),
     )
@@ -89,14 +89,10 @@ private fun Disclaimer(tradition: Tradition) {
     val colors = SaadiahTheme.colors
     val school =
         when (tradition) {
-            Tradition.SUNNI -> "Sunni"
-            Tradition.TWELVER -> "Twelver"
+            Tradition.SUNNI -> strings.traditionSunni
+            Tradition.TWELVER -> strings.traditionTwelver
         }
-    val body =
-        "Answers are generated, not verified, and they can be confidently mistaken. " +
-            "They follow the $school school you have selected, so changing that setting " +
-            "changes the answer. Nothing here is a fatwa. For anything that matters, ask " +
-            "someone qualified."
+    val body = strings.askDisclaimerFor(school)
     Column(
         modifier =
             Modifier
@@ -105,7 +101,7 @@ private fun Disclaimer(tradition: Tradition) {
                 .padding(SaadiahSpacing.medium),
     ) {
         Text(
-            text = "An answer here may be wrong.",
+            text = strings.askDisclaimerTitle,
             color = colors.warning,
             fontSize = SaadiahType.body.size,
             lineHeight = SaadiahType.body.lineHeight,

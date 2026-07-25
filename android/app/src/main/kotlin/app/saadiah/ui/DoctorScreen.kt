@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import app.saadiah.alarm.canPostNotifications
 import app.saadiah.design.MinimumTapTarget
 import app.saadiah.design.SaadiahSpacing
@@ -45,29 +44,20 @@ fun DoctorScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.large),
         ) {
-            Text(
-                text = "Will my alerts arrive?",
-                fontSize = SaadiahType.titleLarge.size,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
-            )
-            Spacer(Modifier.height(SaadiahSpacing.medium))
+            ScreenHeader(title = strings.alertsArriveQuestion, onBack = onBack)
             Checks(context)
             Spacer(Modifier.height(SaadiahSpacing.large))
             Guidance(onOpenSettings = onOpenSettings)
             Spacer(Modifier.height(SaadiahSpacing.large))
             DeliveryHistory(records)
-            TextButton(onClick = onBack, modifier = Modifier.heightIn(min = MinimumTapTarget)) {
-                Text(text = "Back to today", fontSize = SaadiahType.body.size)
-            }
         }
     }
 }
 
 @Composable
 private fun Checks(context: Context) {
-    CheckRow(label = "Notifications allowed", passing = canPostNotifications(context))
-    CheckRow(label = "Exact alarms allowed", passing = canScheduleExactAlarms(context))
+    CheckRow(label = strings.notificationsAllowed, passing = canPostNotifications(context))
+    CheckRow(label = strings.exactAlarmsAllowed, passing = canScheduleExactAlarms(context))
 }
 
 @Composable
@@ -82,7 +72,7 @@ private fun CheckRow(
                 .heightIn(min = MinimumTapTarget)
                 .padding(vertical = SaadiahSpacing.medium / 2),
     ) {
-        Body(if (passing) "$label — yes" else "$label — no")
+        Body(if (passing) "$label — ${strings.yes}" else "$label — ${strings.no}")
         HorizontalDivider()
     }
 }
@@ -91,24 +81,19 @@ private fun CheckRow(
 private fun Guidance(onOpenSettings: () -> Unit) {
     val restrictive = isKnownRestrictive(Build.MANUFACTURER)
     Caption(
-        if (restrictive) {
-            "${Build.MANUFACTURER} phones stop background apps by default, which can hold prayer " +
-                "alerts back. Open the settings screen and allow Saadiah to run."
-        } else {
-            "If an alert ever arrives late, allow Saadiah to run in the background."
-        },
+        if (restrictive) strings.backgroundAdviceRestrictive(Build.MANUFACTURER) else strings.backgroundAdviceGeneric,
     )
     TextButton(onClick = onOpenSettings, modifier = Modifier.heightIn(min = MinimumTapTarget)) {
-        Text(text = "Open background settings", fontSize = SaadiahType.body.size)
+        Text(text = strings.openBackgroundSettings, fontSize = SaadiahType.body.size)
     }
 }
 
 @Composable
 private fun DeliveryHistory(records: List<DeliveryRecord>) {
-    Caption("Recent alerts")
+    Caption(strings.recentAlerts)
     Spacer(Modifier.height(SaadiahSpacing.medium / 2))
     if (records.isEmpty()) {
-        Body("No alert has arrived yet. Once one does, its timing is recorded here.")
+        Body(strings.noAlertYet)
         return
     }
     for (record in records) {

@@ -9,26 +9,22 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import app.saadiah.alarm.BaqarahReminderScheduler
 import app.saadiah.alarm.PrayerAlarmScheduler
 import app.saadiah.alarm.canPostNotifications
-import app.saadiah.alarm.ensurePrayerChannel
+import app.saadiah.alarm.ensureChannels
 import app.saadiah.data.Settings
 import app.saadiah.data.SettingsStore
 import app.saadiah.doctor.guidanceIntents
 import app.saadiah.ui.AppActions
-import app.saadiah.ui.CityPickerScreen
 import app.saadiah.ui.DEFAULT_CITY
-import app.saadiah.ui.DoctorScreen
+import app.saadiah.ui.Navigator
 import app.saadiah.ui.SaadiahApp
 import app.saadiah.ui.SaadiahTheme
 import kotlinx.coroutines.launch
-
-private enum class Screen { TODAY, PICKING_CITY, DOCTOR }
 
 class MainActivity : ComponentActivity() {
     private val requestNotifications =
@@ -36,14 +32,15 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ensurePrayerChannel(this)
+        ensureChannels(this)
         askForNotificationsOnce()
 
         val store = SettingsStore(this)
         val alarms = PrayerAlarmScheduler(this)
         alarms.arm()
+        BaqarahReminderScheduler(this).arm()
 
-        setContent { SaadiahTheme { Saadiah(store, alarms) } }
+        setContent { Saadiah(store, alarms) }
     }
 
     @Composable
@@ -52,35 +49,20 @@ class MainActivity : ComponentActivity() {
         alarms: PrayerAlarmScheduler,
     ) {
         val settings by store.settings.collectAsStateWithLifecycle(initialValue = Settings())
-        val city = settings.city ?: DEFAULT_CITY
-        var screen by remember { mutableStateOf(Screen.TODAY) }
+        val navigator = remember { Navigator() }
 
-        when (screen) {
-            Screen.PICKING_CITY ->
-                CityPickerScreen(
-                    selected = city,
-                    onPick = { chosen ->
-                        save(store, alarms) { it.copy(city = chosen) }
-                        screen = Screen.TODAY
-                    },
-                    onCancel = { screen = Screen.TODAY },
-                )
-            Screen.DOCTOR ->
-                DoctorScreen(
-                    onOpenSettings = ::openBackgroundSettings,
-                    onBack = { screen = Screen.TODAY },
-                )
-            Screen.TODAY ->
-                SaadiahApp(
-                    city = city,
-                    settings = settings,
-                    actions =
-                        AppActions(
-                            onChangeSettings = { changed -> save(store, alarms) { changed } },
-                            onChangeCity = { screen = Screen.PICKING_CITY },
-                            onOpenDoctor = { screen = Screen.DOCTOR },
-                        ),
-                )
+        SaadiahTheme(language = settings.language) {
+            SaadiahApp(
+                city = settings.city ?: DEFAULT_CITY,
+                settings = settings,
+                navigator = navigator,
+                actions =
+                    AppActions(
+                        onChangeSettings = { changed -> save(store, alarms) { changed } },
+                        onChangeCity = { chosen -> save(store, alarms) { it.copy(city = chosen) } },
+                        onOpenBackgroundSettings = ::openBackgroundSettings,
+                    ),
+            )
         }
     }
 
@@ -91,6 +73,7 @@ class MainActivity : ComponentActivity() {
     ) {
         lifecycleScope.launch {
             store.update(transform)
+            BaqarahReminderScheduler(this@MainActivity).arm()
             // The madhhab, the combine mode and the city all move the times an alarm was
             // set for, so arming has to follow the write rather than race it.
             alarms.arm()

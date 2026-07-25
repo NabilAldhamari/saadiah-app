@@ -40,6 +40,7 @@ data class TodayActions(
     val onChangeCity: () -> Unit,
     val onOpenDoctor: () -> Unit,
     val onOpenPrayer: (app.saadiah.model.Prayer) -> Unit = {},
+    val onOpenBaqarah: () -> Unit = {},
 )
 
 @Composable
@@ -50,7 +51,8 @@ fun TodayScreen(
     actions: TodayActions,
 ) {
     val now = rememberTickingNow()
-    val state = remember(city, profile, tradition, now) { todayState(city, profile, tradition, now) }
+    val words = strings
+    val state = remember(city, profile, tradition, now, words) { todayState(city, profile, tradition, now, words) }
     val colors = SaadiahTheme.colors
 
     Column(
@@ -76,6 +78,7 @@ fun TodayScreen(
         }
         FastingStrip(state.fasting)
         Observances(state)
+        BaqarahStrip(actions.onOpenBaqarah)
         Spacer(Modifier.height(SaadiahSpacing.large))
     }
 }
@@ -124,10 +127,35 @@ private fun DateHeader(
 }
 
 @Composable
+private fun BaqarahStrip(onOpen: () -> Unit) {
+    // Always present, not driven by the reminder setting: that setting decides whether a
+    // notification arrives, while the daily reading is standing and belongs on the screen
+    // whether or not anyone asked to be nudged.
+    val colors = SaadiahTheme.colors
+    SectionDivider()
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onOpen)
+                .minimumTouchTarget()
+                .padding(vertical = SaadiahSpacing.snug),
+    ) {
+        Text(
+            text = strings.todaysReading,
+            color = colors.text,
+            fontSize = SaadiahType.body.size,
+            lineHeight = SaadiahType.body.lineHeight,
+        )
+        Caption(strings.todaysReadingHint)
+    }
+}
+
+@Composable
 private fun FastingStrip(prompts: List<FastingPrompt>) {
     if (prompts.isEmpty()) return
     SectionDivider()
-    Caption("Fasting ahead")
+    Caption(strings.fastingAhead)
     for (prompt in prompts) {
         ObservanceRow(
             title = prompt.title,

@@ -26,11 +26,12 @@ import app.saadiah.design.SaadiahTheme
 import app.saadiah.design.SaadiahType
 import app.saadiah.design.SectionDivider
 import app.saadiah.design.minimumTouchTarget
+import app.saadiah.model.BaqarahReminder
 import app.saadiah.model.CombineMode
+import app.saadiah.model.Language
 import app.saadiah.model.Madhab
 import app.saadiah.model.Prayer
 import app.saadiah.model.Tradition
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 private val HAIRLINE = 1.dp
@@ -47,15 +48,18 @@ private fun Settings.alertablePrayers(): List<Prayer> =
 private fun Set<Prayer>.toggle(prayer: Prayer): Set<Prayer> = if (prayer in this) this - prayer else this + prayer
 
 /**
- * Tradition and madhhab are presented as a choice with no preselected answer, because a
- * default here would quietly scope a reader's content and their Asr for them.
+ * Grouped into sections a reader can scan. It was one long column of radio rows before,
+ * where the location, the fiqh choices and every alert control ran together with nothing
+ * to tell them apart.
+ *
+ * Tradition and madhhab are still offered with no preselected answer: a default there
+ * would quietly scope a reader's content and their ʿAṣr for them.
  */
 @Composable
 fun SettingsScreen(
     settings: Settings,
     cityName: String,
-    onChange: (Settings) -> Unit,
-    onChangeCity: () -> Unit,
+    actions: SettingsActions,
 ) {
     val colors = SaadiahTheme.colors
     Column(
@@ -68,99 +72,154 @@ fun SettingsScreen(
                 .padding(top = SaadiahSpacing.screen),
     ) {
         Text(
-            text = "Settings",
+            text = strings.titleSettings,
             color = colors.text,
             fontSize = SaadiahType.titleLarge.size,
             lineHeight = SaadiahType.titleLarge.lineHeight,
         )
-        SectionDivider()
 
-        Caption("Location")
-        ChoiceRow(label = cityName, selected = true, onSelect = onChangeCity)
+        Section(strings.sectionLocation) {
+            ChoiceRow(cityName, selected = true, stateWord = strings.change, onSelect = actions.onChangeCity)
+        }
+        LanguageSection(settings, actions.onChange)
+        FiqhSections(settings, actions.onChange)
+        AlertSections(settings, actions.onChange)
+        BaqarahSection(settings, actions)
 
-        Spacer(Modifier.height(SaadiahSpacing.large))
-        Caption("Tradition — scopes which observances and adhkār you are shown")
+        Section(strings.sectionChecks) {
+            ChoiceRow(strings.alertsArriveQuestion, false, strings.open, actions.onOpenDoctor)
+        }
+        Section(strings.sectionAbout) {
+            Body(strings.privacyNote)
+            Spacer(Modifier.height(SaadiahSpacing.small))
+            // CC BY 4.0 requires the credit to be visible to the reader, not only in the repo.
+            Caption(strings.geoNamesCredit)
+        }
+        Spacer(Modifier.height(SaadiahSpacing.huge))
+    }
+}
+
+@Composable
+private fun LanguageSection(
+    settings: Settings,
+    onChange: (Settings) -> Unit,
+) {
+    Section(strings.sectionLanguage) {
+        for (option in Language.entries) {
+            ChoiceRow(option.spelledOut(strings), settings.language == option) {
+                onChange(settings.copy(language = option))
+            }
+        }
+        Caption(strings.languageHint)
+    }
+}
+
+@Composable
+private fun FiqhSections(
+    settings: Settings,
+    onChange: (Settings) -> Unit,
+) {
+    Section(strings.sectionTradition, strings.sectionTraditionWhy) {
         for (option in Tradition.entries) {
-            ChoiceRow(
-                label = option.spelledOut(),
-                selected = settings.tradition == option,
-                onSelect = { onChange(settings.copy(tradition = option)) },
-            )
+            ChoiceRow(option.spelledOut(strings), settings.tradition == option) {
+                onChange(settings.copy(tradition = option))
+            }
         }
-
-        Spacer(Modifier.height(SaadiahSpacing.large))
-        Caption("ʿAṣr madhhab — changes when ʿAṣr begins")
+    }
+    Section(strings.sectionMadhab, strings.sectionMadhabWhy) {
         for (option in Madhab.entries) {
-            ChoiceRow(
-                label = option.spelledOut(),
-                selected = settings.madhab == option,
-                onSelect = { onChange(settings.copy(madhab = option)) },
-            )
+            ChoiceRow(option.spelledOut(strings), settings.madhab == option) {
+                onChange(settings.copy(madhab = option))
+            }
         }
-
-        Spacer(Modifier.height(SaadiahSpacing.large))
-        Caption("Combining prayers")
+    }
+    Section(strings.sectionCombining) {
         for (option in CombineMode.entries) {
-            ChoiceRow(
-                label = option.spelledOut(),
-                selected = settings.combineMode == option,
-                onSelect = { onChange(settings.copy(combineMode = option)) },
-            )
+            ChoiceRow(option.spelledOut(strings), settings.combineMode == option) {
+                onChange(settings.copy(combineMode = option))
+            }
         }
+    }
+}
 
-        Spacer(Modifier.height(SaadiahSpacing.large))
-        Caption("Alert me for these prayers")
+@Composable
+private fun AlertSections(
+    settings: Settings,
+    onChange: (Settings) -> Unit,
+) {
+    Section(strings.sectionWhichPrayers) {
         for (prayer in settings.alertablePrayers()) {
             val alerting = prayer in settings.enabledPrayers
             ChoiceRow(
-                label = prayer.spelledOut(),
+                label = prayer.spelledOut(strings),
                 selected = alerting,
+                stateWord = if (alerting) strings.alerting else strings.silent,
                 onSelect = { onChange(settings.copy(enabledPrayers = settings.enabledPrayers.toggle(prayer))) },
-                stateWord = if (alerting) "alerting" else "silent",
             )
         }
         if (settings.enabledPrayers.none { it in settings.alertablePrayers() }) {
-            Body("Every prayer is silent. Saadiah will not alert you at all.")
+            Body(strings.everyPrayerSilent)
         }
-
-        Spacer(Modifier.height(SaadiahSpacing.large))
-        Caption("Warn me before each prayer")
-        for (choice in PRE_ALERT_CHOICES) {
-            ChoiceRow(
-                label = choice.spelledOut(),
-                selected = settings.preAlert == choice,
-                onSelect = { onChange(settings.copy(preAlert = choice)) },
-            )
-        }
-
-        Spacer(Modifier.height(SaadiahSpacing.large))
-        Caption("Warn me before each window closes")
-        for (choice in END_OF_WINDOW_CHOICES) {
-            ChoiceRow(
-                label = choice.spelledOutAsClosing(),
-                selected = settings.endOfWindow == choice,
-                onSelect = { onChange(settings.copy(endOfWindow = choice)) },
-            )
-        }
-
-        Spacer(Modifier.height(SaadiahSpacing.large))
-        Body("Every setting is kept on this device. Nothing is sent anywhere.")
-        Spacer(Modifier.height(SaadiahSpacing.small))
-        // CC BY 4.0 requires the credit to be visible to the reader, not only in the repository.
-        Caption("City and town data from GeoNames (geonames.org), used under CC BY 4.0.")
-        Spacer(Modifier.height(SaadiahSpacing.huge))
     }
+    Section(strings.sectionWarnBefore) {
+        for (choice in PRE_ALERT_CHOICES) {
+            ChoiceRow(choice.asWarning(strings), settings.preAlert == choice) {
+                onChange(settings.copy(preAlert = choice))
+            }
+        }
+    }
+    Section(strings.sectionWarnClosing) {
+        for (choice in END_OF_WINDOW_CHOICES) {
+            ChoiceRow(choice.asClosingWarning(strings), settings.endOfWindow == choice) {
+                onChange(settings.copy(endOfWindow = choice))
+            }
+        }
+    }
+}
+
+@Composable
+private fun BaqarahSection(
+    settings: Settings,
+    actions: SettingsActions,
+) {
+    Section(strings.sectionBaqarah, strings.sectionBaqarahWhy) {
+        for (option in BaqarahReminder.entries) {
+            ChoiceRow(option.spelledOut(strings), settings.baqarahReminder == option) {
+                actions.onChange(settings.copy(baqarahReminder = option))
+            }
+        }
+        ChoiceRow(strings.whyItIsRead, false, strings.open, actions.onOpenBaqarah)
+    }
+}
+
+@Composable
+private fun Section(
+    title: String,
+    explanation: String? = null,
+    content: @Composable () -> Unit,
+) {
+    Spacer(Modifier.height(SaadiahSpacing.large))
+    SectionDivider()
+    Text(
+        text = title,
+        color = SaadiahTheme.colors.text,
+        fontSize = SaadiahType.titleMedium.size,
+        lineHeight = SaadiahType.titleMedium.lineHeight,
+    )
+    explanation?.let { Caption(it) }
+    Spacer(Modifier.height(SaadiahSpacing.small))
+    content()
 }
 
 @Composable
 private fun ChoiceRow(
     label: String,
     selected: Boolean,
-    onSelect: () -> Unit,
     stateWord: String? = null,
+    onSelect: () -> Unit,
 ) {
     val colors = SaadiahTheme.colors
-    val word = stateWord ?: if (selected) "chosen" else ""
+    val word = stateWord ?: if (selected) strings.chosen else ""
     Row(
         modifier =
             Modifier
@@ -193,43 +252,3 @@ private fun ChoiceRow(
         )
     }
 }
-
-private fun Tradition.spelledOut(): String =
-    when (this) {
-        Tradition.SUNNI -> "Sunni"
-        Tradition.TWELVER -> "Twelver"
-    }
-
-private fun Madhab.spelledOut(): String =
-    when (this) {
-        Madhab.SHAFI -> "Standard — Shāfiʿī, Mālikī, Ḥanbalī"
-        Madhab.HANAFI -> "Ḥanafī — ʿAṣr begins later"
-    }
-
-private fun CombineMode.spelledOut(): String =
-    when (this) {
-        CombineMode.NONE -> "Show all five prayers"
-        CombineMode.ZUHRAYN_ISHAAYN -> "Combine into Ẓuhrayn and ʿIshāʾayn"
-    }
-
-private fun Duration?.spelledOut(): String =
-    when (this) {
-        null -> "Do not warn me"
-        else -> "$inWholeMinutes minutes before"
-    }
-
-private fun Duration?.spelledOutAsClosing(): String =
-    when (this) {
-        null -> "Do not warn me"
-        else -> "$inWholeMinutes minutes before it closes"
-    }
-
-private fun Prayer.spelledOut(): String =
-    when (this) {
-        Prayer.FAJR -> "الفجر — Fajr"
-        Prayer.SUNRISE -> "الشروق — Sunrise"
-        Prayer.DHUHR -> "الظهر — Dhuhr"
-        Prayer.ASR -> "العصر — Asr"
-        Prayer.MAGHRIB -> "المغرب — Maghrib"
-        Prayer.ISHA -> "العشاء — Isha"
-    }

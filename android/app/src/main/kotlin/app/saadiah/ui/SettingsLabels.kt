@@ -1,0 +1,54 @@
+package app.saadiah.ui
+
+import app.saadiah.model.BaqarahReminder
+import app.saadiah.model.CombineMode
+import app.saadiah.model.Language
+import app.saadiah.model.Madhab
+import app.saadiah.model.Prayer
+import app.saadiah.model.Tradition
+import kotlin.time.Duration
+
+/**
+ * These take the table rather than reading it from the composition, so the same label is
+ * available to the pure state builders and to the notification receiver, neither of which
+ * runs inside a composition.
+ */
+internal fun Tradition.spelledOut(strings: Strings): String =
+    when (this) {
+        Tradition.SUNNI -> strings.traditionSunni
+        Tradition.TWELVER -> strings.traditionTwelver
+    }
+
+internal fun Madhab.spelledOut(strings: Strings): String =
+    when (this) {
+        Madhab.SHAFI -> strings.madhabStandard
+        Madhab.HANAFI -> strings.madhabHanafi
+    }
+
+internal fun CombineMode.spelledOut(strings: Strings): String =
+    when (this) {
+        CombineMode.NONE -> strings.combineNone
+        CombineMode.ZUHRAYN_ISHAAYN -> strings.combineZuhraynIshaayn
+    }
+
+internal fun Prayer.spelledOut(strings: Strings): String = strings.prayerNames[ordinal]
+
+internal fun Language.spelledOut(strings: Strings): String =
+    when (this) {
+        Language.SYSTEM -> strings.followMyPhone
+        Language.ARABIC -> strings.arabicLanguage
+        Language.ENGLISH -> strings.englishLanguage
+    }
+
+internal fun BaqarahReminder.spelledOut(strings: Strings): String =
+    when (this) {
+        BaqarahReminder.OFF -> strings.doNotRemindMe
+        BaqarahReminder.DAILY -> strings.everyDay
+        BaqarahReminder.WEEKLY -> strings.onceAWeek
+    }
+
+internal fun Duration?.asWarning(strings: Strings): String =
+    if (this == null) strings.doNotWarnMe else strings.minutesBefore(inWholeMinutes)
+
+internal fun Duration?.asClosingWarning(strings: Strings): String =
+    if (this == null) strings.doNotWarnMe else strings.minutesBeforeClosing(inWholeMinutes)
