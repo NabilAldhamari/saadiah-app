@@ -26,12 +26,12 @@ import app.saadiah.design.SaadiahTheme
 import app.saadiah.design.SaadiahType
 import app.saadiah.design.SectionDivider
 import app.saadiah.design.minimumTouchTarget
+import app.saadiah.model.AppTheme
 import app.saadiah.model.BaqarahReminder
 import app.saadiah.model.CombineMode
 import app.saadiah.model.Language
 import app.saadiah.model.Madhab
 import app.saadiah.model.Prayer
-import app.saadiah.model.Tradition
 import kotlin.time.Duration.Companion.minutes
 
 private val HAIRLINE = 1.dp
@@ -81,6 +81,7 @@ fun SettingsScreen(
         Section(strings.sectionLocation) {
             ChoiceRow(cityName, selected = true, stateWord = strings.change, onSelect = actions.onChangeCity)
         }
+        ThemeSection(settings, actions.onChange)
         LanguageSection(settings, actions.onChange)
         FiqhSections(settings, actions.onChange)
         AlertSections(settings, actions.onChange)
@@ -96,6 +97,20 @@ fun SettingsScreen(
             Caption(strings.geoNamesCredit)
         }
         Spacer(Modifier.height(SaadiahSpacing.huge))
+    }
+}
+
+@Composable
+private fun ThemeSection(
+    settings: Settings,
+    onChange: (Settings) -> Unit,
+) {
+    Section(strings.sectionTheme) {
+        for (option in AppTheme.entries) {
+            ChoiceRow(option.spelledOut(strings), settings.theme == option) {
+                onChange(settings.copy(theme = option))
+            }
+        }
     }
 }
 
@@ -119,13 +134,6 @@ private fun FiqhSections(
     settings: Settings,
     onChange: (Settings) -> Unit,
 ) {
-    Section(strings.sectionTradition, strings.sectionTraditionWhy) {
-        for (option in Tradition.entries) {
-            ChoiceRow(option.spelledOut(strings), settings.tradition == option) {
-                onChange(settings.copy(tradition = option))
-            }
-        }
-    }
     Section(strings.sectionMadhab, strings.sectionMadhabWhy) {
         for (option in Madhab.entries) {
             ChoiceRow(option.spelledOut(strings), settings.madhab == option) {

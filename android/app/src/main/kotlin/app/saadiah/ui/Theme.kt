@@ -12,10 +12,13 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.TextUnit
 import app.saadiah.design.DarkColors
+import app.saadiah.design.GreenColors
 import app.saadiah.design.LightColors
 import app.saadiah.design.SaadiahColors
 import app.saadiah.design.SaadiahType
+import app.saadiah.model.AppTheme
 import app.saadiah.model.Language
+import app.saadiah.design.SaadiahTheme as DesignTheme
 
 // Every value comes from :design, where ColorContrastTest holds each pair to WCAG AA.
 // onPrimary is the theme's own background: each accent is chosen to contrast with it.
@@ -71,17 +74,28 @@ internal fun Body(text: String) {
 @Composable
 fun SaadiahTheme(
     language: Language = Language.SYSTEM,
+    theme: AppTheme = AppTheme.SYSTEM,
     content: @Composable () -> Unit,
 ) {
-    val dark = isSystemInDarkTheme()
+    val followingSystemDark = isSystemInDarkTheme()
+    val dark = theme == AppTheme.DARK || (theme == AppTheme.SYSTEM && followingSystemDark)
+    val palette =
+        when (theme) {
+            AppTheme.GREEN -> GreenColors
+            AppTheme.LIGHT -> LightColors
+            AppTheme.DARK -> DarkColors
+            AppTheme.SYSTEM -> if (followingSystemDark) DarkColors else LightColors
+        }
     CompositionLocalProvider(
         LocalStrings provides stringsFor(language),
         LocalLayoutDirection provides layoutDirectionFor(language),
     ) {
-        MaterialTheme(
-            colorScheme = (if (dark) DarkColors else LightColors).toScheme(dark),
-            typography = AccessibleTypography,
-            content = content,
-        )
+        DesignTheme(colors = palette) {
+            MaterialTheme(
+                colorScheme = palette.toScheme(dark),
+                typography = AccessibleTypography,
+                content = content,
+            )
+        }
     }
 }

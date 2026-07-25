@@ -87,11 +87,7 @@ private fun BackAction(onBack: () -> Unit) {
 @Composable
 private fun Disclaimer(tradition: Tradition) {
     val colors = SaadiahTheme.colors
-    val school =
-        when (tradition) {
-            Tradition.SUNNI -> strings.traditionSunni
-            Tradition.TWELVER -> strings.traditionTwelver
-        }
+    val school = tradition.spelledOut(strings)
     val body = strings.askDisclaimerFor(school)
     Column(
         modifier =

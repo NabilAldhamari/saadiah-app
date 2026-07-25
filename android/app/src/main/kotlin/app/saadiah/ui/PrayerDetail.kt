@@ -51,7 +51,6 @@ private fun nawafilFor(
 ): List<Nafilah> =
     when (tradition) {
         Tradition.SUNNI -> confirmedSunanRawatib(prayer, strings)
-        Tradition.TWELVER -> twelverNawafilDifferingInCountAndPlacement(prayer, strings)
     }
 
 @Suppress("MagicNumber")
@@ -70,22 +69,6 @@ private fun confirmedSunanRawatib(
         Prayer.ASR -> listOf(Nafilah(s.naflBeforeAsr, s.rakah(4), s.beforeNotConfirmed))
         Prayer.MAGHRIB -> listOf(Nafilah(s.sunnahOf(name), s.rakah(2), s.after))
         Prayer.ISHA -> listOf(Nafilah(s.sunnahOf(name), s.rakah(2), s.after))
-        Prayer.SUNRISE -> emptyList()
-    }
-}
-
-@Suppress("MagicNumber")
-private fun twelverNawafilDifferingInCountAndPlacement(
-    prayer: Prayer,
-    s: Strings,
-): List<Nafilah> {
-    val name = s.prayerNames[prayer.ordinal]
-    return when (prayer) {
-        Prayer.FAJR -> listOf(Nafilah(s.nafilahOf(name), s.rakah(2), s.before))
-        Prayer.DHUHR -> listOf(Nafilah(s.nafilahOf(name), s.rakah(8), s.before))
-        Prayer.ASR -> listOf(Nafilah(s.nafilahOf(name), s.rakah(8), s.before))
-        Prayer.MAGHRIB -> listOf(Nafilah(s.nafilahOf(name), s.rakah(4), s.after))
-        Prayer.ISHA -> listOf(Nafilah(s.wutayrah, "${s.rakah(2)} ${s.seated}", s.after))
         Prayer.SUNRISE -> emptyList()
     }
 }

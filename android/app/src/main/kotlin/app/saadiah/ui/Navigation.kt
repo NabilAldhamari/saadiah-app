@@ -28,6 +28,10 @@ sealed interface Screen {
 
     data object Baqarah : Screen
 
+    data class Reading(
+        val sura: Int,
+    ) : Screen
+
     data class PrayerDetail(
         val prayer: Prayer,
     ) : Screen

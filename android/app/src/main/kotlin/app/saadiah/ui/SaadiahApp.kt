@@ -1,9 +1,18 @@
 package app.saadiah.ui
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -43,9 +52,28 @@ fun SaadiahApp(
 
     BackHandler(enabled = navigator.canGoBack) { navigator.back() }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    // Nothing handled insets before, so every screen drew under the status bar and its
+    // first line was clipped by the clock. This is the one place to inset: the tab bar is
+    // inside it, so it clears the gesture bar at the bottom too.
+    Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
         Box(modifier = Modifier.weight(1f)) {
-            Destination(city, settings, profile, tradition, navigator, actions)
+            // A short crossfade with a little travel. Long enough to read as one screen
+            // becoming another, short enough that it never delays a tap; nothing slides
+            // the full width, because that reads as movement for its own sake.
+            AnimatedContent(
+                targetState = navigator.current,
+                transitionSpec = {
+                    val forward = !targetState.isTabRoot
+                    val travel = if (forward) TRAVEL else -TRAVEL
+                    (
+                        fadeIn(tween(ENTER_MILLIS)) +
+                            slideInHorizontally(tween(ENTER_MILLIS)) { it / travel }
+                    ) togetherWith fadeOut(tween(EXIT_MILLIS))
+                },
+                label = "screen",
+            ) { screen ->
+                Destination(screen, city, settings, profile, tradition, navigator, actions)
+            }
         }
         if (navigator.current.isTabRoot) {
             TabBar(tabs = tabsFor(navigator))
@@ -59,6 +87,7 @@ fun SaadiahApp(
 @Suppress("LongParameterList")
 @Composable
 private fun Destination(
+    screen: Screen,
     city: City,
     settings: Settings,
     profile: TimingProfile,
@@ -67,17 +96,17 @@ private fun Destination(
     actions: AppActions,
 ) {
     val back: () -> Unit = { navigator.back() }
-    val screen = navigator.current
     if (screen.isTabRoot) {
-        TabRoot(city, settings, profile, tradition, navigator, actions)
+        TabRoot(screen, city, settings, profile, tradition, navigator, actions)
     } else {
-        PushedScreen(Place(city, profile, tradition), navigator, actions, back)
+        PushedScreen(screen, Place(city, profile, tradition), navigator, actions)
     }
 }
 
 @Suppress("LongParameterList")
 @Composable
 private fun TabRoot(
+    screen: Screen,
     city: City,
     settings: Settings,
     profile: TimingProfile,
@@ -85,9 +114,14 @@ private fun TabRoot(
     navigator: Navigator,
     actions: AppActions,
 ) {
-    when (navigator.current) {
+    when (screen) {
         Screen.Calendar -> CalendarScreen(state = thisMonth(city, tradition, strings))
-        Screen.Adhkar -> AdhkarScreen(tradition = tradition)
+        Screen.Adhkar ->
+            AdhkarScreen(
+                tradition = tradition,
+                custom = settings.customAdhkar,
+                onChangeCustom = { actions.onChangeSettings(settings.copy(customAdhkar = it)) },
+            )
         Screen.More ->
             SettingsScreen(
                 settings = settings,
@@ -111,6 +145,9 @@ private fun TabRoot(
                         onOpenDoctor = { navigator.go(Screen.WhyThisTime) },
                         onOpenPrayer = { navigator.go(Screen.PrayerDetail(it)) },
                         onOpenBaqarah = { navigator.go(Screen.Baqarah) },
+                        onMarkBaqarahRead = actions.onMarkBaqarahRead,
+                        baqarahReadCount = settings.baqarahReadCount,
+                        baqarahReadToday = settings.baqarahLastRead == today(city).toString(),
                     ),
             )
     }
@@ -118,14 +155,20 @@ private fun TabRoot(
 
 @Composable
 private fun PushedScreen(
+    screen: Screen,
     place: Place,
     navigator: Navigator,
     actions: AppActions,
-    back: () -> Unit,
 ) {
-    when (val screen = navigator.current) {
+    val back: () -> Unit = { navigator.back() }
+    when (screen) {
         Screen.Ask -> AskScreen(tradition = place.tradition, onBack = back)
-        Screen.Baqarah -> BaqarahScreen(onBack = back, tradition = place.tradition)
+        Screen.Baqarah ->
+            BaqarahScreen(
+                onBack = back,
+                onRead = { navigator.go(Screen.Reading(it)) },
+                tradition = place.tradition,
+            )
         Screen.Doctor -> DoctorScreen(onOpenSettings = actions.onOpenBackgroundSettings, onBack = back)
         Screen.PickingCity ->
             CityPickerScreen(
@@ -142,10 +185,34 @@ private fun PushedScreen(
                 onMatchMasjid = { navigator.go(Screen.Doctor) },
                 onBack = back,
             )
+        else -> Reading(screen, place, back)
+    }
+}
+
+@Composable
+private fun Reading(
+    screen: Screen,
+    place: Place,
+    back: () -> Unit,
+) {
+    when (screen) {
+        is Screen.Reading ->
+            QuranScreen(
+                sura = screen.sura,
+                title = if (screen.sura == BAQARAH_SURA) strings.titleAlBaqarah else strings.titleAlImran,
+                onBack = back,
+            )
         is Screen.PrayerDetail -> PrayerDetail(place, screen.prayer, back)
         else -> Unit
     }
 }
+
+private const val ENTER_MILLIS = 220
+private const val EXIT_MILLIS = 160
+private const val TRAVEL = 12
+
+const val BAQARAH_SURA = 2
+const val AL_IMRAN_SURA = 3
 
 private data class Place(
     val city: City,

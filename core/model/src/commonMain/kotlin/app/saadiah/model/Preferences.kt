@@ -13,3 +13,6 @@ enum class Language { SYSTEM, ARABIC, ENGLISH }
  * imposition, not a kindness.
  */
 enum class BaqarahReminder { OFF, DAILY, WEEKLY }
+
+/** [SYSTEM] follows the phone between the dark and light palettes; the rest are explicit. */
+enum class AppTheme { SYSTEM, LIGHT, DARK, GREEN }

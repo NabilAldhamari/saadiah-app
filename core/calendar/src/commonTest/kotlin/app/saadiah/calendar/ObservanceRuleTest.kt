@@ -9,7 +9,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 private const val YEAR = 1445
-private const val MUHARRAM = 1
 private const val RAMADAN = 9
 private const val SHAWWAL = 10
 private const val DHU_AL_HIJJAH = 12
@@ -130,25 +129,6 @@ class ObservanceRuleTest {
         for (tradition in Tradition.entries) {
             assertTrue(Observance.ARAFAH in idsOn(DHU_AL_HIJJAH, 9, tradition), "$tradition")
         }
-    }
-
-    @Test
-    fun ashuraDivergesBetweenTraditions() {
-        assertTrue(Observance.ASHURA in idsOn(MUHARRAM, 10, Tradition.SUNNI))
-        assertFalse(
-            Observance.ASHURA in idsOn(MUHARRAM, 10, Tradition.TWELVER),
-            "ashura must not be offered as a recommended fast to a twelver user",
-        )
-        assertFalse(ObservanceKind.RECOMMENDED_FAST in kindsOn(MUHARRAM, 10, Tradition.TWELVER))
-    }
-
-    @Test
-    fun sixOfShawwalFollowsEidForSunniOnly() {
-        for (day in 2..7) {
-            assertTrue(Observance.SIX_OF_SHAWWAL in idsOn(SHAWWAL, day, Tradition.SUNNI), "day $day")
-            assertFalse(Observance.SIX_OF_SHAWWAL in idsOn(SHAWWAL, day, Tradition.TWELVER), "day $day")
-        }
-        assertFalse(Observance.SIX_OF_SHAWWAL in idsOn(SHAWWAL, 1, Tradition.SUNNI))
     }
 
     private fun assertHijamaDay(

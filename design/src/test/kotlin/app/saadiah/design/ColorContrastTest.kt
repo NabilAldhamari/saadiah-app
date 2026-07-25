@@ -22,6 +22,12 @@ class ColorContrastTest {
     fun everyLightPairMeetsItsGate() = assertGate(LightContrastPairs, theme = "light")
 
     @Test
+    fun everyGreenPairMeetsItsGate() = assertGate(GreenContrastPairs, theme = "green")
+
+    @Test
+    fun everyGreenPairMatchesTheRecordedRatio() = assertRecorded(GreenContrastPairs, theme = "green")
+
+    @Test
     fun everyDarkPairMatchesTheRecordedRatio() = assertRecorded(DarkContrastPairs, theme = "dark")
 
     @Test

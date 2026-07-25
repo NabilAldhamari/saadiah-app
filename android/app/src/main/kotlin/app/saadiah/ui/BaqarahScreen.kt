@@ -1,6 +1,7 @@
 package app.saadiah.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,17 +15,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import app.saadiah.content.BaqarahMerit
+import app.saadiah.content.MeritKind
 import app.saadiah.content.baqarahMerits
 import app.saadiah.design.SaadiahRadius
 import app.saadiah.design.SaadiahSpacing
 import app.saadiah.design.SaadiahTheme
 import app.saadiah.design.SaadiahType
 import app.saadiah.design.SectionDivider
+import app.saadiah.design.minimumTouchTarget
 import app.saadiah.model.Tradition
 
 @Composable
 fun BaqarahScreen(
     onBack: () -> Unit,
+    onRead: (Int) -> Unit = {},
     tradition: Tradition = Tradition.SUNNI,
 ) {
     val colors = SaadiahTheme.colors
@@ -41,6 +45,9 @@ fun BaqarahScreen(
     ) {
         ScreenHeader(title = strings.titleBaqarah, onBack = onBack)
         Body(strings.baqarahSubtitle)
+        Spacer(Modifier.height(SaadiahSpacing.medium))
+        ReadRow(strings.readAlBaqarah) { onRead(BAQARAH_SURA) }
+        ReadRow(strings.readAlImran) { onRead(AL_IMRAN_SURA) }
         SectionDivider()
 
         if (merits.isEmpty()) {
@@ -67,6 +74,22 @@ private fun MeritCard(merit: BaqarahMerit) {
                 .background(colors.surface, RoundedCornerShape(SaadiahRadius.sheet))
                 .padding(SaadiahSpacing.medium),
     ) {
+        if (merit.kind == MeritKind.SAYING) {
+            Text(
+                text = merit.translation,
+                color = colors.text,
+                fontSize = SaadiahType.titleMedium.size,
+                lineHeight = SaadiahType.titleMedium.lineHeight,
+            )
+            Spacer(Modifier.height(SaadiahSpacing.snug))
+            SectionDivider()
+            Text(
+                text = "${strings.quoteBy} ${merit.source}",
+                color = colors.textSecondary,
+                fontSize = SaadiahType.bodySmall.size,
+            )
+            return@Column
+        }
         merit.arabic?.let {
             Text(
                 text = it,
@@ -86,4 +109,23 @@ private fun MeritCard(merit: BaqarahMerit) {
             lineHeight = SaadiahType.bodySmall.lineHeight,
         )
     }
+}
+
+@Composable
+private fun ReadRow(
+    label: String,
+    onOpen: () -> Unit,
+) {
+    val colors = SaadiahTheme.colors
+    Text(
+        text = label,
+        color = colors.accent,
+        fontSize = SaadiahType.body.size,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onOpen)
+                .minimumTouchTarget()
+                .padding(vertical = SaadiahSpacing.snug),
+    )
 }

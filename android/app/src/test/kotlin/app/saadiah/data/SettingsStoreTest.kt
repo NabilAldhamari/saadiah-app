@@ -60,11 +60,11 @@ class SettingsStoreTest {
     @Test
     fun aWriteIsObservableOnTheNextRead() =
         runTest {
-            storeOverItsOwnFreshFile.update { it.copy(tradition = Tradition.TWELVER, madhab = Madhab.HANAFI) }
+            storeOverItsOwnFreshFile.update { it.copy(tradition = Tradition.SUNNI, madhab = Madhab.HANAFI) }
 
             val settings = storeOverItsOwnFreshFile.settings.first()
 
-            assertEquals(expected = Tradition.TWELVER, actual = settings.tradition)
+            assertEquals(expected = Tradition.SUNNI, actual = settings.tradition)
             assertEquals(expected = Madhab.HANAFI, actual = settings.madhab)
         }
 

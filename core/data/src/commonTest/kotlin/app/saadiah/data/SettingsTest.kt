@@ -48,9 +48,9 @@ class SettingsTest {
 
     @Test
     fun copiesWithoutTouchingOtherValues() {
-        val chosen = Settings().copy(tradition = Tradition.TWELVER, madhab = Madhab.HANAFI)
+        val chosen = Settings().copy(tradition = Tradition.SUNNI, madhab = Madhab.HANAFI)
 
-        assertEquals(expected = Tradition.TWELVER, actual = chosen.tradition)
+        assertEquals(expected = Tradition.SUNNI, actual = chosen.tradition)
         assertEquals(expected = Madhab.HANAFI, actual = chosen.madhab)
         assertEquals(expected = Settings().enabledPrayers, actual = chosen.enabledPrayers)
         assertNotEquals(illegal = Settings(), actual = chosen)

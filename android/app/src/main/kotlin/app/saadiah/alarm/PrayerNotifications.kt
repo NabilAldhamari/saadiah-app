@@ -7,30 +7,40 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
 import app.saadiah.MainActivity
+import app.saadiah.model.Language
+import app.saadiah.ui.Strings
+import app.saadiah.ui.stringsFor
 
 const val PRAYER_CHANNEL_ID = "prayer-times"
 const val READING_CHANNEL_ID = "reading-reminders"
 
-private const val CHANNEL_NAME = "Prayer times"
-private const val CHANNEL_DESCRIPTION = "Announces each prayer as its time enters."
-private const val READING_CHANNEL_NAME = "Reading reminders"
-private const val READING_CHANNEL_DESCRIPTION = "Reminds you to read Sūrat al-Baqarah."
-
 private const val OPEN_APP_REQUEST = 1000
 
-fun ensureChannels(context: Context) {
+/**
+ * Android shows these names in system settings, so they are read in the chosen language
+ * too. A channel is only created once, so switching language renames it on the next launch
+ * rather than immediately.
+ */
+fun ensureChannels(
+    context: Context,
+    words: Strings = stringsFor(Language.SYSTEM),
+) {
     val manager = NotificationManagerCompat.from(context)
     manager.createNotificationChannel(
-        NotificationChannel(PRAYER_CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH).apply {
-            description = CHANNEL_DESCRIPTION
+        NotificationChannel(PRAYER_CHANNEL_ID, words.prayerChannelName, NotificationManager.IMPORTANCE_HIGH).apply {
+            description = words.prayerChannelWhat
             setShowBadge(false)
         },
     )
     // A reading reminder is not a prayer time. Separating the channels lets someone silence
     // one without silencing the other, which a single channel would not allow.
     manager.createNotificationChannel(
-        NotificationChannel(READING_CHANNEL_ID, READING_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT).apply {
-            description = READING_CHANNEL_DESCRIPTION
+        NotificationChannel(
+            READING_CHANNEL_ID,
+            words.readingChannelName,
+            NotificationManager.IMPORTANCE_DEFAULT,
+        ).apply {
+            description = words.readingChannelWhat
             setShowBadge(false)
         },
     )

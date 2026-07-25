@@ -44,8 +44,6 @@ interface Strings {
 
     val sectionLocation: String
     val sectionLanguage: String
-    val sectionTradition: String
-    val sectionTraditionWhy: String
     val sectionMadhab: String
     val sectionMadhabWhy: String
     val sectionCombining: String
@@ -66,7 +64,6 @@ interface Strings {
     val silent: String
 
     val traditionSunni: String
-    val traditionTwelver: String
     val madhabStandard: String
     val madhabHanafi: String
     val combineNone: String
@@ -247,6 +244,38 @@ interface Strings {
     val seated: String
 
     fun rakah(count: Int): String
+
+    val readToday: String
+    val readTodayDone: String
+    val quoteBy: String
+
+    fun daysKeptUp(count: Int): String
+
+    val prayerChannelName: String
+    val prayerChannelWhat: String
+    val readingChannelName: String
+    val readingChannelWhat: String
+
+    val sectionTheme: String
+    val themeSystem: String
+    val themeLight: String
+    val themeDark: String
+    val themeGreen: String
+
+    val loadingText: String
+    val textFailedVerification: String
+    val readAlBaqarah: String
+    val readAlImran: String
+    val titleAlBaqarah: String
+    val titleAlImran: String
+
+    val myAdhkar: String
+    val addDhikr: String
+    val newDhikrHint: String
+    val save: String
+    val remove: String
+    val noCustomAdhkar: String
+    val timesLabel: String
 }
 
 val LocalStrings: ProvidableCompositionLocal<Strings> = staticCompositionLocalOf { EnglishStrings }
