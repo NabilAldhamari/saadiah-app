@@ -21,12 +21,11 @@ import app.saadiah.data.Settings
 import app.saadiah.data.SettingsStore
 import app.saadiah.doctor.guidanceIntents
 import app.saadiah.ui.AppActions
-import app.saadiah.ui.CITY_CATALOG
 import app.saadiah.ui.CityPickerScreen
+import app.saadiah.ui.DEFAULT_CITY
 import app.saadiah.ui.DoctorScreen
 import app.saadiah.ui.SaadiahApp
 import app.saadiah.ui.SaadiahTheme
-import app.saadiah.ui.cityById
 import kotlinx.coroutines.launch
 
 private enum class Screen { TODAY, PICKING_CITY, DOCTOR }
@@ -53,7 +52,7 @@ class MainActivity : ComponentActivity() {
         alarms: PrayerAlarmScheduler,
     ) {
         val settings by store.settings.collectAsStateWithLifecycle(initialValue = Settings())
-        val city = cityById(settings.cityId?.value ?: 0) ?: CITY_CATALOG.first()
+        val city = settings.city ?: DEFAULT_CITY
         var screen by remember { mutableStateOf(Screen.TODAY) }
 
         when (screen) {
@@ -61,7 +60,7 @@ class MainActivity : ComponentActivity() {
                 CityPickerScreen(
                     selected = city,
                     onPick = { chosen ->
-                        save(store, alarms) { it.copy(cityId = chosen.id) }
+                        save(store, alarms) { it.copy(city = chosen) }
                         screen = Screen.TODAY
                     },
                     onCancel = { screen = Screen.TODAY },

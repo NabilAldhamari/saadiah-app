@@ -3,13 +3,17 @@ package app.saadiah.data
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
+import app.saadiah.model.City
 import app.saadiah.model.CityId
 import app.saadiah.model.CombineMode
+import app.saadiah.model.Coordinates
+import app.saadiah.model.CountryCode
 import app.saadiah.model.Madhab
 import app.saadiah.model.Prayer
 import app.saadiah.model.Tradition
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.TimeZone
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -18,6 +22,17 @@ import org.robolectric.RobolectricTestRunner
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.time.Duration.Companion.minutes
+
+private val STORED_CITY =
+    City(
+        id = CityId(2643743),
+        name = "London",
+        country = CountryCode("GB"),
+        admin1 = "England",
+        coordinates = Coordinates(latitude = 51.50853, longitude = -0.12574),
+        timeZone = TimeZone.of("Europe/London"),
+        arabicName = "لندن",
+    )
 
 @RunWith(RobolectricTestRunner::class)
 class SettingsStoreTest {
@@ -37,7 +52,7 @@ class SettingsStoreTest {
 
             assertNull(settings.tradition, "tradition must stay unchosen until the user says")
             assertNull(settings.madhab)
-            assertNull(settings.cityId)
+            assertNull(settings.city)
             assertEquals(expected = CombineMode.NONE, actual = settings.combineMode)
             assertEquals(expected = 5, actual = settings.enabledPrayers.size)
         }
@@ -60,7 +75,7 @@ class SettingsStoreTest {
                 Settings(
                     tradition = Tradition.SUNNI,
                     madhab = Madhab.SHAFI,
-                    cityId = CityId(value = 42),
+                    city = STORED_CITY,
                     combineMode = CombineMode.ZUHRAYN_ISHAAYN,
                     enabledPrayers = setOf(Prayer.FAJR, Prayer.MAGHRIB),
                     preAlert = 15.minutes,

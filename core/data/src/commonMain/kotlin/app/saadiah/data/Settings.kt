@@ -1,6 +1,6 @@
 package app.saadiah.data
 
-import app.saadiah.model.CityId
+import app.saadiah.model.City
 import app.saadiah.model.CombineMode
 import app.saadiah.model.Madhab
 import app.saadiah.model.Prayer
@@ -19,7 +19,10 @@ private val DAILY_PRAYERS = setOf(Prayer.FAJR, Prayer.DHUHR, Prayer.ASR, Prayer.
 data class Settings(
     val tradition: Tradition? = null,
     val madhab: Madhab? = null,
-    val cityId: CityId? = null,
+    // The whole city is kept, not just its id. Alarms are armed from a BroadcastReceiver,
+    // and resolving an id there would mean loading the seven-megabyte city index inside
+    // onReceive to learn a latitude the app already knew when the user chose the place.
+    val city: City? = null,
     val combineMode: CombineMode = CombineMode.NONE,
     val enabledPrayers: Set<Prayer> = DAILY_PRAYERS,
     val preAlert: Duration? = null,

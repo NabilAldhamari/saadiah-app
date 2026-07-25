@@ -145,6 +145,9 @@ fun SettingsScreen(
 
         Spacer(Modifier.height(SaadiahSpacing.large))
         Body("Every setting is kept on this device. Nothing is sent anywhere.")
+        Spacer(Modifier.height(SaadiahSpacing.small))
+        // CC BY 4.0 requires the credit to be visible to the reader, not only in the repository.
+        Caption("City and town data from GeoNames (geonames.org), used under CC BY 4.0.")
         Spacer(Modifier.height(SaadiahSpacing.huge))
     }
 }

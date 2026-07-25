@@ -6,11 +6,15 @@ import android.content.Intent
 import app.saadiah.data.Settings
 import app.saadiah.data.SettingsStore
 import app.saadiah.model.AlarmKind
+import app.saadiah.model.City
+import app.saadiah.model.CityId
 import app.saadiah.model.CombineMode
+import app.saadiah.model.Coordinates
+import app.saadiah.model.CountryCode
 import app.saadiah.model.Prayer
-import app.saadiah.ui.CITY_CATALOG
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,6 +28,26 @@ import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
 
 private const val MAX_ALARMS = 12
+
+private val MAKKAH =
+    City(
+        id = CityId(104515),
+        name = "Makkah",
+        country = CountryCode("SA"),
+        admin1 = "Makkah Region",
+        coordinates = Coordinates(latitude = 21.42664, longitude = 39.82563),
+        timeZone = TimeZone.of("Asia/Riyadh"),
+    )
+
+private val NEW_YORK =
+    City(
+        id = CityId(5128581),
+        name = "New York City",
+        country = CountryCode("US"),
+        admin1 = "New York",
+        coordinates = Coordinates(latitude = 40.71427, longitude = -74.00597),
+        timeZone = TimeZone.of("America/New_York"),
+    )
 
 @RunWith(RobolectricTestRunner::class)
 class PrayerAlarmSchedulerTest {
@@ -151,13 +175,11 @@ class PrayerAlarmSchedulerTest {
     @Test
     fun aTimeZoneChangeReschedules() {
         val store = SettingsStore(context)
-        val makkah = CITY_CATALOG.first { it.name == "Makkah" }
-        val newYork = CITY_CATALOG.first { it.name == "New York" }
-        runBlocking { store.update { it.copy(cityId = makkah.id) } }
+        runBlocking { store.update { it.copy(city = MAKKAH) } }
         PrayerAlarmScheduler(context).arm()
         val beforeMove = armed().map { it.triggerAtTime }
 
-        runBlocking { store.update { it.copy(cityId = newYork.id) } }
+        runBlocking { store.update { it.copy(city = NEW_YORK) } }
         SystemChangeReceiver().onReceive(context, Intent(Intent.ACTION_TIMEZONE_CHANGED))
 
         assertNotEquals(illegal = beforeMove, actual = armed().map { it.triggerAtTime })

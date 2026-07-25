@@ -10,14 +10,18 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import app.saadiah.model.City
 import app.saadiah.model.CityId
 import app.saadiah.model.CombineMode
+import app.saadiah.model.Coordinates
+import app.saadiah.model.CountryCode
 import app.saadiah.model.Madhab
 import app.saadiah.model.Prayer
 import app.saadiah.model.Tradition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.TimeZone
 import java.io.IOException
 import kotlin.time.Duration.Companion.minutes
 
@@ -26,6 +30,13 @@ private const val STORE_NAME = "settings"
 private val TRADITION = stringPreferencesKey("tradition")
 private val MADHAB = stringPreferencesKey("madhab")
 private val CITY_ID = longPreferencesKey("city.id")
+private val CITY_NAME = stringPreferencesKey("city.name")
+private val CITY_ARABIC_NAME = stringPreferencesKey("city.name.arabic")
+private val CITY_COUNTRY = stringPreferencesKey("city.country")
+private val CITY_ADMIN1 = stringPreferencesKey("city.admin1")
+private val CITY_LATITUDE = stringPreferencesKey("city.latitude")
+private val CITY_LONGITUDE = stringPreferencesKey("city.longitude")
+private val CITY_TIME_ZONE = stringPreferencesKey("city.timezone")
 private val COMBINE_MODE = stringPreferencesKey("combine.mode")
 private val ENABLED_PRAYERS = stringSetPreferencesKey("alerts.prayers")
 private val PRE_ALERT = longPreferencesKey("alerts.pre.minutes")
@@ -60,7 +71,7 @@ private fun Preferences.toSettings(): Settings {
     return Settings(
         tradition = this[TRADITION]?.let { name -> Tradition.entries.firstOrNull { it.name == name } },
         madhab = this[MADHAB]?.let { name -> Madhab.entries.firstOrNull { it.name == name } },
-        cityId = this[CITY_ID]?.takeIf { it > 0 }?.let { CityId(it.toInt()) },
+        city = readCity(),
         combineMode =
             this[COMBINE_MODE]?.let { name -> CombineMode.entries.firstOrNull { it.name == name } }
                 ?: defaults.combineMode,
@@ -77,11 +88,53 @@ private fun Preferences.toSettings(): Settings {
 private fun MutablePreferences.write(settings: Settings) {
     setOrRemoveWhenUnchosen(TRADITION, settings.tradition?.name)
     setOrRemoveWhenUnchosen(MADHAB, settings.madhab?.name)
-    setOrRemoveWhenUnchosen(CITY_ID, settings.cityId?.value?.toLong())
+    writeCity(settings.city)
     setOrRemoveWhenUnchosen(PRE_ALERT, settings.preAlert?.inWholeMinutes)
     setOrRemoveWhenUnchosen(END_OF_WINDOW, settings.endOfWindow?.inWholeMinutes)
     this[COMBINE_MODE] = settings.combineMode.name
     this[ENABLED_PRAYERS] = settings.enabledPrayers.map { it.name }.toSet()
+}
+
+private data class StoredPlace(
+    val coordinates: Coordinates,
+    val timeZone: TimeZone,
+)
+
+private fun Preferences.readCity(): City? {
+    val id = this[CITY_ID]?.takeIf { it > 0 }
+    val name = this[CITY_NAME]
+    val place = readPlace()
+    if (id == null || name == null || place == null) return null
+    return City(
+        id = CityId(id.toInt()),
+        name = name,
+        country = CountryCode(this[CITY_COUNTRY].orEmpty()),
+        admin1 = this[CITY_ADMIN1].orEmpty(),
+        coordinates = place.coordinates,
+        timeZone = place.timeZone,
+        arabicName = this[CITY_ARABIC_NAME],
+    )
+}
+
+private fun Preferences.readPlace(): StoredPlace? {
+    val latitude = this[CITY_LATITUDE]?.toDoubleOrNull()
+    val longitude = this[CITY_LONGITUDE]?.toDoubleOrNull()
+    // A time zone the platform no longer knows would throw on every read, so a stale one
+    // costs the reader their stored city rather than every screen that shows a prayer time.
+    val timeZone = this[CITY_TIME_ZONE]?.let { zone -> runCatching { TimeZone.of(zone) }.getOrNull() }
+    if (latitude == null || longitude == null || timeZone == null) return null
+    return StoredPlace(Coordinates(latitude = latitude, longitude = longitude), timeZone)
+}
+
+private fun MutablePreferences.writeCity(city: City?) {
+    setOrRemoveWhenUnchosen(CITY_ID, city?.id?.value?.toLong())
+    setOrRemoveWhenUnchosen(CITY_NAME, city?.name)
+    setOrRemoveWhenUnchosen(CITY_ARABIC_NAME, city?.arabicName)
+    setOrRemoveWhenUnchosen(CITY_COUNTRY, city?.country?.value)
+    setOrRemoveWhenUnchosen(CITY_ADMIN1, city?.admin1)
+    setOrRemoveWhenUnchosen(CITY_LATITUDE, city?.coordinates?.latitude?.toString())
+    setOrRemoveWhenUnchosen(CITY_LONGITUDE, city?.coordinates?.longitude?.toString())
+    setOrRemoveWhenUnchosen(CITY_TIME_ZONE, city?.timeZone?.id)
 }
 
 private fun <V : Any> MutablePreferences.setOrRemoveWhenUnchosen(

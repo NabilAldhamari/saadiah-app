@@ -48,3 +48,27 @@ contract rather than this particular source.
 Every entry is tagged `SUNNI`. This compilation's hadith sourcing is Sunni, and tagging it
 for both traditions would present Sunni-framed content to a Twelver reader as their own.
 A Twelver corpus is tagged separately if and when one is sourced.
+
+## Cities
+
+`tools/gen-city-db.py` packs the GeoNames `cities1000` dump — every populated place with a
+thousand or more inhabitants, 170,493 of them — into `android/app/src/main/assets/cities.bin`.
+
+**GeoNames is licensed CC BY 4.0 and attribution is a condition of use.** The credit appears in
+the app's settings screen, not only here. Removing it would make the distribution non-compliant.
+
+- Source: <https://download.geonames.org/export/dump/>, dump dated 2026-07-25
+- `cities1000.txt` `e13434a44e10eddeefb8b3fbc52c85668a1303580482f07774f99147518ad544`
+- `admin1CodesASCII.txt` `34784457b76b988a669dff7c3e4b104e4902c0875643cff019281ac79dfa2992`
+- `cities.bin` `f8e96a8f9811606b6b459c64a2a1664be8fada7f39ca9a3516f512371fcede01`
+
+The `cities1000` tier was chosen against the 12 MB APK budget. The full `allCountries` dump is
+400 MB compressed and cannot ship offline; the tiers above it were rejected because the Quran text
+has yet to claim its share of the budget. Coverage here is a findability decision rather than an
+accuracy one — prayer times move about four minutes per degree of longitude, so a village twenty
+kilometres from a listed town differs by well under a minute.
+
+Identity is the GeoNames id rather than a row index, so refreshing the dump cannot silently turn a
+reader's stored city into a different place. Records are sorted by the ASCII name lowercased, which
+is the contract between the generator and `CityIndex`; `CityDatabaseTest` walks the whole file and
+asserts that ordering rather than trusting it.

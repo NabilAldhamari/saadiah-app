@@ -13,8 +13,7 @@ import app.saadiah.prayer.inferProfile
 import app.saadiah.schedule.AlertSettings
 import app.saadiah.schedule.budget
 import app.saadiah.schedule.schedule
-import app.saadiah.ui.CITY_CATALOG
-import app.saadiah.ui.cityById
+import app.saadiah.ui.DEFAULT_CITY
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
@@ -41,7 +40,7 @@ class PrayerAlarmScheduler(
     fun arm(from: Instant = Clock.System.now()) {
         // A receiver has no scope of its own, and the horizon must be armed before it returns.
         val stored = runBlocking { SettingsStore(context).settings.first() }
-        val city = cityById(stored.cityId?.value ?: 0) ?: CITY_CATALOG.first()
+        val city = stored.city ?: DEFAULT_CITY
         val profile =
             inferProfile(city.country)
                 .let { base ->

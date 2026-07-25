@@ -51,6 +51,9 @@ data class City(
     val admin1: String,
     val coordinates: Coordinates,
     val timeZone: TimeZone,
+    // Arabic is the primary locale, but the source only carries an Arabic form for about a
+    // fifth of places, so a reader may still be shown the latin name.
+    val arabicName: String? = null,
 ) {
     init {
         require(name.isNotBlank()) { "city name must not be blank" }

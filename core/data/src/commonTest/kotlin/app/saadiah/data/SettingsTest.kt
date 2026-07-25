@@ -23,7 +23,7 @@ class SettingsTest {
 
     @Test
     fun leavesLocationUnchosen() {
-        assertNull(Settings().cityId)
+        assertNull(Settings().city)
     }
 
     @Test
