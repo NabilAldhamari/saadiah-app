@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Saadiah — reference mockups</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<style>
+:root{
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;--s6:24px;--s7:32px;
+  --r-s:8px;--r-m:12px;--r-l:20px;
+  --t-display:54px;--t-title-l:24px;--t-title-m:21px;--t-title-s:19px;
+  --t-body:17px;--t-body-s:15px;--t-label:14px;--t-quran:26px;
+}
+.dark{--bg:#0E1614;--surface:#152220;--line:#22302C;--line-2:#1A2724;
+  --text:#F7F4EC;--text-2:#B0BAB6;--text-3:#78837F;--accent:#B8935A;--sage:#5E7A6B;--warn:#C57358;}
+.light{--bg:#F7F4EC;--surface:#EDE6D3;--line:#DDD7C7;--line-2:#EAE5D8;
+  --text:#0E1614;--text-2:#4A4A44;--text-3:#6B665C;--accent:#7A5A22;--sage:#3E5A4A;--warn:#9A3F22;}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#2A2A28;color:#EDEAE0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;padding:var(--s7)}
+h1{font-size:22px;font-weight:500;margin-bottom:var(--s2)}
+p.note{font-size:14px;color:#A8A49A;max-width:70ch;margin-bottom:var(--s7);line-height:1.6}
+.grid{display:flex;flex-wrap:wrap;gap:var(--s7)}
+figure{margin:0}
+figcaption{font-size:14px;color:#A8A49A;margin-top:var(--s3);text-align:center;max-width:340px}
+
+.screen{width:340px;min-height:600px;background:var(--bg);color:var(--text);
+  border-radius:var(--r-l);padding:var(--s5);display:flex;flex-direction:column}
+.hr{border-top:1px solid var(--line);margin:var(--s4) 0}
+.hr-2{border-top:1px solid var(--line-2)}
+.row{display:flex;align-items:center;gap:var(--s3);min-height:48px}
+.grow{flex:1}
+.center{text-align:center}
+.rtl{direction:rtl;text-align:right}
+
+.display{font-size:var(--t-display);line-height:1.1}
+.title-l{font-size:var(--t-title-l);line-height:1.3}
+.title-m{font-size:var(--t-title-m);line-height:1.3}
+.title-s{font-size:var(--t-title-s);line-height:1.4}
+.body{font-size:var(--t-body);line-height:1.5}
+.body-s{font-size:var(--t-body-s);line-height:1.5}
+.label{font-size:var(--t-label);line-height:1.4;font-weight:500}
+.quran{font-size:var(--t-quran);line-height:2}
+.sec{color:var(--text-2)}.ter{color:var(--text-3)}.acc{color:var(--accent)}
+.warn{color:var(--warn)}.sage{color:var(--sage)}
+i{font-size:24px;line-height:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);
+  border:1px solid var(--line);border-radius:var(--r-s);padding:var(--s3) var(--s5);
+  min-height:48px;font-size:var(--t-body);color:var(--text)}
+.btn-acc{border-color:var(--accent);color:var(--accent)}
+.pill{border:1px solid var(--line);border-radius:999px;padding:var(--s2) var(--s4);
+  font-size:var(--t-label);font-weight:500;color:var(--text-3)}
+.pill-acc{border-color:var(--accent);color:var(--accent)}
+.panel{background:var(--surface);border-radius:var(--r-m);padding:var(--s4)}
+.cur{background:var(--surface);border-radius:var(--r-s);margin:0 calc(var(--s3) * -1);padding-left:var(--s3);padding-right:var(--s3)}
+.tabs{display:flex;border-top:1px solid var(--line);padding-top:var(--s3);margin-top:auto}
+.tab{flex:1;text-align:center;color:var(--text-2)}
+.tab.on{color:var(--accent)}
+.tab i{font-size:26px}
+.tab span{display:block;font-size:var(--t-label);margin-top:var(--s1);font-weight:500}
+.lead{width:44px;flex:none}
+.seg{display:flex;gap:var(--s2);margin-top:var(--s4)}
+.seg>div{flex:1;text-align:center;border:1px solid var(--line);border-radius:var(--r-s);
+  padding:var(--s3) 0;font-size:var(--t-body);color:var(--text-2);min-height:48px;
+  display:flex;align-items:center;justify-content:center}
+.seg>div.on{background:var(--surface);border-color:var(--surface);color:var(--text)}
+.ring{width:96px;height:96px;border-radius:50%;border:2px solid var(--accent);
+  margin:0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring b{font-size:30px;font-weight:400}
+.bar{display:flex;gap:var(--s1);margin-top:var(--s3)}
+.bar span{flex:1;height:8px;border-radius:4px}
+.wave{display:flex;align-items:flex-end;gap:2px;height:18px}
+.wave span{width:3px;background:var(--text-3)}
+.mark{width:8px;height:8px;border-radius:50%;flex:none}
+.mark.fast{background:var(--sage)}
+.mark.no{width:12px;height:3px;border-radius:2px;background:var(--text-3)}
+.mark.hij{border:2px solid var(--accent);background:none}
+.startbar{border-inline-start:3px solid var(--accent);padding-inline-start:var(--s3)}
+.notebar{border-inline-start:2px solid var(--line);padding-inline-start:var(--s3)}
+</style>
+</head>
+<body>
+
+<h1>Saadiah — reference mockups</h1>
+<p class="note">Rendered at the values in <code>docs/DESIGN.md</code>. Nothing here is below 14px, every
+status uses shape or words in addition to colour, and every interactive element is at least 48px tall.
+These supersede any earlier sketch. Take measurements from DESIGN.md, not from this file.</p>
+
+<div class="grid">
+
+<figure>
+<div class="screen light">
+  <div class="title-m">٢٧ صفر ١٤٤٨</div>
+  <div class="body-s sec" style="margin-top:4px">Thursday 24 July</div>
+  <div class="hr"></div>
+  <div class="center">
+    <div class="body sec">Next prayer</div>
+    <div class="title-l acc" style="margin-top:8px">ʿAṣr · العصر</div>
+    <div class="display" style="margin-top:4px">17:42</div>
+    <div class="body sec" style="margin-top:8px">in 2 hours 14 minutes</div>
+    <div class="btn" style="margin-top:16px"><i class="ti ti-info-circle"></i>Why this time?</div>
+  </div>
+  <div class="hr"></div>
+  <div class="row hr-2" style="border-top:none"><span class="grow title-s">Fajr</span><span class="title-s sec">03:12</span></div>
+  <div class="row hr-2"><span class="grow title-s">Dhuhr</span><span class="title-s sec">13:04</span></div>
+  <div class="row cur"><span class="grow title-s">ʿAṣr</span><span class="title-s acc">17:42</span></div>
+  <div class="row hr-2"><span class="grow title-s">Maghrib</span><span class="title-s sec">21:08</span></div>
+  <div class="row hr-2"><span class="grow title-s">ʿIshāʾ</span><span class="title-s sec">22:40</span></div>
+  <div class="hr"></div>
+  <div class="row"><span class="mark fast"></span>
+    <span class="grow"><span class="body">Ayyām al-Bīḍ in 3 days</span><br><span class="body-s sec">Monday to Wednesday</span></span>
+    <i class="ti ti-bell acc"></i></div>
+  <div class="row"><span class="mark hij"></span>
+    <span class="grow"><span class="body">Ḥijāmah — 17th, in 6 days</span><br><span class="body-s sec">from Maghrib on Tuesday</span></span>
+    <i class="ti ti-bell-off ter"></i></div>
+  <div class="tabs">
+    <div class="tab on"><i class="ti ti-clock-hour-4"></i><span>Today</span></div>
+    <div class="tab"><i class="ti ti-book-2"></i><span>Quran</span></div>
+    <div class="tab"><i class="ti ti-rotate"></i><span>Adhkār</span></div>
+    <div class="tab"><i class="ti ti-dots"></i><span>More</span></div>
+  </div>
+</div>
+<figcaption>Today — light. One hero, prayers as a list, observances with shape markers.</figcaption>
+</figure>
+
+<figure>
+<div class="screen dark">
+  <div class="title-m">ذو الحجة ١٤٤٧</div>
+  <div class="body-s sec" style="margin-top:4px">May – June 2026</div>
+  <div class="seg"><div class="on">List</div><div>Grid</div></div>
+  <div class="hr"></div>
+  <div class="row hr-2" style="border-top:none">
+    <span class="lead"><span class="title-s">9</span><br><span class="body-s sec">Mon</span></span>
+    <span class="grow"><span class="body">Fast — ʿArafah</span><br><span class="body-s sec">25 May</span></span>
+    <i class="ti ti-bell acc"></i></div>
+  <div class="row hr-2">
+    <span class="lead"><span class="title-s">10</span><br><span class="body-s sec">Tue</span></span>
+    <span class="grow"><span class="body">Do not fast — Eid al-Aḍḥā</span><br><span class="body-s sec">26 May</span></span>
+    <i class="ti ti-bell-off ter"></i></div>
+  <div class="row hr-2">
+    <span class="lead"><span class="title-s">14</span><br><span class="body-s sec">Sat</span></span>
+    <span class="grow"><span class="body">Fast — Ayyām al-Bīḍ</span><br><span class="body-s sec">30 May, and the 15th</span></span>
+    <i class="ti ti-bell acc"></i></div>
+  <div class="row hr-2">
+    <span class="lead"><span class="title-s">17</span><br><span class="body-s sec">Tue</span></span>
+    <span class="grow"><span class="body">Ḥijāmah day</span><br><span class="body-s sec">from Maghrib on 2 June</span></span>
+    <i class="ti ti-bell acc"></i></div>
+  <div class="panel body-s sec" style="margin-top:auto">The 13th is normally Ayyām al-Bīḍ, but it falls in Tashrīq this month.</div>
+</div>
+<figcaption>Calendar — dark, list view is the default. Observances named in words.</figcaption>
+</figure>
+
+<figure>
+<div class="screen dark">
+  <div class="row" style="min-height:auto">
+    <i class="ti ti-chevron-left"></i>
+    <span class="grow"><span class="title-s">البقرة · al-Baqarah</span><br><span class="body-s sec">Juzʾ 3 · page 42</span></span>
+    <i class="ti ti-adjustments-horizontal"></i>
+  </div>
+  <div class="row" style="gap:8px"><span class="pill pill-acc">Daily wird</span><span class="pill">Memorisation</span><span class="pill">Tafsīr</span></div>
+  <div class="hr"></div>
+  <div class="rtl quran">وَٱللَّهُ لَا يَهْدِى ٱلْقَوْمَ ٱلظَّٰلِمِينَ <span class="label acc">٢٥٨</span></div>
+  <div class="hr"></div>
+  <div class="startbar">
+    <div class="rtl quran">ٱللَّهُ لَآ إِلَٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ ۚ لَا تَأْخُذُهُۥ سِنَةٌ وَلَا نَوْمٌ <span class="label acc">٢٥٥</span></div>
+    <div class="panel row" style="margin-top:12px">
+      <i class="ti ti-player-play acc"></i>
+      <span class="wave"><span style="height:7px"></span><span style="height:13px"></span><span style="height:18px"></span><span style="height:10px"></span><span style="height:15px"></span><span style="height:8px"></span><span style="height:12px"></span></span>
+      <span class="grow body-s sec">0:42 · 3 days ago</span>
+    </div>
+    <div class="notebar body-s sec" style="margin-top:12px">Check the waqf here against the tajwīd notes before Thursday.</div>
+  </div>
+  <div class="tabs" style="justify-content:flex-start;gap:16px">
+    <div class="btn" style="padding:12px"><i class="ti ti-bookmark"></i><span class="label">Bookmark</span></div>
+    <div class="btn" style="padding:12px"><i class="ti ti-microphone"></i><span class="label">Record</span></div>
+  </div>
+  <div class="body-s ter" style="margin-top:12px">saved on this device</div>
+</div>
+<figcaption>Quran — thread chips, voice note on the āyah, labelled actions.</figcaption>
+</figure>
+
+<figure>
+<div class="screen dark">
+  <div class="panel row"><i class="ti ti-search ter"></i><span class="body ter">Search adhkār and duʿāʾ</span></div>
+  <div style="margin-top:20px"><span class="title-m acc">أذكار المساء</span><br><span class="body-s sec">Evening adhkār · 4 of 22</span></div>
+  <div class="panel" style="margin-top:16px">
+    <div class="rtl" style="font-size:24px;line-height:2">أَمْسَيْنَا وَأَمْسَى ٱلْمُلْكُ لِلَّهِ</div>
+    <div class="body-s sec" style="font-style:italic;margin-top:12px">amsaynā wa-amsā l-mulku li-llāh</div>
+    <div class="body" style="margin-top:8px">We have reached the evening, and at this very time the dominion belongs to Allah.</div>
+    <div class="hr" style="margin:12px 0"></div>
+    <div class="row body-s ter" style="min-height:auto"><i class="ti ti-file-text" style="font-size:18px"></i>Ṣaḥīḥ Muslim 2723</div>
+  </div>
+  <div style="margin-top:24px" class="center">
+    <div class="ring"><b>3</b><span class="body-s sec">of 33</span></div>
+    <div class="body-s ter" style="margin-top:12px">tap the card to count</div>
+  </div>
+  <div class="tabs" style="justify-content:space-between;align-items:center">
+    <i class="ti ti-chevron-left"></i>
+    <span class="bar" style="width:120px;margin:0"><span style="background:var(--line)"></span><span style="background:var(--line)"></span><span style="background:var(--line)"></span><span style="background:var(--accent);flex:2"></span><span style="background:var(--line)"></span></span>
+    <i class="ti ti-chevron-right"></i>
+  </div>
+</div>
+<figcaption>Adhkār — source reference mandatory, counter keeps its place.</figcaption>
+</figure>
+
+<figure>
+<div class="screen light" style="min-height:520px">
+  <div class="title-l">Why 17:42?</div>
+  <div class="body-s sec" style="margin-top:4px">ʿAṣr today in Farnborough</div>
+  <div class="hr"></div>
+  <div class="row hr-2" style="border-top:none"><span class="grow body sec">Method</span><span class="body">Muslim World League</span></div>
+  <div class="row hr-2"><span class="grow body sec">Fajr / ʿIshāʾ angle</span><span class="body">18° / 17°</span></div>
+  <div class="row hr-2"><span class="grow body sec">ʿAṣr madhhab</span><span class="body acc">Standard</span></div>
+  <div class="row hr-2"><span class="grow body sec">High latitude</span><span class="body">Middle of the night</span></div>
+  <div class="row hr-2"><span class="grow body sec">Your tuning</span><span class="body">none</span></div>
+  <div class="panel body sec" style="margin-top:16px">The Ḥanafī calculation would put ʿAṣr at <span class="acc">18:29</span> — 47 minutes later. If that matches your masjid, switch the madhhab.</div>
+  <div class="row" style="margin-top:auto;gap:12px">
+    <div class="btn btn-acc grow">Match my masjid</div>
+    <div class="btn"><i class="ti ti-adjustments"></i></div>
+  </div>
+</div>
+<figcaption>Why this time — the accuracy complaint, answered in one sheet.</figcaption>
+</figure>
+
+<figure>
+<div class="screen light" style="min-height:520px">
+  <div class="title-l">Alert check</div>
+  <div class="body-s sec" style="margin-top:4px">Xiaomi · HyperOS 3</div>
+  <div class="hr"></div>
+  <div class="row hr-2" style="border-top:none"><i class="ti ti-check sage"></i><span class="grow body">Notifications allowed</span></div>
+  <div class="row hr-2"><i class="ti ti-check sage"></i><span class="grow body">Exact alarms allowed</span></div>
+  <div class="row hr-2"><i class="ti ti-alert-triangle warn"></i><span class="grow body">Battery saver is restricting</span><span class="pill pill-acc">Fix</span></div>
+  <div class="row hr-2"><i class="ti ti-alert-triangle warn"></i><span class="grow body">Autostart is off</span><span class="pill pill-acc">Fix</span></div>
+  <div class="panel" style="margin-top:16px">
+    <div class="body-s sec">Last 10 alerts</div>
+    <div class="bar"><span style="background:var(--sage)"></span><span style="background:var(--sage)"></span><span style="background:var(--warn)"></span><span style="background:var(--sage)"></span><span style="background:var(--sage)"></span><span style="background:var(--warn)"></span><span style="background:var(--sage)"></span><span style="background:var(--sage)"></span><span style="background:var(--warn)"></span><span style="background:var(--sage)"></span></div>
+    <div class="body" style="margin-top:12px">7 on time, 3 late by more than 2 minutes. Both fixes above should clear this.</div>
+  </div>
+  <div class="btn" style="margin-top:auto">Run a 60-second test</div>
+</div>
+<figcaption>Alert check — status by glyph, colour and an action, never colour alone.</figcaption>
+</figure>
+
+</div>
+</body>
+</html>

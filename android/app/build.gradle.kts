@@ -19,6 +19,15 @@ android {
             signingConfig = signingConfigs.getByName("release").takeIf { it.storeFile != null }
         }
     }
+
+    testOptions {
+        unitTests {
+            // Robolectric shadows what the alarm tests exercise; the remaining android.jar
+            // stubs should return defaults rather than throw.
+            isReturnDefaultValues = true
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {

@@ -42,4 +42,6 @@ data class TimingProfile(
     val highLatitudeRule: HighLatitudeRule,
     val madhab: Madhab,
     val adjustments: Map<Prayer, Duration> = emptyMap(),
+    // Whether Zuhrayn and Ishaayn are prayed together. A timing concern, never a tradition one.
+    val combineMode: CombineMode = CombineMode.NONE,
 )

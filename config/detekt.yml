@@ -21,6 +21,10 @@ complexity:
   LongMethod:
     active: true
     threshold: 30
+    # A composable is a tree of declarations rather than imperative logic, so its line
+    # count does not measure the complexity this rule exists to catch. Splitting one
+    # purely to satisfy the limit produces wrappers that exist for no reader's benefit.
+    ignoreAnnotated: ['Composable']
   LongParameterList:
     active: true
     functionThreshold: 5
@@ -70,6 +74,8 @@ naming:
   active: true
   FunctionNaming:
     active: true
+    # Composables are PascalCase by Compose convention, not by accident.
+    ignoreAnnotated: ['Composable']
   ClassNaming:
     active: true
 
