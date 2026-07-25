@@ -37,8 +37,6 @@ object ArabicStrings : Strings {
 
     override val sectionLocation = "الموقع"
     override val sectionLanguage = "اللغة"
-    override val sectionTradition = "المذهب"
-    override val sectionTraditionWhy = "يحدد المناسبات والأذكار التي تُعرض لك."
     override val sectionMadhab = "مذهب العصر"
     override val sectionMadhabWhy = "يغيّر وقت دخول العصر."
     override val sectionCombining = "الجمع بين الصلوات"
@@ -59,7 +57,6 @@ object ArabicStrings : Strings {
     override val silent = "صامت"
 
     override val traditionSunni = "سني"
-    override val traditionTwelver = "اثنا عشري"
     override val madhabStandard = "المعتاد — الشافعي والمالكي والحنبلي"
     override val madhabHanafi = "الحنفي — يدخل العصر متأخرًا"
     override val combineNone = "إظهار الصلوات الخمس"
@@ -295,4 +292,15 @@ object ArabicStrings : Strings {
     override val seated = "جالسًا"
 
     override fun rakah(count: Int) = "$count ركعات"
+
+    override val readToday = "سجّل قراءة اليوم"
+    override val readTodayDone = "قُرئت اليوم"
+    override val quoteBy = "—"
+
+    override fun daysKeptUp(count: Int) = if (count == 1) "يوم واحد" else "$count يومًا من المداومة"
+
+    override val prayerChannelName = "أوقات الصلاة"
+    override val prayerChannelWhat = "يعلن كل صلاة عند دخول وقتها."
+    override val readingChannelName = "تذكير القراءة"
+    override val readingChannelWhat = "يذكّرك بقراءة سورة البقرة."
 }

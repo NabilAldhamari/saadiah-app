@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -45,6 +46,8 @@ private val PRE_ALERT = longPreferencesKey("alerts.pre.minutes")
 private val END_OF_WINDOW = longPreferencesKey("alerts.end.minutes")
 private val LANGUAGE = stringPreferencesKey("language")
 private val BAQARAH_REMINDER = stringPreferencesKey("baqarah.reminder")
+private val BAQARAH_READ_COUNT = intPreferencesKey("baqarah.read.count")
+private val BAQARAH_LAST_READ = stringPreferencesKey("baqarah.last.read")
 
 private val Context.settingsStore: DataStore<Preferences> by preferencesDataStore(name = STORE_NAME)
 
@@ -82,6 +85,8 @@ private fun Preferences.toSettings(): Settings {
         endOfWindow = this[END_OF_WINDOW]?.minutes,
         language = enumOrNull<Language>(LANGUAGE) ?: defaults.language,
         baqarahReminder = enumOrNull<BaqarahReminder>(BAQARAH_REMINDER) ?: defaults.baqarahReminder,
+        baqarahReadCount = this[BAQARAH_READ_COUNT] ?: defaults.baqarahReadCount,
+        baqarahLastRead = this[BAQARAH_LAST_READ],
     )
 }
 
@@ -101,6 +106,8 @@ private fun MutablePreferences.write(settings: Settings) {
     this[ENABLED_PRAYERS] = settings.enabledPrayers.map { it.name }.toSet()
     this[LANGUAGE] = settings.language.name
     this[BAQARAH_REMINDER] = settings.baqarahReminder.name
+    this[BAQARAH_READ_COUNT] = settings.baqarahReadCount
+    setOrRemoveWhenUnchosen(BAQARAH_LAST_READ, settings.baqarahLastRead)
 }
 
 private data class StoredPlace(

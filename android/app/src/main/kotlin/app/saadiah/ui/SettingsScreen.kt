@@ -31,7 +31,6 @@ import app.saadiah.model.CombineMode
 import app.saadiah.model.Language
 import app.saadiah.model.Madhab
 import app.saadiah.model.Prayer
-import app.saadiah.model.Tradition
 import kotlin.time.Duration.Companion.minutes
 
 private val HAIRLINE = 1.dp
@@ -119,13 +118,6 @@ private fun FiqhSections(
     settings: Settings,
     onChange: (Settings) -> Unit,
 ) {
-    Section(strings.sectionTradition, strings.sectionTraditionWhy) {
-        for (option in Tradition.entries) {
-            ChoiceRow(option.spelledOut(strings), settings.tradition == option) {
-                onChange(settings.copy(tradition = option))
-            }
-        }
-    }
     Section(strings.sectionMadhab, strings.sectionMadhabWhy) {
         for (option in Madhab.entries) {
             ChoiceRow(option.spelledOut(strings), settings.madhab == option) {

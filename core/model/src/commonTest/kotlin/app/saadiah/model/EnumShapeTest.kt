@@ -10,8 +10,9 @@ class EnumShapeTest {
     }
 
     @Test
-    fun traditionsAreSunniAndTwelver() {
-        assertEquals(expected = 2, actual = Tradition.entries.size)
+    fun traditionIsSunniOnly() {
+        assertEquals(expected = 1, actual = Tradition.entries.size)
+        assertEquals(expected = Tradition.SUNNI, actual = Tradition.entries.single())
     }
 
     @Test

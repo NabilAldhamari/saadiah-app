@@ -3,7 +3,10 @@ package app.saadiah.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -43,7 +46,10 @@ fun SaadiahApp(
 
     BackHandler(enabled = navigator.canGoBack) { navigator.back() }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    // Nothing handled insets before, so every screen drew under the status bar and its
+    // first line was clipped by the clock. This is the one place to inset: the tab bar is
+    // inside it, so it clears the gesture bar at the bottom too.
+    Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
         Box(modifier = Modifier.weight(1f)) {
             Destination(city, settings, profile, tradition, navigator, actions)
         }
@@ -111,6 +117,9 @@ private fun TabRoot(
                         onOpenDoctor = { navigator.go(Screen.WhyThisTime) },
                         onOpenPrayer = { navigator.go(Screen.PrayerDetail(it)) },
                         onOpenBaqarah = { navigator.go(Screen.Baqarah) },
+                        onMarkBaqarahRead = actions.onMarkBaqarahRead,
+                        baqarahReadCount = settings.baqarahReadCount,
+                        baqarahReadToday = settings.baqarahLastRead == today(city).toString(),
                     ),
             )
     }

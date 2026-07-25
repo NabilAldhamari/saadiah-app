@@ -3,24 +3,34 @@ package app.saadiah.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import app.saadiah.design.NextPrayerHero
 import app.saadiah.design.ObservanceRow
 import app.saadiah.design.PrayerRow
+import app.saadiah.design.R
+import app.saadiah.design.SaadiahRadius
 import app.saadiah.design.SaadiahSpacing
 import app.saadiah.design.SaadiahTheme
 import app.saadiah.design.SaadiahType
@@ -35,12 +45,16 @@ import kotlinx.datetime.Instant
 import androidx.compose.runtime.LaunchedEffect as ComposeLaunchedEffect
 
 private const val TICK_MILLIS = 1_000L
+private val GLYPH = 28.dp
 
 data class TodayActions(
     val onChangeCity: () -> Unit,
     val onOpenDoctor: () -> Unit,
     val onOpenPrayer: (app.saadiah.model.Prayer) -> Unit = {},
     val onOpenBaqarah: () -> Unit = {},
+    val onMarkBaqarahRead: () -> Unit = {},
+    val baqarahReadCount: Int = 0,
+    val baqarahReadToday: Boolean = false,
 )
 
 @Composable
@@ -78,7 +92,12 @@ fun TodayScreen(
         }
         FastingStrip(state.fasting)
         Observances(state)
-        BaqarahStrip(actions.onOpenBaqarah)
+        BaqarahCard(
+            readCount = actions.baqarahReadCount,
+            readToday = actions.baqarahReadToday,
+            onOpen = actions.onOpenBaqarah,
+            onMarkRead = actions.onMarkBaqarahRead,
+        )
         Spacer(Modifier.height(SaadiahSpacing.large))
     }
 }
@@ -127,27 +146,64 @@ private fun DateHeader(
 }
 
 @Composable
-private fun BaqarahStrip(onOpen: () -> Unit) {
-    // Always present, not driven by the reminder setting: that setting decides whether a
-    // notification arrives, while the daily reading is standing and belongs on the screen
-    // whether or not anyone asked to be nudged.
+private fun BaqarahCard(
+    readCount: Int,
+    readToday: Boolean,
+    onOpen: () -> Unit,
+    onMarkRead: () -> Unit,
+) {
+    // Deliberately the loudest thing below the prayer list: a filled card with its own
+    // glyph rather than another row of text. Every other item here is something to read;
+    // this one is something to do, and it is meant to be noticed and opened.
     val colors = SaadiahTheme.colors
-    SectionDivider()
+    Spacer(Modifier.height(SaadiahSpacing.medium))
     Column(
         modifier =
             Modifier
                 .fillMaxWidth()
+                .background(colors.surface, RoundedCornerShape(SaadiahRadius.sheet))
                 .clickable(onClick = onOpen)
-                .minimumTouchTarget()
-                .padding(vertical = SaadiahSpacing.snug),
+                .padding(SaadiahSpacing.medium),
     ) {
-        Text(
-            text = strings.todaysReading,
-            color = colors.text,
-            fontSize = SaadiahType.body.size,
-            lineHeight = SaadiahType.body.lineHeight,
-        )
-        Caption(strings.todaysReadingHint)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                painter = painterResource(R.drawable.ic_book),
+                contentDescription = null,
+                tint = colors.accent,
+                modifier = Modifier.size(GLYPH),
+            )
+            Spacer(Modifier.width(SaadiahSpacing.snug))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = strings.todaysReading,
+                    color = colors.text,
+                    fontSize = SaadiahType.titleMedium.size,
+                    lineHeight = SaadiahType.titleMedium.lineHeight,
+                )
+                Caption(strings.todaysReadingHint)
+            }
+        }
+        Spacer(Modifier.height(SaadiahSpacing.small))
+        SectionDivider()
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = strings.daysKeptUp(readCount),
+                color = colors.textSecondary,
+                fontSize = SaadiahType.bodySmall.size,
+                modifier = Modifier.weight(1f),
+            )
+            // The word carries the state, so a reader who cannot see the tint still knows.
+            Text(
+                text = if (readToday) strings.readTodayDone else strings.readToday,
+                color = if (readToday) colors.sage else colors.accent,
+                fontSize = SaadiahType.body.size,
+                modifier =
+                    Modifier
+                        .clickable(enabled = !readToday, onClick = onMarkRead)
+                        .minimumTouchTarget()
+                        .padding(horizontal = SaadiahSpacing.snug),
+            )
+        }
     }
 }
 

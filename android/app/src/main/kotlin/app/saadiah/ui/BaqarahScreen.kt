@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import app.saadiah.content.BaqarahMerit
+import app.saadiah.content.MeritKind
 import app.saadiah.content.baqarahMerits
 import app.saadiah.design.SaadiahRadius
 import app.saadiah.design.SaadiahSpacing
@@ -67,6 +68,22 @@ private fun MeritCard(merit: BaqarahMerit) {
                 .background(colors.surface, RoundedCornerShape(SaadiahRadius.sheet))
                 .padding(SaadiahSpacing.medium),
     ) {
+        if (merit.kind == MeritKind.SAYING) {
+            Text(
+                text = merit.translation,
+                color = colors.text,
+                fontSize = SaadiahType.titleMedium.size,
+                lineHeight = SaadiahType.titleMedium.lineHeight,
+            )
+            Spacer(Modifier.height(SaadiahSpacing.snug))
+            SectionDivider()
+            Text(
+                text = "${strings.quoteBy} ${merit.source}",
+                color = colors.textSecondary,
+                fontSize = SaadiahType.bodySmall.size,
+            )
+            return@Column
+        }
         merit.arabic?.let {
             Text(
                 text = it,

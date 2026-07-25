@@ -29,8 +29,6 @@ object EnglishStrings : Strings {
 
     override val sectionLocation = "Location"
     override val sectionLanguage = "Language"
-    override val sectionTradition = "Tradition"
-    override val sectionTraditionWhy = "Scopes which observances and adhkār you are shown."
     override val sectionMadhab = "ʿAṣr madhhab"
     override val sectionMadhabWhy = "Changes when ʿAṣr begins."
     override val sectionCombining = "Combining prayers"
@@ -51,7 +49,6 @@ object EnglishStrings : Strings {
     override val silent = "silent"
 
     override val traditionSunni = "Sunni"
-    override val traditionTwelver = "Twelver"
     override val madhabStandard = "Standard — Shāfiʿī, Mālikī, Ḥanbalī"
     override val madhabHanafi = "Ḥanafī — ʿAṣr begins later"
     override val combineNone = "Show all five prayers"
@@ -290,4 +287,15 @@ object EnglishStrings : Strings {
     override val seated = "seated"
 
     override fun rakah(count: Int) = "$count rakʿah"
+
+    override val readToday = "Mark today's reading"
+    override val readTodayDone = "Read today"
+    override val quoteBy = "—"
+
+    override fun daysKeptUp(count: Int) = if (count == 1) "1 day kept up" else "$count days kept up"
+
+    override val prayerChannelName = "Prayer times"
+    override val prayerChannelWhat = "Announces each prayer as its time enters."
+    override val readingChannelName = "Reading reminders"
+    override val readingChannelWhat = "Reminds you to read Sūrat al-Baqarah."
 }

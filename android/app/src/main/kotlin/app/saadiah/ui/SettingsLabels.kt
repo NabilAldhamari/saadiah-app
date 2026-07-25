@@ -16,7 +16,6 @@ import kotlin.time.Duration
 internal fun Tradition.spelledOut(strings: Strings): String =
     when (this) {
         Tradition.SUNNI -> strings.traditionSunni
-        Tradition.TWELVER -> strings.traditionTwelver
     }
 
 internal fun Madhab.spelledOut(strings: Strings): String =

@@ -19,7 +19,7 @@ private val WHITE_DAYS = 13..15
 private val SIX_OF_SHAWWAL_DAYS = 2..7
 private val HIJAMA_DAYS = setOf(17, 19, 21)
 
-private val BOTH = setOf(Tradition.SUNNI, Tradition.TWELVER)
+private val BOTH = setOf(Tradition.SUNNI)
 private val SUNNI_ONLY = setOf(Tradition.SUNNI)
 
 enum class Observance {
