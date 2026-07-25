@@ -37,6 +37,7 @@ data class Settings(
     // kept it up, not to audit which mornings they missed.
     val baqarahReadCount: Int = 0,
     val baqarahLastRead: String? = null,
+    val customAdhkar: List<CustomDhikr> = emptyList(),
 )
 
 /**

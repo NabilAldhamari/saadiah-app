@@ -50,6 +50,7 @@ private val THEME = stringPreferencesKey("theme")
 private val BAQARAH_REMINDER = stringPreferencesKey("baqarah.reminder")
 private val BAQARAH_READ_COUNT = intPreferencesKey("baqarah.read.count")
 private val BAQARAH_LAST_READ = stringPreferencesKey("baqarah.last.read")
+private val CUSTOM_ADHKAR = stringSetPreferencesKey("adhkar.custom")
 
 private val Context.settingsStore: DataStore<Preferences> by preferencesDataStore(name = STORE_NAME)
 
@@ -90,6 +91,7 @@ private fun Preferences.toSettings(): Settings {
         baqarahReminder = enumOrNull<BaqarahReminder>(BAQARAH_REMINDER) ?: defaults.baqarahReminder,
         baqarahReadCount = this[BAQARAH_READ_COUNT] ?: defaults.baqarahReadCount,
         baqarahLastRead = this[BAQARAH_LAST_READ],
+        customAdhkar = decodeCustomAdhkar(this[CUSTOM_ADHKAR].orEmpty()),
     )
 }
 
@@ -112,6 +114,7 @@ private fun MutablePreferences.write(settings: Settings) {
     this[BAQARAH_REMINDER] = settings.baqarahReminder.name
     this[BAQARAH_READ_COUNT] = settings.baqarahReadCount
     setOrRemoveWhenUnchosen(BAQARAH_LAST_READ, settings.baqarahLastRead)
+    this[CUSTOM_ADHKAR] = encodeCustomAdhkar(settings.customAdhkar)
 }
 
 private data class StoredPlace(

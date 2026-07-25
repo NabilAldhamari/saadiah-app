@@ -268,6 +268,14 @@ interface Strings {
     val readAlImran: String
     val titleAlBaqarah: String
     val titleAlImran: String
+
+    val myAdhkar: String
+    val addDhikr: String
+    val newDhikrHint: String
+    val save: String
+    val remove: String
+    val noCustomAdhkar: String
+    val timesLabel: String
 }
 
 val LocalStrings: ProvidableCompositionLocal<Strings> = staticCompositionLocalOf { EnglishStrings }

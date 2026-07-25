@@ -313,4 +313,12 @@ object EnglishStrings : Strings {
     override val readAlImran = "Read Sūrat Āl ʿImrān"
     override val titleAlBaqarah = "سورة البقرة"
     override val titleAlImran = "سورة آل عمران"
+
+    override val myAdhkar = "My adhkār"
+    override val addDhikr = "Add a dhikr"
+    override val newDhikrHint = "What you want to repeat"
+    override val save = "Save"
+    override val remove = "Remove"
+    override val noCustomAdhkar = "Nothing added yet. What you add here is kept on this device."
+    override val timesLabel = "Times"
 }

@@ -317,4 +317,12 @@ object ArabicStrings : Strings {
     override val readAlImran = "اقرأ سورة آل عمران"
     override val titleAlBaqarah = "سورة البقرة"
     override val titleAlImran = "سورة آل عمران"
+
+    override val myAdhkar = "أذكاري"
+    override val addDhikr = "أضف ذكرًا"
+    override val newDhikrHint = "ما تريد تكراره"
+    override val save = "حفظ"
+    override val remove = "حذف"
+    override val noCustomAdhkar = "لم تُضف شيئًا بعد. ما تضيفه هنا يُحفظ على هذا الجهاز."
+    override val timesLabel = "عدد المرات"
 }

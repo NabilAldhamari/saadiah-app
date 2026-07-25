@@ -116,7 +116,12 @@ private fun TabRoot(
 ) {
     when (screen) {
         Screen.Calendar -> CalendarScreen(state = thisMonth(city, tradition, strings))
-        Screen.Adhkar -> AdhkarScreen(tradition = tradition)
+        Screen.Adhkar ->
+            AdhkarScreen(
+                tradition = tradition,
+                custom = settings.customAdhkar,
+                onChangeCustom = { actions.onChangeSettings(settings.copy(customAdhkar = it)) },
+            )
         Screen.More ->
             SettingsScreen(
                 settings = settings,
