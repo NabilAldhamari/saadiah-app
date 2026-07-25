@@ -16,6 +16,7 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 
 data class PrayerRowState(
+    val prayer: Prayer,
     val name: String,
     val time: String,
     val isCurrent: Boolean,
@@ -38,6 +39,7 @@ data class TodayState(
     val remaining: String,
     val rows: List<PrayerRowState>,
     val observances: List<ObservanceState>,
+    val fasting: List<FastingPrompt>,
 )
 
 private const val MAX_OBSERVANCES = 2
@@ -73,6 +75,7 @@ fun todayState(
         remaining = "in ${(nextAt - now).spelledOut()}",
         rows = rowsFor(timings, city, profile, now),
         observances = observancesFor(hijri, tradition),
+        fasting = fastingOutlook(today, hijri, tradition),
     )
 }
 
@@ -86,6 +89,7 @@ private fun rowsFor(
     val current = currentPrayerOf(shown, timings, now)
     return shown.map {
         PrayerRowState(
+            prayer = it,
             name = it.latinLabel(profile.combineMode),
             time = timings[it].asClockTime(city.timeZone),
             isCurrent = it == current,

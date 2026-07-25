@@ -32,10 +32,20 @@ fun SaadiahApp(
 ) {
     var destination by remember { mutableStateOf(Destination.TODAY) }
     var explaining by remember { mutableStateOf(false) }
+    var asking by remember { mutableStateOf(false) }
+    var openPrayer by remember { mutableStateOf<app.saadiah.model.Prayer?>(null) }
     val profile = remember(city) { inferProfile(city.country).copy(madhab = Madhab.SHAFI) }
 
     if (explaining) {
         Explanation(city, profile, onOpenDoctor) { explaining = false }
+        return
+    }
+    if (asking) {
+        AskScreen(tradition = tradition) { asking = false }
+        return
+    }
+    openPrayer?.let { prayer ->
+        Detail(DetailContext(city, profile, tradition), prayer) { openPrayer = null }
         return
     }
 
@@ -47,7 +57,12 @@ fun SaadiahApp(
                         city = city,
                         profile = profile,
                         tradition = tradition,
-                        actions = TodayActions(onChangeCity = onChangeCity, onOpenDoctor = { explaining = true }),
+                        actions =
+                            TodayActions(
+                                onChangeCity = onChangeCity,
+                                onOpenDoctor = { explaining = true },
+                                onOpenPrayer = { openPrayer = it },
+                            ),
                     )
                 Destination.CALENDAR -> CalendarScreen(state = thisMonth(city, tradition))
                 Destination.ADHKAR -> NotYetScreen("Adhkār", "The adhkār corpus is not bundled yet.")
@@ -56,7 +71,31 @@ fun SaadiahApp(
         }
         TabBar(tabs = tabsFor(destination) { destination = it })
     }
+    AskButton { asking = true }
 }
+
+@Composable
+private fun Detail(
+    context: DetailContext,
+    prayer: app.saadiah.model.Prayer,
+    onBack: () -> Unit,
+) {
+    val city = context.city
+    val timings =
+        app.saadiah.prayer
+            .PrayerCalculator()
+            .compute(city, today(city), context.profile)
+    PrayerDetailScreen(
+        detail = prayerDetail(prayer, timings[prayer].asClockTime(city.timeZone), context.tradition),
+        onBack = onBack,
+    )
+}
+
+private data class DetailContext(
+    val city: City,
+    val profile: app.saadiah.model.TimingProfile,
+    val tradition: Tradition,
+)
 
 @Composable
 private fun Explanation(

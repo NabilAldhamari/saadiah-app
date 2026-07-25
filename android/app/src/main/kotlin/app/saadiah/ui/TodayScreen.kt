@@ -39,6 +39,7 @@ private const val TICK_MILLIS = 1_000L
 data class TodayActions(
     val onChangeCity: () -> Unit,
     val onOpenDoctor: () -> Unit,
+    val onOpenPrayer: (app.saadiah.model.Prayer) -> Unit = {},
 )
 
 @Composable
@@ -66,8 +67,14 @@ fun TodayScreen(
         Hero(state, actions.onOpenDoctor)
         SectionDivider()
         for (row in state.rows) {
-            PrayerRow(name = row.name, time = row.time, isCurrent = row.isCurrent)
+            PrayerRow(
+                name = row.name,
+                time = row.time,
+                isCurrent = row.isCurrent,
+                modifier = Modifier.clickable { actions.onOpenPrayer(row.prayer) },
+            )
         }
+        FastingStrip(state.fasting)
         Observances(state)
         Spacer(Modifier.height(SaadiahSpacing.large))
     }
@@ -112,6 +119,22 @@ private fun DateHeader(
                     .clickable(onClick = onChangeCity)
                     .minimumTouchTarget(),
             textAlign = TextAlign.Start,
+        )
+    }
+}
+
+@Composable
+private fun FastingStrip(prompts: List<FastingPrompt>) {
+    if (prompts.isEmpty()) return
+    SectionDivider()
+    Caption("Fasting ahead")
+    for (prompt in prompts) {
+        ObservanceRow(
+            title = prompt.title,
+            subtitle = prompt.timing,
+            marker = prompt.marker,
+            alertEnabled = true,
+            onToggleAlert = {},
         )
     }
 }
