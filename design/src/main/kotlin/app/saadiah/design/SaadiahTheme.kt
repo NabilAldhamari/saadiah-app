@@ -23,8 +23,18 @@ fun SaadiahTheme(
     dark: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
-    CompositionLocalProvider(
-        LocalSaadiahColors provides if (dark) DarkColors else LightColors,
-        content = content,
-    )
+    SaadiahTheme(colors = if (dark) DarkColors else LightColors, content = content)
+}
+
+/**
+ * Takes the palette rather than a boolean, because there are more than two of them now.
+ * The caller has to provide one: the local used to fall back to [LightColors] when nobody
+ * did, which is why every component drew light colours even in dark mode.
+ */
+@Composable
+fun SaadiahTheme(
+    colors: SaadiahColors,
+    content: @Composable () -> Unit,
+) {
+    CompositionLocalProvider(LocalSaadiahColors provides colors, content = content)
 }

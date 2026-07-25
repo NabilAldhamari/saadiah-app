@@ -303,4 +303,10 @@ object ArabicStrings : Strings {
     override val prayerChannelWhat = "يعلن كل صلاة عند دخول وقتها."
     override val readingChannelName = "تذكير القراءة"
     override val readingChannelWhat = "يذكّرك بقراءة سورة البقرة."
+
+    override val sectionTheme = "المظهر"
+    override val themeSystem = "حسب إعداد الهاتف"
+    override val themeLight = "فاتح دافئ"
+    override val themeDark = "داكن دافئ"
+    override val themeGreen = "أبيض وأخضر"
 }

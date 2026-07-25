@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import app.saadiah.model.AppTheme
 import app.saadiah.model.BaqarahReminder
 import app.saadiah.model.City
 import app.saadiah.model.CityId
@@ -45,6 +46,7 @@ private val ENABLED_PRAYERS = stringSetPreferencesKey("alerts.prayers")
 private val PRE_ALERT = longPreferencesKey("alerts.pre.minutes")
 private val END_OF_WINDOW = longPreferencesKey("alerts.end.minutes")
 private val LANGUAGE = stringPreferencesKey("language")
+private val THEME = stringPreferencesKey("theme")
 private val BAQARAH_REMINDER = stringPreferencesKey("baqarah.reminder")
 private val BAQARAH_READ_COUNT = intPreferencesKey("baqarah.read.count")
 private val BAQARAH_LAST_READ = stringPreferencesKey("baqarah.last.read")
@@ -84,6 +86,7 @@ private fun Preferences.toSettings(): Settings {
         preAlert = this[PRE_ALERT]?.minutes,
         endOfWindow = this[END_OF_WINDOW]?.minutes,
         language = enumOrNull<Language>(LANGUAGE) ?: defaults.language,
+        theme = enumOrNull<AppTheme>(THEME) ?: defaults.theme,
         baqarahReminder = enumOrNull<BaqarahReminder>(BAQARAH_REMINDER) ?: defaults.baqarahReminder,
         baqarahReadCount = this[BAQARAH_READ_COUNT] ?: defaults.baqarahReadCount,
         baqarahLastRead = this[BAQARAH_LAST_READ],
@@ -105,6 +108,7 @@ private fun MutablePreferences.write(settings: Settings) {
     this[COMBINE_MODE] = settings.combineMode.name
     this[ENABLED_PRAYERS] = settings.enabledPrayers.map { it.name }.toSet()
     this[LANGUAGE] = settings.language.name
+    this[THEME] = settings.theme.name
     this[BAQARAH_REMINDER] = settings.baqarahReminder.name
     this[BAQARAH_READ_COUNT] = settings.baqarahReadCount
     setOrRemoveWhenUnchosen(BAQARAH_LAST_READ, settings.baqarahLastRead)

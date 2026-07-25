@@ -255,6 +255,12 @@ interface Strings {
     val prayerChannelWhat: String
     val readingChannelName: String
     val readingChannelWhat: String
+
+    val sectionTheme: String
+    val themeSystem: String
+    val themeLight: String
+    val themeDark: String
+    val themeGreen: String
 }
 
 val LocalStrings: ProvidableCompositionLocal<Strings> = staticCompositionLocalOf { EnglishStrings }

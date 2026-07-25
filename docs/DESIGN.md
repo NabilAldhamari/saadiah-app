@@ -60,6 +60,27 @@ Two themes. Follow the system setting — do not pick for the user, and do not d
 | `sage` | `#3E5A4A` | recommended-fast marker | 6.91:1 |
 | `warning` | `#9A3F22` | failed check, prohibited day | 6.14:1 |
 
+### White and green
+
+A third palette, chosen for readers who want the app to feel light rather than warm. Every
+ratio below was measured before the colour was written, and `ColorContrastTest` holds them.
+
+| Token | Hex | Role | Contrast on `bg` |
+|---|---|---|---|
+| `bg` | `#F6FAF7` | screen background | — |
+| `surface` | `#E6F0E9` | cards, current prayer | — |
+| `line` | `#CBDFD1` | hairline | decorative |
+| `lineSubtle` | `#DEEAE1` | fainter hairline | decorative |
+| `text` | `#10201A` | primary text | 16.03:1 |
+| `textSecondary` | `#3C4E44` | secondary text | 8.43:1 |
+| `textTertiary` | `#59695F` | sources, captions | 5.52:1 |
+| `accent` | `#2E6A4B` | accents, filled controls | 6.08:1 |
+| `sage` | `#3A6650` | passing markers | 6.24:1 |
+| `warning` | `#8F3A1F` | failing markers | 7.14:1 |
+
+`accent` is used both as a foreground and as a fill with `bg` written on it, so 6.08:1 has to
+hold in both directions — contrast is symmetric, so the one measurement covers both.
+
 **Do not use `#B8935A` on a light background.** It measures 2.60:1 and fails. That is what
 `accent` light exists for. This mistake was made once already.
 

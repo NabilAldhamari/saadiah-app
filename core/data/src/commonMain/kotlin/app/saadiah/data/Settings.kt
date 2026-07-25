@@ -1,5 +1,6 @@
 package app.saadiah.data
 
+import app.saadiah.model.AppTheme
 import app.saadiah.model.BaqarahReminder
 import app.saadiah.model.City
 import app.saadiah.model.CombineMode
@@ -30,6 +31,7 @@ data class Settings(
     val preAlert: Duration? = null,
     val endOfWindow: Duration? = null,
     val language: Language = Language.SYSTEM,
+    val theme: AppTheme = AppTheme.SYSTEM,
     val baqarahReminder: BaqarahReminder = BaqarahReminder.OFF,
     // Kept as a count and a date rather than a list of days: the reader wants to know they
     // kept it up, not to audit which mornings they missed.

@@ -57,6 +57,24 @@ val LightColors =
         warning = Color(0xFF9A3F22),
     )
 
+/**
+ * White with the faintest green breath, and a deep green carrying the accents. Every pair
+ * measured before it was written: the ratios are in GreenContrastPairs and DESIGN.md §2.
+ */
+val GreenColors =
+    SaadiahColors(
+        bg = Color(0xFFF6FAF7),
+        surface = Color(0xFFE6F0E9),
+        line = Color(0xFFCBDFD1),
+        lineSubtle = Color(0xFFDEEAE1),
+        text = Color(0xFF10201A),
+        textSecondary = Color(0xFF3C4E44),
+        textTertiary = Color(0xFF59695F),
+        accent = Color(0xFF2E6A4B),
+        sage = Color(0xFF3A6650),
+        warning = Color(0xFF8F3A1F),
+    )
+
 enum class ColorRole(
     val minimumRatio: Double,
 ) {
@@ -92,6 +110,16 @@ val LightContrastPairs: List<TokenPair> =
         TokenPair("accent", LightColors.accent, LightColors.bg, ColorRole.TEXT, recordedRatio = 5.79),
         TokenPair("sage", LightColors.sage, LightColors.bg, ColorRole.NON_TEXT, recordedRatio = 6.91),
         TokenPair("warning", LightColors.warning, LightColors.bg, ColorRole.TEXT, recordedRatio = 6.14),
+    )
+
+val GreenContrastPairs: List<TokenPair> =
+    listOf(
+        TokenPair("text", GreenColors.text, GreenColors.bg, ColorRole.TEXT, recordedRatio = 16.03),
+        TokenPair("textSecondary", GreenColors.textSecondary, GreenColors.bg, ColorRole.TEXT, recordedRatio = 8.43),
+        TokenPair("textTertiary", GreenColors.textTertiary, GreenColors.bg, ColorRole.TEXT, recordedRatio = 5.52),
+        TokenPair("accent", GreenColors.accent, GreenColors.bg, ColorRole.TEXT, recordedRatio = 6.08),
+        TokenPair("sage", GreenColors.sage, GreenColors.bg, ColorRole.NON_TEXT, recordedRatio = 6.24),
+        TokenPair("warning", GreenColors.warning, GreenColors.bg, ColorRole.TEXT, recordedRatio = 7.14),
     )
 
 fun contrastRatio(

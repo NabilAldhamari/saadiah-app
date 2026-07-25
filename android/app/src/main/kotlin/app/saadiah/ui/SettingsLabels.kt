@@ -1,5 +1,6 @@
 package app.saadiah.ui
 
+import app.saadiah.model.AppTheme
 import app.saadiah.model.BaqarahReminder
 import app.saadiah.model.CombineMode
 import app.saadiah.model.Language
@@ -51,3 +52,11 @@ internal fun Duration?.asWarning(strings: Strings): String =
 
 internal fun Duration?.asClosingWarning(strings: Strings): String =
     if (this == null) strings.doNotWarnMe else strings.minutesBeforeClosing(inWholeMinutes)
+
+internal fun AppTheme.spelledOut(strings: Strings): String =
+    when (this) {
+        AppTheme.SYSTEM -> strings.themeSystem
+        AppTheme.LIGHT -> strings.themeLight
+        AppTheme.DARK -> strings.themeDark
+        AppTheme.GREEN -> strings.themeGreen
+    }

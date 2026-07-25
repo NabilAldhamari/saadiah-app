@@ -298,4 +298,10 @@ object EnglishStrings : Strings {
     override val prayerChannelWhat = "Announces each prayer as its time enters."
     override val readingChannelName = "Reading reminders"
     override val readingChannelWhat = "Reminds you to read Sūrat al-Baqarah."
+
+    override val sectionTheme = "Theme"
+    override val themeSystem = "Follow my phone"
+    override val themeLight = "Warm light"
+    override val themeDark = "Warm dark"
+    override val themeGreen = "White and green"
 }

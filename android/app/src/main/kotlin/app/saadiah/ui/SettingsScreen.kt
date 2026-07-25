@@ -26,6 +26,7 @@ import app.saadiah.design.SaadiahTheme
 import app.saadiah.design.SaadiahType
 import app.saadiah.design.SectionDivider
 import app.saadiah.design.minimumTouchTarget
+import app.saadiah.model.AppTheme
 import app.saadiah.model.BaqarahReminder
 import app.saadiah.model.CombineMode
 import app.saadiah.model.Language
@@ -80,6 +81,7 @@ fun SettingsScreen(
         Section(strings.sectionLocation) {
             ChoiceRow(cityName, selected = true, stateWord = strings.change, onSelect = actions.onChangeCity)
         }
+        ThemeSection(settings, actions.onChange)
         LanguageSection(settings, actions.onChange)
         FiqhSections(settings, actions.onChange)
         AlertSections(settings, actions.onChange)
@@ -95,6 +97,20 @@ fun SettingsScreen(
             Caption(strings.geoNamesCredit)
         }
         Spacer(Modifier.height(SaadiahSpacing.huge))
+    }
+}
+
+@Composable
+private fun ThemeSection(
+    settings: Settings,
+    onChange: (Settings) -> Unit,
+) {
+    Section(strings.sectionTheme) {
+        for (option in AppTheme.entries) {
+            ChoiceRow(option.spelledOut(strings), settings.theme == option) {
+                onChange(settings.copy(theme = option))
+            }
+        }
     }
 }
 

@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
         val settings by store.settings.collectAsStateWithLifecycle(initialValue = Settings())
         val navigator = remember { Navigator() }
 
-        SaadiahTheme(language = settings.language) {
+        SaadiahTheme(language = settings.language, theme = settings.theme) {
             SaadiahApp(
                 city = settings.city ?: DEFAULT_CITY,
                 settings = settings,
