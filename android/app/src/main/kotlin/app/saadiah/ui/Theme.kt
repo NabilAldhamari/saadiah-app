@@ -2,12 +2,14 @@ package app.saadiah.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -54,6 +56,19 @@ private val AccessibleTypography =
         bodyLarge = TextStyle(fontSize = BodySize),
         bodyMedium = TextStyle(fontSize = SecondarySize),
     )
+
+@Composable
+internal fun Caption(
+    text: String,
+    size: TextUnit = SecondarySize,
+) {
+    Text(text = text, fontSize = size, color = MaterialTheme.colorScheme.onSurfaceVariant)
+}
+
+@Composable
+internal fun Body(text: String) {
+    Text(text = text, fontSize = BodySize, color = MaterialTheme.colorScheme.onBackground)
+}
 
 @Composable
 fun SaadiahTheme(content: @Composable () -> Unit) {

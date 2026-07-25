@@ -15,6 +15,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,8 +48,9 @@ fun TodayScreen(
     city: City,
     profile: TimingProfile,
     tradition: Tradition,
-    calculator: PrayerCalculator = PrayerCalculator(),
+    onChangeCity: () -> Unit,
 ) {
+    val calculator = remember { PrayerCalculator() }
     val now = rememberTickingNow()
     val today = now.toLocalDateTime(city.timeZone).date
     val timings = remember(city, profile, today) { calculator.compute(city, today, profile) }
@@ -66,7 +68,7 @@ fun TodayScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = ScreenPadding, vertical = SectionGap),
         ) {
-            DateHeader(city = city, hijriLabel = hijri.arabicLabel())
+            DateHeader(city = city, hijriLabel = hijri.arabicLabel(), onChangeCity = onChangeCity)
             Spacer(Modifier.height(SectionGap))
             NextPrayerHero(now = now, timings = timings, tomorrow = tomorrow, city = city)
             Spacer(Modifier.height(SectionGap))
@@ -81,6 +83,7 @@ fun TodayScreen(
 private fun DateHeader(
     city: City,
     hijriLabel: String,
+    onChangeCity: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -89,12 +92,9 @@ private fun DateHeader(
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onBackground,
         )
-        Spacer(Modifier.height(RowGap / 2))
-        Text(
-            text = city.name,
-            fontSize = SecondarySize,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        TextButton(onClick = onChangeCity, modifier = Modifier.heightIn(min = MinimumTapTarget)) {
+            Text(text = "${city.name} — change city", fontSize = BodySize)
+        }
     }
 }
 
@@ -140,19 +140,6 @@ private fun rememberTickingNow(): Instant {
         }
     }
     return now
-}
-
-@Composable
-private fun Caption(
-    text: String,
-    size: androidx.compose.ui.unit.TextUnit = SecondarySize,
-) {
-    Text(text = text, fontSize = size, color = MaterialTheme.colorScheme.onSurfaceVariant)
-}
-
-@Composable
-private fun Body(text: String) {
-    Text(text = text, fontSize = BodySize, color = MaterialTheme.colorScheme.onBackground)
 }
 
 @Composable
