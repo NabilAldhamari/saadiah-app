@@ -9,58 +9,62 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.TextUnit
-import app.saadiah.design.DarkColours
-import app.saadiah.design.LightColours
+import app.saadiah.design.DarkColors
+import app.saadiah.design.LightColors
+import app.saadiah.design.SaadiahColors
 import app.saadiah.design.SaadiahType
 
-// Colours and sizes live in :design, where a contrast test holds every pair to WCAG AA.
-private val LightScheme =
-    lightColorScheme(
-        primary = LightColours.accent,
-        onPrimary = LightColours.onAccent,
-        background = LightColours.background,
-        onBackground = LightColours.onBackground,
-        surface = LightColours.surface,
-        onSurface = LightColours.onSurface,
-        onSurfaceVariant = LightColours.onSurfaceVariant,
-        outlineVariant = LightColours.divider,
-    )
-
-private val DarkScheme =
-    darkColorScheme(
-        primary = DarkColours.accent,
-        onPrimary = DarkColours.onAccent,
-        background = DarkColours.background,
-        onBackground = DarkColours.onBackground,
-        surface = DarkColours.surface,
-        onSurface = DarkColours.onSurface,
-        onSurfaceVariant = DarkColours.onSurfaceVariant,
-        outlineVariant = DarkColours.divider,
-    )
+// Every value comes from :design, where ColorContrastTest holds each pair to WCAG AA.
+// onPrimary is the theme's own background: each accent is chosen to contrast with it.
+private fun SaadiahColors.toScheme(dark: Boolean) =
+    if (dark) {
+        darkColorScheme(
+            primary = accent,
+            onPrimary = bg,
+            background = bg,
+            onBackground = text,
+            surface = surface,
+            onSurface = text,
+            onSurfaceVariant = textSecondary,
+            outlineVariant = line,
+        )
+    } else {
+        lightColorScheme(
+            primary = accent,
+            onPrimary = bg,
+            background = bg,
+            onBackground = text,
+            surface = surface,
+            onSurface = text,
+            onSurfaceVariant = textSecondary,
+            outlineVariant = line,
+        )
+    }
 
 private val AccessibleTypography =
     Typography(
-        bodyLarge = TextStyle(fontSize = SaadiahType.body),
-        bodyMedium = TextStyle(fontSize = SaadiahType.secondary),
+        bodyLarge = TextStyle(fontSize = SaadiahType.body.size),
+        bodyMedium = TextStyle(fontSize = SaadiahType.bodySmall.size),
     )
 
 @Composable
 internal fun Caption(
     text: String,
-    size: TextUnit = SaadiahType.secondary,
+    size: TextUnit = SaadiahType.bodySmall.size,
 ) {
     Text(text = text, fontSize = size, color = MaterialTheme.colorScheme.onSurfaceVariant)
 }
 
 @Composable
 internal fun Body(text: String) {
-    Text(text = text, fontSize = SaadiahType.body, color = MaterialTheme.colorScheme.onBackground)
+    Text(text = text, fontSize = SaadiahType.body.size, color = MaterialTheme.colorScheme.onBackground)
 }
 
 @Composable
 fun SaadiahTheme(content: @Composable () -> Unit) {
+    val dark = isSystemInDarkTheme()
     MaterialTheme(
-        colorScheme = if (isSystemInDarkTheme()) DarkScheme else LightScheme,
+        colorScheme = (if (dark) DarkColors else LightColors).toScheme(dark),
         typography = AccessibleTypography,
         content = content,
     )

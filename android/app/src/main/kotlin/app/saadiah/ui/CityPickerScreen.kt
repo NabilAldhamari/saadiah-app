@@ -38,17 +38,17 @@ fun CityPickerScreen(
     val results = remember(query) { searchCities(query) }
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-        Column(modifier = Modifier.padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.section)) {
+        Column(modifier = Modifier.padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.large)) {
             PickerHeader(selectedName = selected.name, onCancel = onCancel)
-            Spacer(Modifier.height(SaadiahSpacing.row))
+            Spacer(Modifier.height(SaadiahSpacing.medium))
             OutlinedTextField(
                 value = query,
                 onValueChange = { query = it },
-                label = { Text(text = "Search for your city", fontSize = SaadiahType.body) },
+                label = { Text(text = "Search for your city", fontSize = SaadiahType.body.size) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
-            Spacer(Modifier.height(SaadiahSpacing.row))
+            Spacer(Modifier.height(SaadiahSpacing.medium))
             CityResults(results = results, selected = selected, onPick = onPick)
         }
     }
@@ -62,7 +62,7 @@ private fun PickerHeader(
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "Choose your city",
-            fontSize = SaadiahType.title,
+            fontSize = SaadiahType.titleLarge.size,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
         )
@@ -71,7 +71,7 @@ private fun PickerHeader(
             onClick = onCancel,
             modifier = Modifier.heightIn(min = MinimumTapTarget),
         ) {
-            Text(text = "Keep $selectedName", fontSize = SaadiahType.body)
+            Text(text = "Keep $selectedName", fontSize = SaadiahType.body.size)
         }
     }
 }
@@ -106,11 +106,11 @@ private fun CityRow(
                 .fillMaxWidth()
                 .heightIn(min = MinimumTapTarget)
                 .clickable { onPick(city) }
-                .padding(vertical = SaadiahSpacing.row / 2),
+                .padding(vertical = SaadiahSpacing.medium / 2),
     ) {
         Text(
             text = if (isSelected) "${city.name} — selected" else city.name,
-            fontSize = SaadiahType.body,
+            fontSize = SaadiahType.body.size,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
             color = MaterialTheme.colorScheme.onBackground,
         )

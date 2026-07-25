@@ -43,22 +43,22 @@ fun DoctorScreen(
             modifier =
                 Modifier
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.section),
+                    .padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.large),
         ) {
             Text(
                 text = "Will my alerts arrive?",
-                fontSize = SaadiahType.title,
+                fontSize = SaadiahType.titleLarge.size,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
             )
-            Spacer(Modifier.height(SaadiahSpacing.row))
+            Spacer(Modifier.height(SaadiahSpacing.medium))
             Checks(context)
-            Spacer(Modifier.height(SaadiahSpacing.section))
+            Spacer(Modifier.height(SaadiahSpacing.large))
             Guidance(onOpenSettings = onOpenSettings)
-            Spacer(Modifier.height(SaadiahSpacing.section))
+            Spacer(Modifier.height(SaadiahSpacing.large))
             DeliveryHistory(records)
             TextButton(onClick = onBack, modifier = Modifier.heightIn(min = MinimumTapTarget)) {
-                Text(text = "Back to today", fontSize = SaadiahType.body)
+                Text(text = "Back to today", fontSize = SaadiahType.body.size)
             }
         }
     }
@@ -80,7 +80,7 @@ private fun CheckRow(
             Modifier
                 .fillMaxWidth()
                 .heightIn(min = MinimumTapTarget)
-                .padding(vertical = SaadiahSpacing.row / 2),
+                .padding(vertical = SaadiahSpacing.medium / 2),
     ) {
         Body(if (passing) "$label — yes" else "$label — no")
         HorizontalDivider()
@@ -99,14 +99,14 @@ private fun Guidance(onOpenSettings: () -> Unit) {
         },
     )
     TextButton(onClick = onOpenSettings, modifier = Modifier.heightIn(min = MinimumTapTarget)) {
-        Text(text = "Open background settings", fontSize = SaadiahType.body)
+        Text(text = "Open background settings", fontSize = SaadiahType.body.size)
     }
 }
 
 @Composable
 private fun DeliveryHistory(records: List<DeliveryRecord>) {
     Caption("Recent alerts")
-    Spacer(Modifier.height(SaadiahSpacing.row / 2))
+    Spacer(Modifier.height(SaadiahSpacing.medium / 2))
     if (records.isEmpty()) {
         Body("No alert has arrived yet. Once one does, its timing is recorded here.")
         return
@@ -117,7 +117,7 @@ private fun DeliveryHistory(records: List<DeliveryRecord>) {
                 Modifier
                     .fillMaxWidth()
                     .heightIn(min = MinimumTapTarget)
-                    .padding(vertical = SaadiahSpacing.row / 2),
+                    .padding(vertical = SaadiahSpacing.medium / 2),
         ) {
             Body("${record.prayerName} — ${record.describeDelay()}")
             HorizontalDivider()

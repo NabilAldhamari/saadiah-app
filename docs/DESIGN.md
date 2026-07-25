@@ -38,8 +38,8 @@ Two themes. Follow the system setting — do not pick for the user, and do not d
 | `surface` | `#152220` | cards, inset panels | 1.4:1 (non-text) |
 | `line` | `#22302C` | dividers, hairlines | decorative |
 | `lineSubtle` | `#1A2724` | ayah separators | decorative |
-| `text` | `#F7F4EC` | primary text | 16.4:1 |
-| `textSecondary` | `#B0BAB6` | translations, supporting copy | 9.1:1 |
+| `text` | `#F7F4EC` | primary text | 16.71:1 |
+| `textSecondary` | `#B0BAB6` | translations, supporting copy | 9.22:1 |
 | `textTertiary` | `#78837F` | labels, metadata | 4.70:1 |
 | `accent` | `#B8935A` | active state, primary action | 6.42:1 |
 | `sage` | `#5E7A6B` | recommended-fast marker | 3.91:1 — **markers only, never text** |
