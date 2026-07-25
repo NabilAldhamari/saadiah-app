@@ -309,4 +309,12 @@ object ArabicStrings : Strings {
     override val themeLight = "فاتح دافئ"
     override val themeDark = "داكن دافئ"
     override val themeGreen = "أبيض وأخضر"
+
+    override val loadingText = "جارٍ فتح النص…"
+    override val textFailedVerification =
+        "هذه النسخة من النص لا تطابق البصمات التي نُشرت معها، فلا تُعرض. إعادة تثبيت التطبيق تستبدلها."
+    override val readAlBaqarah = "اقرأ سورة البقرة"
+    override val readAlImran = "اقرأ سورة آل عمران"
+    override val titleAlBaqarah = "سورة البقرة"
+    override val titleAlImran = "سورة آل عمران"
 }

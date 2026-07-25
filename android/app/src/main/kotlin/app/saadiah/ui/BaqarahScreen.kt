@@ -1,6 +1,7 @@
 package app.saadiah.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,11 +22,13 @@ import app.saadiah.design.SaadiahSpacing
 import app.saadiah.design.SaadiahTheme
 import app.saadiah.design.SaadiahType
 import app.saadiah.design.SectionDivider
+import app.saadiah.design.minimumTouchTarget
 import app.saadiah.model.Tradition
 
 @Composable
 fun BaqarahScreen(
     onBack: () -> Unit,
+    onRead: (Int) -> Unit = {},
     tradition: Tradition = Tradition.SUNNI,
 ) {
     val colors = SaadiahTheme.colors
@@ -42,6 +45,9 @@ fun BaqarahScreen(
     ) {
         ScreenHeader(title = strings.titleBaqarah, onBack = onBack)
         Body(strings.baqarahSubtitle)
+        Spacer(Modifier.height(SaadiahSpacing.medium))
+        ReadRow(strings.readAlBaqarah) { onRead(BAQARAH_SURA) }
+        ReadRow(strings.readAlImran) { onRead(AL_IMRAN_SURA) }
         SectionDivider()
 
         if (merits.isEmpty()) {
@@ -103,4 +109,23 @@ private fun MeritCard(merit: BaqarahMerit) {
             lineHeight = SaadiahType.bodySmall.lineHeight,
         )
     }
+}
+
+@Composable
+private fun ReadRow(
+    label: String,
+    onOpen: () -> Unit,
+) {
+    val colors = SaadiahTheme.colors
+    Text(
+        text = label,
+        color = colors.accent,
+        fontSize = SaadiahType.body.size,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onOpen)
+                .minimumTouchTarget()
+                .padding(vertical = SaadiahSpacing.snug),
+    )
 }

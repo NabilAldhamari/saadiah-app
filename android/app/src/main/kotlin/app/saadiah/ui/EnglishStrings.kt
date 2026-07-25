@@ -304,4 +304,13 @@ object EnglishStrings : Strings {
     override val themeLight = "Warm light"
     override val themeDark = "Warm dark"
     override val themeGreen = "White and green"
+
+    override val loadingText = "Opening the text…"
+    override val textFailedVerification =
+        "This copy of the text does not match the checksums it was published with, so it is not " +
+            "shown. Reinstalling the app will replace it."
+    override val readAlBaqarah = "Read Sūrat al-Baqarah"
+    override val readAlImran = "Read Sūrat Āl ʿImrān"
+    override val titleAlBaqarah = "سورة البقرة"
+    override val titleAlImran = "سورة آل عمران"
 }

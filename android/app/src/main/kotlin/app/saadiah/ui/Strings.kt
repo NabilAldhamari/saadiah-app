@@ -261,6 +261,13 @@ interface Strings {
     val themeLight: String
     val themeDark: String
     val themeGreen: String
+
+    val loadingText: String
+    val textFailedVerification: String
+    val readAlBaqarah: String
+    val readAlImran: String
+    val titleAlBaqarah: String
+    val titleAlImran: String
 }
 
 val LocalStrings: ProvidableCompositionLocal<Strings> = staticCompositionLocalOf { EnglishStrings }

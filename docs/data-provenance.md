@@ -72,3 +72,30 @@ Identity is the GeoNames id rather than a row index, so refreshing the dump cann
 reader's stored city into a different place. Records are sorted by the ASCII name lowercased, which
 is the contract between the generator and `CityIndex`; `CityDatabaseTest` walks the whole file and
 asserts that ordering rather than trusting it.
+
+## Quran text
+
+`tools/gen-quran-db.py` packs Sūrat al-Baqarah and Āl ʿImrān — 486 āyāt — from the Tanzil
+Uthmani edition into `android/app/src/main/assets/quran.bin`.
+
+**Tanzil's terms are stricter than attribution.** The text may be copied and distributed only
+verbatim; changing it is not permitted. The source must be indicated with a link to tanzil.net,
+and the copyright notice must be reproduced in derived files. The notice is therefore written
+into the binary and read back out for display, rather than retyped in the UI where it could
+drift from the text it belongs to.
+
+- Source: <https://tanzil.net>, Uthmani edition, CC BY 3.0
+- `tanzil-uthmani.txt` `bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8`
+- `quran.bin` `228d47444ea0b15ae0a9047f501f060232256c3cca381ab01fa18694cf56d062`
+
+Nothing is normalised at generation. Stripping diacritics to make matching cheaper would be
+exactly the change the licence forbids, so any search normalisation happens at query time
+against a copy.
+
+Every āyah carries the SHA-256 of its own bytes, and the reader checks all 486 against those
+digests. `QuranTextTest` flips a byte in the middle of the text pool and asserts the
+mismatch is caught: suspect scripture is refused, not rendered.
+
+**Tanzil ships the Basmala as part of the first āyah of each sura**, which is how the Uthmani
+muṣḥaf prints it. It is left exactly as received rather than split into a heading, because
+splitting is a change to the published text.
