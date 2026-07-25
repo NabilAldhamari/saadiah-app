@@ -147,3 +147,15 @@ Stop and raise it rather than working around it if:
 - A performance budget cannot be met without adding complexity.
 - A dependency would introduce network access, an annotation processor, or a runtime reflection cost.
 - A religious-content question has more than one defensible answer. Expose it as a setting and stay neutral; do not pick a position in code.
+
+---
+
+## Design
+
+`docs/DESIGN.md` is the authoritative design specification. Do not invent colours, type sizes,
+spacing or component APIs. If a value you need is not in it, stop and ask rather than choosing one.
+Every token pair is contrast-verified; changing a colour requires re-running `ColorContrastTest`
+and updating the ratio recorded in `DESIGN.md`.
+
+`docs/mockups/mockups.html` shows every screen rendered at those values. It is a picture of the
+intended result, not a source of measurements.
