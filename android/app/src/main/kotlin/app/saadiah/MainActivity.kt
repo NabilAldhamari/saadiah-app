@@ -12,18 +12,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import app.saadiah.alarm.PrayerAlarmScheduler
 import app.saadiah.alarm.canPostNotifications
 import app.saadiah.alarm.ensurePrayerChannel
+import app.saadiah.data.Settings
+import app.saadiah.data.SettingsStore
 import app.saadiah.doctor.guidanceIntents
-import app.saadiah.model.Tradition
+import app.saadiah.ui.AppActions
+import app.saadiah.ui.CITY_CATALOG
 import app.saadiah.ui.CityPickerScreen
 import app.saadiah.ui.DoctorScreen
 import app.saadiah.ui.SaadiahApp
 import app.saadiah.ui.SaadiahTheme
-
-// Provisional until onboarding can ask; nothing doctrinal is inferred from this default.
-private val PreviewTradition = Tradition.SUNNI
+import app.saadiah.ui.cityById
+import kotlinx.coroutines.launch
 
 private enum class Screen { TODAY, PICKING_CITY, DOCTOR }
 
@@ -36,28 +40,28 @@ class MainActivity : ComponentActivity() {
         ensurePrayerChannel(this)
         askForNotificationsOnce()
 
-        val settings = PreviewSettings(this)
+        val store = SettingsStore(this)
         val alarms = PrayerAlarmScheduler(this)
         alarms.arm()
 
-        setContent { SaadiahTheme { Saadiah(settings, alarms) } }
+        setContent { SaadiahTheme { Saadiah(store, alarms) } }
     }
 
     @Composable
     private fun Saadiah(
-        settings: PreviewSettings,
+        store: SettingsStore,
         alarms: PrayerAlarmScheduler,
     ) {
-        var city by remember { mutableStateOf(settings.city) }
+        val settings by store.settings.collectAsStateWithLifecycle(initialValue = Settings())
+        val city = cityById(settings.cityId?.value ?: 0) ?: CITY_CATALOG.first()
         var screen by remember { mutableStateOf(Screen.TODAY) }
 
         when (screen) {
             Screen.PICKING_CITY ->
                 CityPickerScreen(
                     selected = city,
-                    onPick = {
-                        city = it
-                        settings.city = it
+                    onPick = { chosen ->
+                        save(store) { it.copy(cityId = chosen.id) }
                         alarms.arm()
                         screen = Screen.TODAY
                     },
@@ -71,11 +75,22 @@ class MainActivity : ComponentActivity() {
             Screen.TODAY ->
                 SaadiahApp(
                     city = city,
-                    tradition = PreviewTradition,
-                    onChangeCity = { screen = Screen.PICKING_CITY },
-                    onOpenDoctor = { screen = Screen.DOCTOR },
+                    settings = settings,
+                    actions =
+                        AppActions(
+                            onChangeSettings = { changed -> save(store) { changed } },
+                            onChangeCity = { screen = Screen.PICKING_CITY },
+                            onOpenDoctor = { screen = Screen.DOCTOR },
+                        ),
                 )
         }
+    }
+
+    private fun save(
+        store: SettingsStore,
+        transform: (Settings) -> Settings,
+    ) {
+        lifecycleScope.launch { store.update(transform) }
     }
 
     private fun openBackgroundSettings() {

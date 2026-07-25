@@ -26,52 +26,84 @@ import kotlinx.datetime.toLocalDateTime
 @Composable
 fun SaadiahApp(
     city: City,
-    tradition: Tradition,
-    onChangeCity: () -> Unit,
-    onOpenDoctor: () -> Unit,
+    settings: app.saadiah.data.Settings,
+    actions: AppActions,
 ) {
+    val onChangeSettings = actions.onChangeSettings
+    val onChangeCity = actions.onChangeCity
+    val onOpenDoctor = actions.onOpenDoctor
+    val tradition = settings.tradition ?: Tradition.SUNNI
     var destination by remember { mutableStateOf(Destination.TODAY) }
     var explaining by remember { mutableStateOf(false) }
     var asking by remember { mutableStateOf(false) }
-    var openPrayer by remember { mutableStateOf<app.saadiah.model.Prayer?>(null) }
-    val profile = remember(city) { inferProfile(city.country).copy(madhab = Madhab.SHAFI) }
+    val profile =
+        remember(city, settings) {
+            inferProfile(city.country)
+                .copy(madhab = settings.madhab ?: Madhab.SHAFI, combineMode = settings.combineMode)
+        }
 
-    if (explaining) {
-        Explanation(city, profile, onOpenDoctor) { explaining = false }
-        return
-    }
-    if (asking) {
-        AskScreen(tradition = tradition) { asking = false }
-        return
-    }
-    openPrayer?.let { prayer ->
-        Detail(DetailContext(city, profile, tradition), prayer) { openPrayer = null }
-        return
+    when {
+        explaining -> {
+            Explanation(city, profile, onOpenDoctor) { explaining = false }
+            return
+        }
+        asking -> {
+            AskScreen(tradition = tradition) { asking = false }
+            return
+        }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
         androidx.compose.foundation.layout.Box(modifier = Modifier.weight(1f)) {
-            when (destination) {
-                Destination.TODAY ->
-                    TodayScreen(
-                        city = city,
-                        profile = profile,
-                        tradition = tradition,
-                        actions =
-                            TodayActions(
-                                onChangeCity = onChangeCity,
-                                onOpenDoctor = { explaining = true },
-                                onOpenPrayer = { openPrayer = it },
-                            ),
-                    )
-                Destination.CALENDAR -> CalendarScreen(state = thisMonth(city, tradition))
-                Destination.ADHKAR -> NotYetScreen("Adhkār", "The adhkār corpus is not bundled yet.")
-                Destination.MORE -> MoreScreen(onChangeCity = onChangeCity, onOpenDoctor = onOpenDoctor)
+            Destinations(destination, city, settings, profile, tradition, onChangeSettings, onChangeCity) {
+                explaining = true
             }
         }
         TabBar(tabs = tabsFor(destination) { destination = it })
     }
     AskButton { asking = true }
+}
+
+@Suppress("LongParameterList")
+@Composable
+private fun Destinations(
+    destination: Destination,
+    city: City,
+    settings: app.saadiah.data.Settings,
+    profile: app.saadiah.model.TimingProfile,
+    tradition: Tradition,
+    onChangeSettings: (app.saadiah.data.Settings) -> Unit,
+    onChangeCity: () -> Unit,
+    onExplain: () -> Unit,
+) {
+    var openPrayer by remember { mutableStateOf<app.saadiah.model.Prayer?>(null) }
+    openPrayer?.let { prayer ->
+        Detail(DetailContext(city, profile, tradition), prayer) { openPrayer = null }
+        return
+    }
+    when (destination) {
+        Destination.TODAY ->
+            TodayScreen(
+                city = city,
+                profile = profile,
+                tradition = tradition,
+                actions =
+                    TodayActions(
+                        onChangeCity = onChangeCity,
+                        onOpenDoctor = onExplain,
+                        onOpenPrayer = { openPrayer = it },
+                    ),
+            )
+        Destination.CALENDAR -> CalendarScreen(state = thisMonth(city, tradition))
+        Destination.ADHKAR -> AdhkarScreen(tradition = tradition)
+        Destination.MORE ->
+            SettingsScreen(
+                settings = settings,
+                cityName = city.name,
+                onChange = onChangeSettings,
+                onChangeCity = onChangeCity,
+            )
+    }
 }
 
 @Composable

@@ -3,10 +3,11 @@ package app.saadiah.alarm
 import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
-import app.saadiah.PreviewSettings
+import app.saadiah.data.SettingsStore
 import app.saadiah.model.AlarmKind
 import app.saadiah.model.Prayer
 import app.saadiah.ui.CITY_CATALOG
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -68,12 +69,14 @@ class PrayerAlarmSchedulerTest {
 
     @Test
     fun aTimeZoneChangeReschedules() {
-        val settings = PreviewSettings(context)
-        settings.city = CITY_CATALOG.first { it.name == "Makkah" }
+        val store = SettingsStore(context)
+        val makkah = CITY_CATALOG.first { it.name == "Makkah" }
+        val newYork = CITY_CATALOG.first { it.name == "New York" }
+        runBlocking { store.update { it.copy(cityId = makkah.id) } }
         PrayerAlarmScheduler(context).arm()
         val beforeMove = armed().map { it.triggerAtTime }
 
-        settings.city = CITY_CATALOG.first { it.name == "New York" }
+        runBlocking { store.update { it.copy(cityId = newYork.id) } }
         SystemChangeReceiver().onReceive(context, Intent(Intent.ACTION_TIMEZONE_CHANGED))
 
         assertNotEquals(illegal = beforeMove, actual = armed().map { it.triggerAtTime })

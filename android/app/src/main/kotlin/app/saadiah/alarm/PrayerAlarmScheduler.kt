@@ -5,7 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import app.saadiah.PreviewSettings
+import app.saadiah.data.SettingsStore
 import app.saadiah.model.AlarmKind
 import app.saadiah.model.AlarmSpec
 import app.saadiah.model.Prayer
@@ -13,6 +13,10 @@ import app.saadiah.prayer.inferProfile
 import app.saadiah.schedule.AlertSettings
 import app.saadiah.schedule.budget
 import app.saadiah.schedule.schedule
+import app.saadiah.ui.CITY_CATALOG
+import app.saadiah.ui.cityById
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.days
@@ -34,12 +38,20 @@ class PrayerAlarmScheduler(
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     fun arm(from: Instant = Clock.System.now()) {
-        val city = PreviewSettings(context).city
+        // A receiver has no scope of its own, and the horizon must be armed before it returns.
+        val stored = runBlocking { SettingsStore(context).settings.first() }
+        val city = cityById(stored.cityId?.value ?: 0) ?: CITY_CATALOG.first()
+        val profile =
+            inferProfile(city.country)
+                .let { base ->
+                    stored.madhab?.let { base.copy(madhab = it) } ?: base
+                }.copy(combineMode = stored.combineMode)
         val settings =
             AlertSettings(
                 city = city,
-                profile = inferProfile(city.country),
-                enabled = ALERTED_PRAYERS,
+                profile = profile,
+                enabled = stored.enabledPrayers.ifEmpty { ALERTED_PRAYERS },
+                preAlert = stored.preAlert,
             )
         val due = schedule(settings, from, HORIZON).filter { it.kind == AlarmKind.AT_TIME }
         val armed = budget(due, max = MAX_ALARMS)
