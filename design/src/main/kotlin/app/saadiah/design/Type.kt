@@ -15,7 +15,10 @@ data class TypeStyle(
     val size: TextUnit,
     val lineHeightRatio: Float,
     val weight: FontWeight = FontWeight.Normal,
-)
+) {
+    /** Line height is set per style; one global value clips Arabic diacritics. */
+    val lineHeight: TextUnit get() = size * lineHeightRatio
+}
 
 object SaadiahType {
     val display = TypeStyle("display", 54.sp, lineHeightRatio = 1.1f)
