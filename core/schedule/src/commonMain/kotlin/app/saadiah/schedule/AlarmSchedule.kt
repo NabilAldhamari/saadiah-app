@@ -64,15 +64,13 @@ private fun AlertSettings.specsFor(
     return specs
 }
 
-/**
- * A prayer's window closes when the next one opens. Under [CombineMode.ZUHRAYN_ISHAAYN]
- * the pairs are prayed together, so Zuhrayn runs to Maghrib and Ishaayn to the next Fajr.
- */
 private fun AlertSettings.windowEnd(
     prayer: Prayer,
     timings: DayTimings,
     nextDay: DayTimings,
 ): Instant {
+    // A window closes when the next prayer opens, so a combined pair runs to whatever
+    // follows the second of the two: Zuhrayn to Maghrib, Ishaayn to the next Fajr.
     val combined = combineMode == CombineMode.ZUHRAYN_ISHAAYN
     return when (prayer) {
         Prayer.FAJR -> timings[Prayer.SUNRISE]

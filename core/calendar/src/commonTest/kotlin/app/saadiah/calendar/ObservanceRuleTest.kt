@@ -37,20 +37,19 @@ class ObservanceRuleTest {
         }
     }
 
+    private fun everyDayOfTheYear(): List<HijriDate> =
+        (1..12).flatMap { month -> (1..29).map { day -> HijriDate(year = YEAR, month = month, day = day) } }
+
+    private fun leaksFor(tradition: Tradition): List<Observance> =
+        everyDayOfTheYear()
+            .flatMap { observancesOn(it, tradition) }
+            .filterNot { tradition in it.traditions }
+            .map { it.observance }
+
     @Test
     fun noRuleLeaksAcrossTraditions() {
         for (tradition in Tradition.entries) {
-            for (month in 1..12) {
-                for (day in 1..29) {
-                    val date = HijriDate(year = YEAR, month = month, day = day)
-                    for (rule in observancesOn(date, tradition)) {
-                        assertTrue(
-                            tradition in rule.traditions,
-                            "$tradition received ${rule.observance} tagged ${rule.traditions}",
-                        )
-                    }
-                }
-            }
+            assertEquals(expected = emptyList(), actual = leaksFor(tradition), message = "$tradition")
         }
     }
 
@@ -152,24 +151,32 @@ class ObservanceRuleTest {
         assertFalse(Observance.SIX_OF_SHAWWAL in idsOn(SHAWWAL, 1, Tradition.SUNNI))
     }
 
+    private fun assertHijamaDay(
+        month: Int,
+        day: Int,
+        tradition: Tradition,
+        expected: Boolean,
+    ) {
+        assertEquals(
+            expected = expected,
+            actual = ObservanceKind.RECOMMENDED_HIJAMA in kindsOn(month, day, tradition),
+            message = "$tradition month $month day $day",
+        )
+    }
+
+    private fun assertHijamaMonth(
+        month: Int,
+        tradition: Tradition,
+    ) {
+        listOf(17, 19, 21).forEach { assertHijamaDay(month, it, tradition, expected = true) }
+        listOf(16, 18, 20, 22).forEach { assertHijamaDay(month, it, tradition, expected = false) }
+    }
+
     @Test
     fun hijamaFallsOnSeventeenNineteenAndTwentyOne() {
         for (tradition in Tradition.entries) {
             for (month in 1..12) {
-                for (day in listOf(17, 19, 21)) {
-                    assertEquals(
-                        expected = setOf(ObservanceKind.RECOMMENDED_HIJAMA),
-                        actual =
-                            kindsOn(month, day, tradition)
-                                .filter { it == ObservanceKind.RECOMMENDED_HIJAMA }
-                                .toSet(),
-                        message = "$tradition month $month day $day",
-                    )
-                }
-                assertFalse(
-                    ObservanceKind.RECOMMENDED_HIJAMA in kindsOn(month, 18, tradition),
-                    "$tradition month $month day 18",
-                )
+                assertHijamaMonth(month, tradition)
             }
         }
     }

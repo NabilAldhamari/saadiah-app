@@ -43,16 +43,17 @@ class AlarmScheduleTest {
             timeZone = TimeZone.of("America/New_York"),
         )
 
+    private val profile = Method.EGYPTIAN.toProfile(madhab = Madhab.SHAFI)
+
     private fun settings(
         city: City = cairo,
-        enabled: Set<Prayer> = PRAYERS_WITH_ALARMS,
         preAlert: kotlin.time.Duration? = null,
         endOfWindow: kotlin.time.Duration? = null,
         combineMode: CombineMode = CombineMode.NONE,
     ) = AlertSettings(
         city = city,
-        profile = Method.EGYPTIAN.toProfile(madhab = Madhab.SHAFI),
-        enabled = enabled,
+        profile = profile,
+        enabled = PRAYERS_WITH_ALARMS,
         preAlert = preAlert,
         endOfWindow = endOfWindow,
         combineMode = combineMode,
@@ -60,17 +61,15 @@ class AlarmScheduleTest {
 
     private fun instant(
         city: City,
-        year: Int,
-        month: Int,
-        day: Int,
+        date: LocalDate,
         hour: Int,
-    ): Instant = LocalDateTime(year, month, day, hour, 0).toInstant(city.timeZone)
+    ): Instant = LocalDateTime(date.year, date.monthNumber, date.dayOfMonth, hour, 0).toInstant(city.timeZone)
 
-    private val from = instant(cairo, 2024, 3, 11, 0)
+    private val from = instant(cairo, LocalDate(2024, 3, 11), hour = 0)
 
     @Test
     fun neverSchedulesInThePast() {
-        val noon = instant(cairo, 2024, 3, 11, 12)
+        val noon = instant(cairo, LocalDate(2024, 3, 11), hour = 12)
 
         val specs = schedule(settings(), from = noon, horizon = 3.days)
 
@@ -89,7 +88,14 @@ class AlarmScheduleTest {
 
     @Test
     fun respectsPerPrayerEnableFlags() {
-        val specs = schedule(settings(enabled = setOf(Prayer.FAJR)), from = from, horizon = 3.days)
+        val fajrOnly =
+            AlertSettings(
+                city = cairo,
+                profile = profile,
+                enabled = setOf(Prayer.FAJR),
+            )
+
+        val specs = schedule(fajrOnly, from = from, horizon = 3.days)
 
         assertEquals(expected = setOf(Prayer.FAJR), actual = specs.map { it.prayer }.toSet())
     }
@@ -181,7 +187,7 @@ class AlarmScheduleTest {
     @Test
     fun remainsCorrectAcrossADaylightSavingTransition() {
         // US clocks jump forward on 2024-03-10.
-        val before = instant(newYork, 2024, 3, 8, 0)
+        val before = instant(newYork, LocalDate(2024, 3, 8), hour = 0)
 
         val specs = schedule(settings(city = newYork), from = before, horizon = 4.days)
 
