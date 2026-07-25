@@ -61,8 +61,7 @@ class MainActivity : ComponentActivity() {
                 CityPickerScreen(
                     selected = city,
                     onPick = { chosen ->
-                        save(store) { it.copy(cityId = chosen.id) }
-                        alarms.arm()
+                        save(store, alarms) { it.copy(cityId = chosen.id) }
                         screen = Screen.TODAY
                     },
                     onCancel = { screen = Screen.TODAY },
@@ -78,7 +77,7 @@ class MainActivity : ComponentActivity() {
                     settings = settings,
                     actions =
                         AppActions(
-                            onChangeSettings = { changed -> save(store) { changed } },
+                            onChangeSettings = { changed -> save(store, alarms) { changed } },
                             onChangeCity = { screen = Screen.PICKING_CITY },
                             onOpenDoctor = { screen = Screen.DOCTOR },
                         ),
@@ -88,9 +87,15 @@ class MainActivity : ComponentActivity() {
 
     private fun save(
         store: SettingsStore,
+        alarms: PrayerAlarmScheduler,
         transform: (Settings) -> Settings,
     ) {
-        lifecycleScope.launch { store.update(transform) }
+        lifecycleScope.launch {
+            store.update(transform)
+            // The madhhab, the combine mode and the city all move the times an alarm was
+            // set for, so arming has to follow the write rather than race it.
+            alarms.arm()
+        }
     }
 
     private fun openBackgroundSettings() {
