@@ -1,0 +1,2 @@
+content.saadiah.app
+api.aladhan.com
