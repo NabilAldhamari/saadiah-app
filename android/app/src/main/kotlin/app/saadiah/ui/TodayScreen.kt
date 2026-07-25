@@ -40,6 +40,7 @@ data class TodayActions(
     val onChangeCity: () -> Unit,
     val onOpenDoctor: () -> Unit,
     val onOpenPrayer: (app.saadiah.model.Prayer) -> Unit = {},
+    val onOpenBaqarah: () -> Unit = {},
 )
 
 @Composable
@@ -76,6 +77,7 @@ fun TodayScreen(
         }
         FastingStrip(state.fasting)
         Observances(state)
+        BaqarahStrip(actions.onOpenBaqarah)
         Spacer(Modifier.height(SaadiahSpacing.large))
     }
 }
@@ -120,6 +122,31 @@ private fun DateHeader(
                     .minimumTouchTarget(),
             textAlign = TextAlign.Start,
         )
+    }
+}
+
+@Composable
+private fun BaqarahStrip(onOpen: () -> Unit) {
+    // Always present, not driven by the reminder setting: that setting decides whether a
+    // notification arrives, while the daily reading is standing and belongs on the screen
+    // whether or not anyone asked to be nudged.
+    val colors = SaadiahTheme.colors
+    SectionDivider()
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onOpen)
+                .minimumTouchTarget()
+                .padding(vertical = SaadiahSpacing.snug),
+    ) {
+        Text(
+            text = "سورة البقرة — Sūrat al-Baqarah",
+            color = colors.text,
+            fontSize = SaadiahType.body.size,
+            lineHeight = SaadiahType.body.lineHeight,
+        )
+        Caption("Today's reading. Tap to read why it is kept up.")
     }
 }
 

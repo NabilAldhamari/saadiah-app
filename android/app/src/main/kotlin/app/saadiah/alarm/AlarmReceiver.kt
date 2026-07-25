@@ -98,7 +98,7 @@ class AlarmReceiver : BroadcastReceiver() {
         wording: String,
     ) {
         if (!canPostNotifications(context)) return
-        ensurePrayerChannel(context)
+        ensureChannels(context)
         val notification =
             NotificationCompat
                 .Builder(context, PRAYER_CHANNEL_ID)
@@ -107,6 +107,7 @@ class AlarmReceiver : BroadcastReceiver() {
                 .setContentText(wording)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setContentIntent(openAppIntent(context))
                 .setAutoCancel(true)
                 .build()
         NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, notification)

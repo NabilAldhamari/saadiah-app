@@ -10,11 +10,13 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import app.saadiah.model.BaqarahReminder
 import app.saadiah.model.City
 import app.saadiah.model.CityId
 import app.saadiah.model.CombineMode
 import app.saadiah.model.Coordinates
 import app.saadiah.model.CountryCode
+import app.saadiah.model.Language
 import app.saadiah.model.Madhab
 import app.saadiah.model.Prayer
 import app.saadiah.model.Tradition
@@ -41,6 +43,8 @@ private val COMBINE_MODE = stringPreferencesKey("combine.mode")
 private val ENABLED_PRAYERS = stringSetPreferencesKey("alerts.prayers")
 private val PRE_ALERT = longPreferencesKey("alerts.pre.minutes")
 private val END_OF_WINDOW = longPreferencesKey("alerts.end.minutes")
+private val LANGUAGE = stringPreferencesKey("language")
+private val BAQARAH_REMINDER = stringPreferencesKey("baqarah.reminder")
 
 private val Context.settingsStore: DataStore<Preferences> by preferencesDataStore(name = STORE_NAME)
 
@@ -69,21 +73,23 @@ class SettingsStore(
 private fun Preferences.toSettings(): Settings {
     val defaults = Settings()
     return Settings(
-        tradition = this[TRADITION]?.let { name -> Tradition.entries.firstOrNull { it.name == name } },
-        madhab = this[MADHAB]?.let { name -> Madhab.entries.firstOrNull { it.name == name } },
+        tradition = enumOrNull<Tradition>(TRADITION),
+        madhab = enumOrNull<Madhab>(MADHAB),
         city = readCity(),
-        combineMode =
-            this[COMBINE_MODE]?.let { name -> CombineMode.entries.firstOrNull { it.name == name } }
-                ?: defaults.combineMode,
-        enabledPrayers =
-            this[ENABLED_PRAYERS]
-                ?.mapNotNull { name -> Prayer.entries.firstOrNull { it.name == name } }
-                ?.toSet()
-                ?: defaults.enabledPrayers,
+        combineMode = enumOrNull<CombineMode>(COMBINE_MODE) ?: defaults.combineMode,
+        enabledPrayers = readEnabledPrayers() ?: defaults.enabledPrayers,
         preAlert = this[PRE_ALERT]?.minutes,
         endOfWindow = this[END_OF_WINDOW]?.minutes,
+        language = enumOrNull<Language>(LANGUAGE) ?: defaults.language,
+        baqarahReminder = enumOrNull<BaqarahReminder>(BAQARAH_REMINDER) ?: defaults.baqarahReminder,
     )
 }
+
+private inline fun <reified T : Enum<T>> Preferences.enumOrNull(key: Preferences.Key<String>): T? =
+    this[key]?.let { stored -> enumValues<T>().firstOrNull { it.name == stored } }
+
+private fun Preferences.readEnabledPrayers(): Set<Prayer>? =
+    this[ENABLED_PRAYERS]?.mapNotNull { name -> Prayer.entries.firstOrNull { it.name == name } }?.toSet()
 
 private fun MutablePreferences.write(settings: Settings) {
     setOrRemoveWhenUnchosen(TRADITION, settings.tradition?.name)
@@ -93,6 +99,8 @@ private fun MutablePreferences.write(settings: Settings) {
     setOrRemoveWhenUnchosen(END_OF_WINDOW, settings.endOfWindow?.inWholeMinutes)
     this[COMBINE_MODE] = settings.combineMode.name
     this[ENABLED_PRAYERS] = settings.enabledPrayers.map { it.name }.toSet()
+    this[LANGUAGE] = settings.language.name
+    this[BAQARAH_REMINDER] = settings.baqarahReminder.name
 }
 
 private data class StoredPlace(

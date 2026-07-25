@@ -31,6 +31,10 @@
             android:exported="false" />
 
         <receiver
+            android:name=".alarm.BaqarahReminderReceiver"
+            android:exported="false" />
+
+        <receiver
             android:name=".alarm.SystemChangeReceiver"
             android:exported="true">
             <intent-filter>

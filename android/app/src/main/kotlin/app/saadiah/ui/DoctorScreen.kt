@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import app.saadiah.alarm.canPostNotifications
 import app.saadiah.design.MinimumTapTarget
 import app.saadiah.design.SaadiahSpacing
@@ -45,21 +44,12 @@ fun DoctorScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.large),
         ) {
-            Text(
-                text = "Will my alerts arrive?",
-                fontSize = SaadiahType.titleLarge.size,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
-            )
-            Spacer(Modifier.height(SaadiahSpacing.medium))
+            ScreenHeader(title = "Will my alerts arrive?", onBack = onBack)
             Checks(context)
             Spacer(Modifier.height(SaadiahSpacing.large))
             Guidance(onOpenSettings = onOpenSettings)
             Spacer(Modifier.height(SaadiahSpacing.large))
             DeliveryHistory(records)
-            TextButton(onClick = onBack, modifier = Modifier.heightIn(min = MinimumTapTarget)) {
-                Text(text = "Back to today", fontSize = SaadiahType.body.size)
-            }
         }
     }
 }

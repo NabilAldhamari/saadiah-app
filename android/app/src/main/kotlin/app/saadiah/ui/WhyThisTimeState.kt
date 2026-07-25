@@ -45,7 +45,7 @@ fun whyThisTimeState(
         entries =
             listOf(
                 WhyEntry("Fajr / ʿIshāʾ angle", "${profile.angles.fajr}° / ${profile.angles.isha}°"),
-                WhyEntry("ʿAṣr madhhab", profile.madhab.spelledOut(), isChangeable = true),
+                WhyEntry("ʿAṣr madhhab", profile.madhab.shortName(), isChangeable = true),
                 WhyEntry("High latitude", profile.highLatitudeRule.spelledOut()),
                 WhyEntry("Your tuning", if (profile.adjustments.isEmpty()) "none" else "set"),
             ),
@@ -60,7 +60,7 @@ private fun alternativeSentence(
 ): String {
     val minutes = abs(difference.inWholeMinutes)
     val direction = if (difference.isNegative()) "earlier" else "later"
-    return "The ${other.spelledOut()} calculation would put ʿAṣr at $time — " +
+    return "The ${other.shortName()} calculation would put ʿAṣr at $time — " +
         "${minutes.spelledOutMinutes()} $direction. If that matches your masjid, switch the madhhab."
 }
 
@@ -72,7 +72,7 @@ private fun Long.spelledOutMinutes(): String {
     return if (minutes == 0L) hourPart else "$hourPart $minutes ${if (minutes == 1L) "minute" else "minutes"}"
 }
 
-private fun Madhab.spelledOut(): String =
+private fun Madhab.shortName(): String =
     when (this) {
         Madhab.SHAFI -> "Standard"
         Madhab.HANAFI -> "Ḥanafī"

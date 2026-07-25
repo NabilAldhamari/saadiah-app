@@ -1,7 +1,9 @@
 package app.saadiah.data
 
+import app.saadiah.model.BaqarahReminder
 import app.saadiah.model.City
 import app.saadiah.model.CombineMode
+import app.saadiah.model.Language
 import app.saadiah.model.Madhab
 import app.saadiah.model.Prayer
 import app.saadiah.model.Tradition
@@ -27,4 +29,6 @@ data class Settings(
     val enabledPrayers: Set<Prayer> = DAILY_PRAYERS,
     val preAlert: Duration? = null,
     val endOfWindow: Duration? = null,
+    val language: Language = Language.SYSTEM,
+    val baqarahReminder: BaqarahReminder = BaqarahReminder.OFF,
 )

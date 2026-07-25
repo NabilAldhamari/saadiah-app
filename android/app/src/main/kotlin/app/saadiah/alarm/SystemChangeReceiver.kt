@@ -18,7 +18,10 @@ class SystemChangeReceiver : BroadcastReceiver() {
             Intent.ACTION_TIME_CHANGED,
             Intent.ACTION_TIMEZONE_CHANGED,
             Intent.ACTION_MY_PACKAGE_REPLACED,
-            -> PrayerAlarmScheduler(context).arm()
+            -> {
+                PrayerAlarmScheduler(context).arm()
+                BaqarahReminderScheduler(context).arm()
+            }
         }
     }
 }
