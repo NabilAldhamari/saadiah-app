@@ -23,6 +23,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import app.saadiah.design.MinimumTapTarget
+import app.saadiah.design.SaadiahSpacing
+import app.saadiah.design.SaadiahType
 import app.saadiah.model.City
 
 @Composable
@@ -35,17 +38,17 @@ fun CityPickerScreen(
     val results = remember(query) { searchCities(query) }
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-        Column(modifier = Modifier.padding(horizontal = ScreenPadding, vertical = SectionGap)) {
+        Column(modifier = Modifier.padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.section)) {
             PickerHeader(selectedName = selected.name, onCancel = onCancel)
-            Spacer(Modifier.height(RowGap))
+            Spacer(Modifier.height(SaadiahSpacing.row))
             OutlinedTextField(
                 value = query,
                 onValueChange = { query = it },
-                label = { Text(text = "Search for your city", fontSize = BodySize) },
+                label = { Text(text = "Search for your city", fontSize = SaadiahType.body) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
-            Spacer(Modifier.height(RowGap))
+            Spacer(Modifier.height(SaadiahSpacing.row))
             CityResults(results = results, selected = selected, onPick = onPick)
         }
     }
@@ -59,7 +62,7 @@ private fun PickerHeader(
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "Choose your city",
-            fontSize = HeroNameSize,
+            fontSize = SaadiahType.title,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
         )
@@ -68,7 +71,7 @@ private fun PickerHeader(
             onClick = onCancel,
             modifier = Modifier.heightIn(min = MinimumTapTarget),
         ) {
-            Text(text = "Keep $selectedName", fontSize = BodySize)
+            Text(text = "Keep $selectedName", fontSize = SaadiahType.body)
         }
     }
 }
@@ -103,11 +106,11 @@ private fun CityRow(
                 .fillMaxWidth()
                 .heightIn(min = MinimumTapTarget)
                 .clickable { onPick(city) }
-                .padding(vertical = RowGap / 2),
+                .padding(vertical = SaadiahSpacing.row / 2),
     ) {
         Text(
             text = if (isSelected) "${city.name} — selected" else city.name,
-            fontSize = BodySize,
+            fontSize = SaadiahType.body,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
             color = MaterialTheme.colorScheme.onBackground,
         )

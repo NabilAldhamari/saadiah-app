@@ -27,6 +27,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import app.saadiah.calendar.hijriDateAt
 import app.saadiah.calendar.observancesOn
+import app.saadiah.design.MinimumTapTarget
+import app.saadiah.design.SaadiahSpacing
+import app.saadiah.design.SaadiahType
 import app.saadiah.model.City
 import app.saadiah.model.DayTimings
 import app.saadiah.model.Prayer
@@ -66,12 +69,12 @@ fun TodayScreen(
             modifier =
                 Modifier
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = ScreenPadding, vertical = SectionGap),
+                    .padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.section),
         ) {
             DateHeader(city = city, hijriLabel = hijri.arabicLabel(), onChangeCity = onChangeCity)
-            Spacer(Modifier.height(SectionGap))
+            Spacer(Modifier.height(SaadiahSpacing.section))
             NextPrayerHero(now = now, timings = timings, tomorrow = tomorrow, city = city)
-            Spacer(Modifier.height(SectionGap))
+            Spacer(Modifier.height(SaadiahSpacing.section))
             HorizontalDivider()
             Timetable(timings = timings, city = city, next = nextPrayerOf(now, timings))
             ObservanceList(observances = observances)
@@ -88,12 +91,12 @@ private fun DateHeader(
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = hijriLabel,
-            fontSize = ArabicSize,
+            fontSize = SaadiahType.arabic,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onBackground,
         )
         TextButton(onClick = onChangeCity, modifier = Modifier.heightIn(min = MinimumTapTarget)) {
-            Text(text = "${city.name} — change city", fontSize = BodySize)
+            Text(text = "${city.name} — change city", fontSize = SaadiahType.body)
         }
     }
 }
@@ -111,22 +114,22 @@ private fun NextPrayerHero(
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Caption("Next prayer")
-        Spacer(Modifier.height(RowGap / 2))
+        Spacer(Modifier.height(SaadiahSpacing.row / 2))
         Text(
             text = name.arabicName,
-            fontSize = HeroNameSize,
+            fontSize = SaadiahType.title,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
         )
         Body(name.englishName)
-        Spacer(Modifier.height(RowGap / 2))
+        Spacer(Modifier.height(SaadiahSpacing.row / 2))
         Text(
             text = at.asClockTime(city.timeZone),
-            fontSize = HeroTimeSize,
+            fontSize = SaadiahType.hero,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
         )
-        Caption("in ${(at - now).spelledOut()}", size = BodySize)
+        Caption("in ${(at - now).spelledOut()}", size = SaadiahType.body)
     }
 }
 
@@ -171,14 +174,14 @@ private fun PrayerRow(
             Modifier
                 .fillMaxWidth()
                 .heightIn(min = MinimumTapTarget)
-                .padding(vertical = RowGap / 2),
+                .padding(vertical = SaadiahSpacing.row / 2),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = prayer.arabicName,
-                fontSize = ArabicSize,
+                fontSize = SaadiahType.arabic,
                 fontWeight = if (isNext) FontWeight.Bold else FontWeight.Normal,
                 color = MaterialTheme.colorScheme.onBackground,
             )
@@ -186,7 +189,7 @@ private fun PrayerRow(
         }
         Text(
             text = time,
-            fontSize = BodySize,
+            fontSize = SaadiahType.body,
             fontWeight = if (isNext) FontWeight.Bold else FontWeight.Normal,
             textAlign = TextAlign.End,
             color = MaterialTheme.colorScheme.onBackground,
@@ -197,18 +200,18 @@ private fun PrayerRow(
 @Composable
 private fun ObservanceList(observances: List<String>) {
     if (observances.isEmpty()) return
-    Spacer(Modifier.height(SectionGap))
+    Spacer(Modifier.height(SaadiahSpacing.section))
     Caption("Today")
-    Spacer(Modifier.height(RowGap / 2))
+    Spacer(Modifier.height(SaadiahSpacing.row / 2))
     for (observance in observances) {
         Text(
             text = observance,
-            fontSize = BodySize,
+            fontSize = SaadiahType.body,
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .heightIn(min = MinimumTapTarget)
-                    .padding(vertical = RowGap / 2),
+                    .padding(vertical = SaadiahSpacing.row / 2),
             color = MaterialTheme.colorScheme.onBackground,
         )
     }
