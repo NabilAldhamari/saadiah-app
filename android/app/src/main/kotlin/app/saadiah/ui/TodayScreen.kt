@@ -1,47 +1,37 @@
 package app.saadiah.ui
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import app.saadiah.calendar.hijriDateAt
-import app.saadiah.calendar.observancesOn
-import app.saadiah.design.MinimumTapTarget
+import app.saadiah.design.NextPrayerHero
+import app.saadiah.design.ObservanceRow
+import app.saadiah.design.PrayerRow
 import app.saadiah.design.SaadiahSpacing
+import app.saadiah.design.SaadiahTheme
 import app.saadiah.design.SaadiahType
+import app.saadiah.design.SectionDivider
+import app.saadiah.design.minimumTouchTarget
 import app.saadiah.model.City
-import app.saadiah.model.DayTimings
-import app.saadiah.model.Prayer
 import app.saadiah.model.TimingProfile
 import app.saadiah.model.Tradition
-import app.saadiah.prayer.PrayerCalculator
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
-import kotlinx.datetime.plus
-import kotlinx.datetime.toLocalDateTime
 import androidx.compose.runtime.LaunchedEffect as ComposeLaunchedEffect
 
 private const val TICK_MILLIS = 1_000L
@@ -58,89 +48,86 @@ fun TodayScreen(
     tradition: Tradition,
     actions: TodayActions,
 ) {
-    val calculator = remember { PrayerCalculator() }
     val now = rememberTickingNow()
-    val today = now.toLocalDateTime(city.timeZone).date
-    val timings = remember(city, profile, today) { calculator.compute(city, today, profile) }
-    val next = today.plus(1, DateTimeUnit.DAY)
-    val tomorrow = remember(city, profile, today) { calculator.compute(city, next, profile) }
-    val hijri = timings.hijriDateAt(now)
-    val observances = observancesOn(hijri, tradition).map { it.observance.label }.distinct()
+    val state = remember(city, profile, tradition, now) { todayState(city, profile, tradition, now) }
+    val colors = SaadiahTheme.colors
 
-    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-        Column(
-            modifier =
-                Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.large),
-        ) {
-            DateHeader(city = city, hijriLabel = hijri.arabicLabel(), onChangeCity = actions.onChangeCity)
-            Spacer(Modifier.height(SaadiahSpacing.large))
-            NextPrayerHero(now = now, timings = timings, tomorrow = tomorrow, city = city)
-            Spacer(Modifier.height(SaadiahSpacing.large))
-            HorizontalDivider()
-            Timetable(timings = timings, city = city, next = nextPrayerOf(now, timings))
-            ObservanceList(observances = observances)
-            DoctorLink(actions.onOpenDoctor)
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(colors.bg)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = SaadiahSpacing.screen)
+                .padding(top = SaadiahSpacing.screen),
+    ) {
+        DateHeader(state, actions.onChangeCity)
+        SectionDivider()
+        Hero(state, actions.onOpenDoctor)
+        SectionDivider()
+        for (row in state.rows) {
+            PrayerRow(name = row.name, time = row.time, isCurrent = row.isCurrent)
         }
+        Observances(state)
+        Spacer(Modifier.height(SaadiahSpacing.large))
     }
+}
+
+@Composable
+private fun Hero(
+    state: TodayState,
+    onWhyThisTime: () -> Unit,
+) {
+    NextPrayerHero(
+        prayerName = state.nextPrayerLatin,
+        prayerNameArabic = state.nextPrayerArabic,
+        time = state.nextPrayerTime,
+        remaining = state.remaining,
+        onWhyThisTime = onWhyThisTime,
+    )
 }
 
 @Composable
 private fun DateHeader(
-    city: City,
-    hijriLabel: String,
+    state: TodayState,
     onChangeCity: () -> Unit,
 ) {
+    val colors = SaadiahTheme.colors
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = hijriLabel,
+            text = state.hijriLabel,
+            color = colors.text,
             fontSize = SaadiahType.titleMedium.size,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onBackground,
+            lineHeight = SaadiahType.titleMedium.lineHeight,
         )
-        TextButton(onClick = onChangeCity, modifier = Modifier.heightIn(min = MinimumTapTarget)) {
-            Text(text = "${city.name} — change city", fontSize = SaadiahType.body.size)
-        }
+        Spacer(Modifier.height(SaadiahSpacing.tiny))
+        Text(
+            text = "${state.gregorianLabel} · ${state.cityName}",
+            color = colors.textSecondary,
+            fontSize = SaadiahType.bodySmall.size,
+            lineHeight = SaadiahType.bodySmall.lineHeight,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onChangeCity)
+                    .minimumTouchTarget(),
+            textAlign = TextAlign.Start,
+        )
     }
 }
 
 @Composable
-private fun NextPrayerHero(
-    now: Instant,
-    timings: DayTimings,
-    tomorrow: DayTimings,
-    city: City,
-) {
-    val next = nextPrayerOf(now, timings)
-    val at = if (next == null) tomorrow[Prayer.FAJR] else timings[next]
-    val name = next ?: Prayer.FAJR
-
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Caption("Next prayer")
-        Spacer(Modifier.height(SaadiahSpacing.medium / 2))
-        Text(
-            text = name.arabicName,
-            fontSize = SaadiahType.titleLarge.size,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
+private fun Observances(state: TodayState) {
+    if (state.observances.isEmpty()) return
+    SectionDivider()
+    for (observance in state.observances) {
+        ObservanceRow(
+            title = observance.title,
+            subtitle = observance.subtitle,
+            marker = observance.marker,
+            alertEnabled = observance.alertEnabled,
+            onToggleAlert = {},
         )
-        Body(name.englishName)
-        Spacer(Modifier.height(SaadiahSpacing.medium / 2))
-        Text(
-            text = at.asClockTime(city.timeZone),
-            fontSize = SaadiahType.display.size,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
-        Caption("in ${(at - now).spelledOut()}", size = SaadiahType.body.size)
-    }
-}
-
-@Composable
-private fun DoctorLink(onOpenDoctor: () -> Unit) {
-    TextButton(onClick = onOpenDoctor, modifier = Modifier.heightIn(min = MinimumTapTarget)) {
-        Text(text = "Will my alerts arrive?", fontSize = SaadiahType.body.size)
     }
 }
 
@@ -155,80 +142,3 @@ private fun rememberTickingNow(): Instant {
     }
     return now
 }
-
-@Composable
-private fun Timetable(
-    timings: DayTimings,
-    city: City,
-    next: Prayer?,
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        for (prayer in Prayer.entries) {
-            PrayerRow(
-                prayer = prayer,
-                time = timings[prayer].asClockTime(city.timeZone),
-                isNext = prayer == next,
-            )
-            HorizontalDivider()
-        }
-    }
-}
-
-@Composable
-private fun PrayerRow(
-    prayer: Prayer,
-    time: String,
-    isNext: Boolean,
-) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .heightIn(min = MinimumTapTarget)
-                .padding(vertical = SaadiahSpacing.medium / 2),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = prayer.arabicName,
-                fontSize = SaadiahType.titleMedium.size,
-                fontWeight = if (isNext) FontWeight.Bold else FontWeight.Normal,
-                color = MaterialTheme.colorScheme.onBackground,
-            )
-            Caption(if (isNext) "${prayer.englishName} — next" else prayer.englishName)
-        }
-        Text(
-            text = time,
-            fontSize = SaadiahType.body.size,
-            fontWeight = if (isNext) FontWeight.Bold else FontWeight.Normal,
-            textAlign = TextAlign.End,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
-    }
-}
-
-@Composable
-private fun ObservanceList(observances: List<String>) {
-    if (observances.isEmpty()) return
-    Spacer(Modifier.height(SaadiahSpacing.large))
-    Caption("Today")
-    Spacer(Modifier.height(SaadiahSpacing.medium / 2))
-    for (observance in observances) {
-        Text(
-            text = observance,
-            fontSize = SaadiahType.body.size,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = MinimumTapTarget)
-                    .padding(vertical = SaadiahSpacing.medium / 2),
-            color = MaterialTheme.colorScheme.onBackground,
-        )
-    }
-}
-
-private fun nextPrayerOf(
-    now: Instant,
-    timings: DayTimings,
-): Prayer? = Prayer.entries.firstOrNull { timings[it] > now }

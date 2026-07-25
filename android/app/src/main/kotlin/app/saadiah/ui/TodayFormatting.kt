@@ -4,6 +4,7 @@ import app.saadiah.calendar.Observance
 import app.saadiah.model.HijriDate
 import app.saadiah.model.Prayer
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
@@ -11,7 +12,7 @@ import kotlin.time.Duration
 private const val MINUTES_PER_HOUR = 60L
 private const val NOON = 12
 
-private val HIJRI_MONTHS =
+internal val HIJRI_MONTHS =
     listOf(
         "محرم",
         "صفر",
@@ -90,3 +91,33 @@ private fun plural(
     value: Long,
     word: String,
 ): String = if (value == 1L) word else "${word}s"
+
+internal val WEEKDAYS =
+    listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+
+internal val MONTHS =
+    listOf(
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    )
+
+/** "Thursday 24 July" — the day of the week is spelled out, never abbreviated. */
+fun LocalDate.spelledOut(): String = "${WEEKDAYS[dayOfWeek.ordinal]} $dayOfMonth ${MONTHS[monthNumber - 1]}"
+
+fun LocalDate.shortWeekday(): String = WEEKDAYS[dayOfWeek.ordinal].take(n = 3)
+
+fun LocalDate.dayAndMonth(): String = "$dayOfMonth ${MONTHS[monthNumber - 1]}"
+
+fun LocalDate.monthName(): String = MONTHS[monthNumber - 1]
+
+fun HijriDate.monthLabel(): String = "${HIJRI_MONTHS[month - 1]} $year"

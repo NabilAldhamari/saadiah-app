@@ -16,15 +16,11 @@ import app.saadiah.alarm.PrayerAlarmScheduler
 import app.saadiah.alarm.canPostNotifications
 import app.saadiah.alarm.ensurePrayerChannel
 import app.saadiah.doctor.guidanceIntents
-import app.saadiah.model.City
-import app.saadiah.model.Madhab
 import app.saadiah.model.Tradition
-import app.saadiah.prayer.inferProfile
 import app.saadiah.ui.CityPickerScreen
 import app.saadiah.ui.DoctorScreen
+import app.saadiah.ui.SaadiahApp
 import app.saadiah.ui.SaadiahTheme
-import app.saadiah.ui.TodayActions
-import app.saadiah.ui.TodayScreen
 
 // Provisional until onboarding can ask; nothing doctrinal is inferred from this default.
 private val PreviewTradition = Tradition.SUNNI
@@ -72,25 +68,14 @@ class MainActivity : ComponentActivity() {
                     onOpenSettings = ::openBackgroundSettings,
                     onBack = { screen = Screen.TODAY },
                 )
-            Screen.TODAY -> Today(city) { screen = it }
+            Screen.TODAY ->
+                SaadiahApp(
+                    city = city,
+                    tradition = PreviewTradition,
+                    onChangeCity = { screen = Screen.PICKING_CITY },
+                    onOpenDoctor = { screen = Screen.DOCTOR },
+                )
         }
-    }
-
-    @Composable
-    private fun Today(
-        city: City,
-        onNavigate: (Screen) -> Unit,
-    ) {
-        TodayScreen(
-            city = city,
-            profile = inferProfile(city.country).copy(madhab = Madhab.SHAFI),
-            tradition = PreviewTradition,
-            actions =
-                TodayActions(
-                    onChangeCity = { onNavigate(Screen.PICKING_CITY) },
-                    onOpenDoctor = { onNavigate(Screen.DOCTOR) },
-                ),
-        )
     }
 
     private fun openBackgroundSettings() {
