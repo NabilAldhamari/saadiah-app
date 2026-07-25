@@ -70,6 +70,8 @@ naming:
   active: true
   FunctionNaming:
     active: true
+    # Composables are PascalCase by Compose convention, not by accident.
+    ignoreAnnotated: ['Composable']
   ClassNaming:
     active: true
 
