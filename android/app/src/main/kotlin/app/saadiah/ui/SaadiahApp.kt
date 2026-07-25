@@ -31,7 +31,13 @@ fun SaadiahApp(
     onOpenDoctor: () -> Unit,
 ) {
     var destination by remember { mutableStateOf(Destination.TODAY) }
+    var explaining by remember { mutableStateOf(false) }
     val profile = remember(city) { inferProfile(city.country).copy(madhab = Madhab.SHAFI) }
+
+    if (explaining) {
+        Explanation(city, profile, onOpenDoctor) { explaining = false }
+        return
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         androidx.compose.foundation.layout.Box(modifier = Modifier.weight(1f)) {
@@ -41,7 +47,7 @@ fun SaadiahApp(
                         city = city,
                         profile = profile,
                         tradition = tradition,
-                        actions = TodayActions(onChangeCity = onChangeCity, onOpenDoctor = onOpenDoctor),
+                        actions = TodayActions(onChangeCity = onChangeCity, onOpenDoctor = { explaining = true }),
                     )
                 Destination.CALENDAR -> CalendarScreen(state = thisMonth(city, tradition))
                 Destination.ADHKAR -> NotYetScreen("Adhkār", "The adhkār corpus is not bundled yet.")
@@ -50,6 +56,20 @@ fun SaadiahApp(
         }
         TabBar(tabs = tabsFor(destination) { destination = it })
     }
+}
+
+@Composable
+private fun Explanation(
+    city: City,
+    profile: app.saadiah.model.TimingProfile,
+    onMatchMasjid: () -> Unit,
+    onBack: () -> Unit,
+) {
+    WhyThisTimeScreen(
+        state = whyThisTimeState(city, profile, today(city)),
+        onMatchMasjid = onMatchMasjid,
+        onBack = onBack,
+    )
 }
 
 @Composable
@@ -84,3 +104,9 @@ private fun thisMonth(
     val hijri = todayHijri(today)
     return calendarState(year = hijri.year, month = hijri.month, tradition = tradition)
 }
+
+private fun today(city: City) =
+    Clock.System
+        .now()
+        .toLocalDateTime(city.timeZone)
+        .date
