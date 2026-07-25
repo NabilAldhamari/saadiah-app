@@ -63,7 +63,14 @@ fun AdhkarScreen(tradition: Tradition) {
         }
         if (entries.isEmpty()) {
             SectionDivider()
-            Body("No adhkār are bundled for this tradition yet.")
+            Body("Coming in a future update")
+            Spacer(Modifier.height(SaadiahSpacing.small))
+            Caption(
+                "Adhkār for this tradition are not bundled yet. They will be added once a " +
+                    "verified, openly licensed collection is available. Another tradition's " +
+                    "compilation is not shown here in its place.",
+            )
+            Spacer(Modifier.height(SaadiahSpacing.huge))
             return@Column
         }
 
