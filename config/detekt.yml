@@ -1,0 +1,81 @@
+build:
+  maxIssues: 0
+
+comments:
+  active: true
+  UndocumentedPublicClass:
+    active: false
+  UndocumentedPublicFunction:
+    active: false
+  UndocumentedPublicProperty:
+    active: false
+  CommentOverPrivateFunction:
+    active: true
+  CommentOverPrivateProperty:
+    active: true
+  OutdatedDocumentation:
+    active: true
+
+complexity:
+  active: true
+  LongMethod:
+    active: true
+    threshold: 30
+  LongParameterList:
+    active: true
+    functionThreshold: 5
+    constructorThreshold: 7
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 10
+  NestedBlockDepth:
+    active: true
+    threshold: 3
+  TooManyFunctions:
+    active: true
+    thresholdInClasses: 12
+    thresholdInFiles: 12
+
+style:
+  active: true
+  MagicNumber:
+    active: true
+    ignorePropertyDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+    ignoreAnnotation: true
+  ForbiddenComment:
+    active: true
+    comments:
+      - reason: "TODO comments rot. Open an issue."
+        value: "TODO:"
+      - reason: "FIXME comments rot. Open an issue."
+        value: "FIXME:"
+  MaxLineLength:
+    active: true
+    maxLineLength: 120
+  ReturnCount:
+    active: true
+    max: 3
+  UnusedPrivateMember:
+    active: true
+
+exceptions:
+  active: true
+  TooGenericExceptionCaught:
+    active: true
+  SwallowedException:
+    active: true
+
+naming:
+  active: true
+  FunctionNaming:
+    active: true
+  ClassNaming:
+    active: true
+
+potential-bugs:
+  active: true
+  UnsafeCallOnNullableType:
+    active: true
+  LateinitUsage:
+    active: true
