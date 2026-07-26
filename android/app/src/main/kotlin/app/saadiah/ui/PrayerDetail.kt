@@ -40,7 +40,7 @@ fun prayerDetail(
         arabic = prayer.arabicName,
         time = time,
         nawafil = nawafilFor(prayer, tradition, strings),
-        duas = duasFor(prayer),
+        duas = duasFor(prayer, strings),
         sourcingNote = strings.duaWordingWithheld,
     )
 
@@ -73,22 +73,25 @@ private fun confirmedSunanRawatib(
     }
 }
 
-private fun duasFor(prayer: Prayer): List<NamedDua> =
+private fun duasFor(
+    prayer: Prayer,
+    s: Strings,
+): List<NamedDua> =
     when (prayer) {
         Prayer.FAJR ->
             listOf(
-                NamedDua("Morning adhkār", "Ḥiṣn al-Muslim"),
-                NamedDua("Āyat al-Kursī after the prayer", "al-Nasāʾī, ʿAmal al-Yawm wa-l-Layla"),
+                NamedDua(s.duaMorningAdhkar, "Ḥiṣn al-Muslim"),
+                NamedDua(s.duaAyatAlKursi, "al-Nasāʾī, ʿAmal al-Yawm wa-l-Layla"),
             )
         Prayer.MAGHRIB ->
             listOf(
-                NamedDua("Evening adhkār", "Ḥiṣn al-Muslim"),
-                NamedDua("Āyat al-Kursī after the prayer", "al-Nasāʾī, ʿAmal al-Yawm wa-l-Layla"),
+                NamedDua(s.duaEveningAdhkar, "Ḥiṣn al-Muslim"),
+                NamedDua(s.duaAyatAlKursi, "al-Nasāʾī, ʿAmal al-Yawm wa-l-Layla"),
             )
         Prayer.SUNRISE -> emptyList()
         else ->
             listOf(
-                NamedDua("Tasbīḥ after the prayer", "Ṣaḥīḥ Muslim 596"),
-                NamedDua("Āyat al-Kursī after the prayer", "al-Nasāʾī, ʿAmal al-Yawm wa-l-Layla"),
+                NamedDua(s.duaTasbih, "Ṣaḥīḥ Muslim 596"),
+                NamedDua(s.duaAyatAlKursi, "al-Nasāʾī, ʿAmal al-Yawm wa-l-Layla"),
             )
     }

@@ -107,7 +107,7 @@ private fun DeliveryHistory(records: List<DeliveryRecord>) {
                     .heightIn(min = MinimumTapTarget)
                     .padding(vertical = SaadiahSpacing.medium / 2),
         ) {
-            Body("${record.prayerName} — ${record.describeDelay()}")
+            Body("${record.prayerName} — ${record.describeDelay(strings)}")
             HorizontalDivider()
         }
     }

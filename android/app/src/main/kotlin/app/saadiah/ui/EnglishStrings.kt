@@ -301,4 +301,20 @@ object EnglishStrings : Strings {
     override val noCustomAdhkar = "Nothing added yet. What you add here is kept on this device."
     override val timesLabel = "Times"
     override val bundledAdhkar = "Morning and evening"
+
+    override fun whyIsItAt(time: String) = "Why $time?"
+
+    override fun prayerTodayIn(
+        prayer: String,
+        city: String,
+    ) = "$prayer today in $city"
+
+    override val onTime = "on time"
+
+    override fun lateBy(duration: String) = "$duration late"
+
+    override val duaMorningAdhkar = "Morning adhkār"
+    override val duaEveningAdhkar = "Evening adhkār"
+    override val duaAyatAlKursi = "Āyat al-Kursī after the prayer"
+    override val duaTasbih = "Tasbīḥ after the prayer"
 }

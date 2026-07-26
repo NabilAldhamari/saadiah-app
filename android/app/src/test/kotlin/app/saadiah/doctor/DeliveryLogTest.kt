@@ -1,5 +1,6 @@
 package app.saadiah.doctor
 
+import app.saadiah.ui.EnglishStrings
 import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -49,7 +50,7 @@ class DeliveryLogTest {
                 delivery = Delivery.LATE,
             )
 
-        assertEquals(expected = "3 minutes late", actual = record.describeDelay())
+        assertEquals(expected = "3 minutes late", actual = record.describeDelay(EnglishStrings))
     }
 
     @Test
@@ -62,6 +63,6 @@ class DeliveryLogTest {
                 delivery = Delivery.ON_TIME,
             )
 
-        assertEquals(expected = "on time", actual = record.describeDelay())
+        assertEquals(expected = "on time", actual = record.describeDelay(EnglishStrings))
     }
 }
