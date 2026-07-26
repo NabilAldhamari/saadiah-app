@@ -265,6 +265,13 @@ interface Strings {
 
     fun whyIsItAt(time: String): String
 
+    val jumpToToday: String
+    val matchMyMasjidWhy: String
+    val applyProfile: String
+    val matchedProfile: String
+    val lowConfidence: String
+    val enterYourMasjidTimes: String
+
     fun prayerTodayIn(
         prayer: String,
         city: String,

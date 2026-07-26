@@ -63,6 +63,10 @@ class MainActivity : ComponentActivity() {
                         onChangeSettings = { changed -> save(store, alarms) { changed } },
                         onChangeCity = { chosen -> save(store, alarms) { it.copy(city = chosen) } },
                         onOpenBackgroundSettings = ::openBackgroundSettings,
+                        onApplyMatchedProfile = { matched ->
+                            // Applied only on the reader's explicit confirm, never by the solve.
+                            save(store, alarms) { it.copy(madhab = matched.madhab) }
+                        },
                     ),
             )
         }

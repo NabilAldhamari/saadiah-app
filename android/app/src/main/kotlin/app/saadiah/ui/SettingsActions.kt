@@ -7,4 +7,5 @@ data class SettingsActions(
     val onChangeCity: () -> Unit,
     val onOpenDoctor: () -> Unit,
     val onOpenBaqarah: () -> Unit,
+    val onMatchMasjid: () -> Unit,
 )

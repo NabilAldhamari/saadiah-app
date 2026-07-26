@@ -304,6 +304,15 @@ object EnglishStrings : Strings {
 
     override fun whyIsItAt(time: String) = "Why $time?"
 
+    override val jumpToToday = "Today"
+    override val matchMyMasjidWhy = "Enter your masjid's printed times and Saadiah finds the settings that fit."
+    override val applyProfile = "Apply these settings"
+    override val matchedProfile = "Closest match"
+    override val lowConfidence =
+        "These times do not fit any single calculation cleanly. Check the ones you entered, or apply " +
+            "this and tune a prayer by hand."
+    override val enterYourMasjidTimes = "Overwrite any time you have from your masjid. Leave the rest as they are."
+
     override fun prayerTodayIn(
         prayer: String,
         city: String,

@@ -26,6 +26,8 @@ sealed interface Screen {
 
     data object Baqarah : Screen
 
+    data object MatchMasjid : Screen
+
     data class Reading(
         val sura: Int,
     ) : Screen
