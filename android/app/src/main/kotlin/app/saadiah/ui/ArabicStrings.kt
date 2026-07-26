@@ -25,7 +25,6 @@ object ArabicStrings : Strings {
 
     override val titleChooseCity = "اختر مدينتك"
     override val titleAlertCheck = "هل ستصلني التنبيهات؟"
-    override val titleAsk = "اسأل"
     override val titleWhyThisTime = "لماذا هذا الوقت"
     override val titleBaqarah = "سورة البقرة"
     override val titlePrayer = "الصلاة"
@@ -93,14 +92,6 @@ object ArabicStrings : Strings {
 
     override val yes = "نعم"
     override val no = "لا"
-
-    override val askAQuestion = "اطرح سؤالًا"
-    override val askNotConnected = "الإجابة غير مفعّلة بعد. لا يغادر ما تكتبه هذا الجهاز."
-    override val askDisclaimerTitle = "قد تكون الإجابة هنا خاطئة."
-
-    override fun askDisclaimerBody(tradition: String) =
-        "الإجابات مولّدة وغير مراجَعة، وقد تكون خاطئة رغم ثقتها. مذهبك ($tradition) يغيّر الإجابة. " +
-            "لا شيء هنا فتوى. وفيما يهم، اسأل أهل العلم."
 
     override val adhkarMorning = "الصباح"
     override val adhkarEvening = "المساء"
@@ -249,10 +240,6 @@ object ArabicStrings : Strings {
 
     override fun doNotFastOn(observance: String) = "لا يُصام — $observance"
 
-    override fun askDisclaimerFor(school: String) =
-        "الإجابات مولّدة وغير مراجَعة، وقد تكون خاطئة رغم ثقتها. وهي تتبع المذهب $school الذي " +
-            "اخترته، فتغيير ذلك الإعداد يغيّر الإجابة. لا شيء هنا فتوى. وفيما يهم، اسأل أهل العلم."
-
     override val observanceLabels =
         mapOf(
             "RAMADAN" to "رمضان — صيام",
@@ -292,12 +279,6 @@ object ArabicStrings : Strings {
     override val seated = "جالسًا"
 
     override fun rakah(count: Int) = "$count ركعات"
-
-    override val readToday = "سجّل قراءة اليوم"
-    override val readTodayDone = "قُرئت اليوم"
-    override val quoteBy = "—"
-
-    override fun daysKeptUp(count: Int) = if (count == 1) "يوم واحد" else "$count يومًا من المداومة"
 
     override val prayerChannelName = "أوقات الصلاة"
     override val prayerChannelWhat = "يعلن كل صلاة عند دخول وقتها."

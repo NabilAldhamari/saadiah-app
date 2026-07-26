@@ -17,7 +17,6 @@ object EnglishStrings : Strings {
 
     override val titleChooseCity = "Choose your city"
     override val titleAlertCheck = "Will my alerts arrive?"
-    override val titleAsk = "Ask"
     override val titleWhyThisTime = "Why this time"
     override val titleBaqarah = "Sūrat al-Baqarah"
     override val titlePrayer = "Prayer"
@@ -85,15 +84,6 @@ object EnglishStrings : Strings {
 
     override val yes = "yes"
     override val no = "no"
-
-    override val askAQuestion = "Ask a question"
-    override val askNotConnected = "Answering is not connected yet. Nothing you type leaves this device."
-    override val askDisclaimerTitle = "An answer here may be wrong."
-
-    override fun askDisclaimerBody(tradition: String) =
-        "Answers are generated, not verified, and they can be confidently mistaken. Your tradition " +
-            "($tradition) changes the answer. Nothing here is a fatwa. For anything that matters, " +
-            "ask someone qualified."
 
     override val adhkarMorning = "Morning"
     override val adhkarEvening = "Evening"
@@ -243,11 +233,6 @@ object EnglishStrings : Strings {
 
     override fun doNotFastOn(observance: String) = "Do not fast — $observance"
 
-    override fun askDisclaimerFor(school: String) =
-        "Answers are generated, not verified, and they can be confidently mistaken. They follow " +
-            "the $school school you have selected, so changing that setting changes the answer. " +
-            "Nothing here is a fatwa. For anything that matters, ask someone qualified."
-
     override val observanceLabels =
         mapOf(
             "RAMADAN" to "Ramaḍān — fasting",
@@ -287,12 +272,6 @@ object EnglishStrings : Strings {
     override val seated = "seated"
 
     override fun rakah(count: Int) = "$count rakʿah"
-
-    override val readToday = "Mark today's reading"
-    override val readTodayDone = "Read today"
-    override val quoteBy = "—"
-
-    override fun daysKeptUp(count: Int) = if (count == 1) "1 day kept up" else "$count days kept up"
 
     override val prayerChannelName = "Prayer times"
     override val prayerChannelWhat = "Announces each prayer as its time enters."
