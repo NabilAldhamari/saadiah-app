@@ -32,7 +32,6 @@ interface Strings {
 
     val titleChooseCity: String
     val titleAlertCheck: String
-    val titleAsk: String
     val titleWhyThisTime: String
     val titleBaqarah: String
     val titlePrayer: String
@@ -98,12 +97,6 @@ interface Strings {
 
     val yes: String
     val no: String
-
-    val askAQuestion: String
-    val askNotConnected: String
-    val askDisclaimerTitle: String
-
-    fun askDisclaimerBody(tradition: String): String
 
     val adhkarMorning: String
     val adhkarEvening: String
@@ -226,8 +219,6 @@ interface Strings {
 
     fun doNotFastOn(observance: String): String
 
-    fun askDisclaimerFor(school: String): String
-
     val observanceLabels: Map<String, String>
 
     val observanceShortLabels: Map<String, String>
@@ -244,12 +235,6 @@ interface Strings {
     val seated: String
 
     fun rakah(count: Int): String
-
-    val readToday: String
-    val readTodayDone: String
-    val quoteBy: String
-
-    fun daysKeptUp(count: Int): String
 
     val prayerChannelName: String
     val prayerChannelWhat: String
@@ -276,6 +261,23 @@ interface Strings {
     val remove: String
     val noCustomAdhkar: String
     val timesLabel: String
+    val bundledAdhkar: String
+
+    fun whyIsItAt(time: String): String
+
+    fun prayerTodayIn(
+        prayer: String,
+        city: String,
+    ): String
+
+    val onTime: String
+
+    fun lateBy(duration: String): String
+
+    val duaMorningAdhkar: String
+    val duaEveningAdhkar: String
+    val duaAyatAlKursi: String
+    val duaTasbih: String
 }
 
 val LocalStrings: ProvidableCompositionLocal<Strings> = staticCompositionLocalOf { EnglishStrings }

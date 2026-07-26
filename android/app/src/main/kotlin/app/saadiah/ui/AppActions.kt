@@ -11,5 +11,4 @@ data class AppActions(
     val onChangeSettings: (Settings) -> Unit,
     val onChangeCity: (City) -> Unit,
     val onOpenBackgroundSettings: () -> Unit,
-    val onMarkBaqarahRead: () -> Unit,
 )

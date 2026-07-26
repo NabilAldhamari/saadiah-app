@@ -28,6 +28,20 @@ measurements from this file.
 
 ## 2. Colour tokens
 
+**Corrected to match what ships.** The hex values below were read back out of `Tokens.kt` and
+every ratio re-measured with the WCAG 2.1 formula; the numbers in the tables are the measured
+ones, not the originally proposed ones. `ColorContrastTest` holds each to its gate and also
+asserts the recorded ratio matches the measurement, so this section and the code cannot drift
+apart silently.
+
+A third palette, **white and green**, was added later and is recorded further down. Every token
+in all three passes.
+
+**What does not change:** `ColorContrastTest` still gates the build regardless of which palette
+it's checking. ≥ 4.5:1 for text roles, ≥ 3:1 for non-text roles, in both themes. If the shipped
+palette hasn't been run through it yet, run it now — the accent-on-light failure recorded below
+happened once already precisely because a colour was chosen before it was measured.
+
 Two themes. Follow the system setting — do not pick for the user, and do not default to dark.
 
 ### Dark
@@ -40,8 +54,8 @@ Two themes. Follow the system setting — do not pick for the user, and do not d
 | `lineSubtle` | `#1A2724` | ayah separators | decorative |
 | `text` | `#F7F4EC` | primary text | 16.71:1 |
 | `textSecondary` | `#B0BAB6` | translations, supporting copy | 9.22:1 |
-| `textTertiary` | `#78837F` | labels, metadata | 4.70:1 |
-| `accent` | `#B8935A` | active state, primary action | 6.42:1 |
+| `textTertiary` | `#78837F` | labels, metadata | 4.68:1 |
+| `accent` | `#B8935A` | active state, primary action | 6.44:1 |
 | `sage` | `#5E7A6B` | recommended-fast marker | 3.91:1 — **markers only, never text** |
 | `warning` | `#C57358` | failed check, prohibited day | 5.22:1 |
 
@@ -53,33 +67,12 @@ Two themes. Follow the system setting — do not pick for the user, and do not d
 | `surface` | `#EDE6D3` | cards, inset panels | 1.2:1 (non-text) |
 | `line` | `#DDD7C7` | dividers | decorative |
 | `lineSubtle` | `#EAE5D8` | row separators | decorative |
-| `text` | `#0E1614` | primary text | 16.7:1 |
-| `textSecondary` | `#4A4A44` | supporting copy | 8.14:1 |
+| `text` | `#0E1614` | primary text | 16.71:1 |
+| `textSecondary` | `#4A4A44` | supporting copy | 8.12:1 |
 | `textTertiary` | `#6B665C` | labels, metadata | 5.19:1 |
-| `accent` | `#7A5A22` | active state, primary action | 5.79:1 |
+| `accent` | `#7A5A22` | active state, primary action | 5.77:1 |
 | `sage` | `#3E5A4A` | recommended-fast marker | 6.91:1 |
-| `warning` | `#9A3F22` | failed check, prohibited day | 6.14:1 |
-
-### White and green
-
-A third palette, chosen for readers who want the app to feel light rather than warm. Every
-ratio below was measured before the colour was written, and `ColorContrastTest` holds them.
-
-| Token | Hex | Role | Contrast on `bg` |
-|---|---|---|---|
-| `bg` | `#F6FAF7` | screen background | — |
-| `surface` | `#E6F0E9` | cards, current prayer | — |
-| `line` | `#CBDFD1` | hairline | decorative |
-| `lineSubtle` | `#DEEAE1` | fainter hairline | decorative |
-| `text` | `#10201A` | primary text | 16.03:1 |
-| `textSecondary` | `#3C4E44` | secondary text | 8.43:1 |
-| `textTertiary` | `#59695F` | sources, captions | 5.52:1 |
-| `accent` | `#2E6A4B` | accents, filled controls | 6.08:1 |
-| `sage` | `#3A6650` | passing markers | 6.24:1 |
-| `warning` | `#8F3A1F` | failing markers | 7.14:1 |
-
-`accent` is used both as a foreground and as a fill with `bg` written on it, so 6.08:1 has to
-hold in both directions — contrast is symmetric, so the one measurement covers both.
+| `warning` | `#9A3F22` | failed check, prohibited day | 6.15:1 |
 
 **Do not use `#B8935A` on a light background.** It measures 2.60:1 and fails. That is what
 `accent` light exists for. This mistake was made once already.
@@ -198,9 +191,33 @@ enum class CheckStatus { PASS, FAIL }
 
 @Composable
 fun SectionDivider(modifier: Modifier = Modifier)
+
+@Composable
+fun ScreenHeader(
+    title: String,
+    onBack: (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+)
 ```
 
-Rules that apply to all of them:
+**`ScreenHeader` was missing from the original spec — that's a gap in this document, not
+something implementation skipped.** It is mandatory on every screen and sheet reached by
+navigating forward: Ask, Why this time, Alert check, Match my masjid, every settings sub-page.
+The four root tab destinations (Today, Quran, Adhkār, More) don't need it — they're arrived at
+via the tab bar, not "back"-able.
+
+Rules:
+
+- **Pinned at the very top of the screen, above all content, and it never scrolls away.** A back
+  action placed at the bottom of scrolling content — reachable only after scrolling past
+  everything else — does not satisfy this component. Use it for a secondary confirm action if a
+  screen wants one; it is never the only way back.
+- `onBack` renders as a small icon control inline in the header, RTL-mirrored per §7, not a
+  full-width button competing visually with body content.
+- `title` is always a localized string. A screen title in the wrong locale is the same bug as a
+  hardcoded English label anywhere else — see §7.
+
+Rules that apply to all components:
 
 - **Every interactive component takes a visible text label.** There is no icon-only variant of
   `LabelledIconButton`, and no primary flow contains a bare icon.
@@ -239,17 +256,32 @@ Scrolling is acceptable at large font scales. Do not compress to avoid it.
 
 ### 6.2 Calendar
 
-**List is the default view. Grid is the alternative.** A segmented control at the top switches
-them, list selected on first launch.
+**List is the default view. Grid is a genuinely different visualisation, not the same list with
+an extra legend appended.** The current implementation renders the same row layout under both
+tabs, with the grid tab additionally showing the legend as inline rows — that's the one existing
+tab doing double duty, not two views. Fix this by building the two as actually distinct:
 
-List rows: Hijri day number (`titleSmall`) and weekday (`bodySmall`) in a fixed 44dp leading
-column; then the observance name in `body`, spelled out in words — "Fast — ʿArafah",
-"Do not fast — Eid al-Aḍḥā", "Ḥijāmah day"; then the Gregorian date in `bodySmall`; then a bell
-toggle. Never a bare coloured dot.
+- **List** (default): rows in date order, one observance per row. Hijri day number (`titleSmall`)
+  and weekday (`bodySmall`) in a fixed 44dp leading column; then the observance name in `body`,
+  spelled out in words — "Fast — ʿArafah", "Do not fast — Eid al-Aḍḥā", "Ḥijāmah day"; then the
+  Gregorian date in `bodySmall`; then a bell toggle. Never a bare coloured dot. No legend needed
+  here — the words carry the meaning.
+- **Grid**: an actual month grid — day-of-week columns, numbered day cells, one calendar month
+  at a time. Each cell carries the Gregorian day number plus a marker for that day if it has one:
+  filled circle for recommended fast, horizontal bar for prohibited, ring outline for hijāmah.
+  A legend naming all three in words sits below the grid, fixed, not scrolling with the month.
+  This view answers "what does this month look like at a glance" — the list answers "what's
+  coming up and can I set an alert for it." If that distinction doesn't hold for a given view,
+  it's the wrong view, not a labelling problem.
 
-Grid view keeps the dot markers but every marker is additionally distinguished by shape: filled
-circle for recommended fast, horizontal bar for prohibited, ring outline for hijāmah. A legend
-below the grid names all three in words.
+**Enrichments, in priority order:**
+
+1. **Tap a day for a detail sheet** (`ScreenHeader` + content): full observance detail including
+   its evidence reference from §8 of the implementation plan, that day's five prayer times, and
+   — where relevant — the alert toggle. This is the single highest-value addition since it gives
+   the grid view something to do beyond browsing.
+2. **Jump to today** — a single action from anywhere in the calendar, list or grid, at any month.
+3. **Per-day prayer time peek** inside the detail sheet from (1), rather than a separate feature.
 
 Conflicts are explained, not hidden. When Ayyām al-Bīḍ overlaps Tashrīq, show a note in
 `bodySmall` / `textSecondary` saying so.
@@ -292,16 +324,48 @@ item is a wider pill, not merely a different colour.
 
 ### 6.5 Why this time
 
-A bottom sheet. Title `titleLarge`. A definition list of Method, Fajr/Isha angle, ʿAṣr madhhab,
-high-latitude rule and tuning — label in `body`/`textSecondary` at the start, value in `body` at
-the end, one per row with a `lineSubtle` divider. The value the user is most likely to want to
-change is rendered in `accent`.
+A bottom sheet with `ScreenHeader`. Title `titleLarge`, always localized (currently ships in
+English — "Why 5:32 PM?" — that's a §7 violation, not a §6.5 one, but flagged here since this is
+where it was seen). A definition list of Method, Fajr/Isha angle, ʿAṣr madhhab, high-latitude
+rule and tuning — label in `body`/`textSecondary` at the start, value in `body` at the end, one
+per row with a `lineSubtle` divider. The value the user is most likely to want to change is
+rendered in `accent`.
 
-Below it, an inset `surface` panel giving the concrete alternative in words: what the other
-madhhab would produce, and by how many minutes it differs.
+**The explanatory panel is prayer-aware. It is not one canned paragraph reused for every prayer.**
+What currently ships explains Aṣr madhhab regardless of which prayer's sheet is open, which is
+meaningless for Fajr or Isha — madhhab has no bearing on either. The content must branch:
 
-Two actions: a filled-outline "Match my masjid" occupying most of the width, and a compact
-tuning button beside it.
+- **Fajr, Isha**: explain in terms of the twilight angle and the high-latitude rule — these are
+  the two variables that actually move these times, and at latitudes like Exeter's they can move
+  by more than an hour. Name the rule in plain words ("your Fajr uses the middle-of-the-night
+  approximation because true twilight doesn't occur at this latitude in summer") rather than just
+  the setting's label.
+- **Aṣr**: explain in terms of madhhab, as it does today.
+- **Dhuhr, Maghrib**: these are not method-sensitive. If there's a gap from the user's masjid, say
+  so plainly and point at tuning rather than implying a method choice would fix it.
+
+Below the definition list, an inset `surface` panel gives the concrete alternative in words —
+what the other setting would produce, and by how many minutes it differs — using whichever
+variable is relevant per the branching above.
+
+**Two actions, and "Match my masjid" must actually do something.** It currently opens to static
+text about the Ḥanafī/standard Aṣr difference and nothing else — there is no entry point for the
+user to input their own masjid's times and no solve happening. Build the real flow:
+
+1. **Entry points**: this button, *and* a standalone "Match my masjid" item in Settings — a user
+   should be able to run this once for all five prayers, not rediscover it prayer by prayer.
+2. **Input**: a form with one time field per prayer, labelled by name, pre-filled with today's
+   computed time as a starting point. The user overwrites any field where they have their masjid's
+   printed time; fields left unchanged are not treated as a hard constraint on the solve.
+3. **Solve**: reuse `PrayerCalculator.solve()` from `core/prayer` (T1.4 in the implementation
+   plan) across method × madhhab × high-latitude rule, scored by total absolute error across the
+   fields the user actually entered, with any residual difference applied as per-prayer minute
+   tuning.
+4. **Confirmation**: show the matched profile in the same definition-list style as the sheet
+   above, with an explicit "Apply" action — nothing changes silently.
+
+The compact tuning button beside "Match my masjid" remains for a user who wants to nudge a single
+prayer by hand without running the full solve.
 
 ### 6.6 Alert check
 

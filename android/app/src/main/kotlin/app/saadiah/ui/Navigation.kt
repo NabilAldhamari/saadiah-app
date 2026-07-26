@@ -22,8 +22,6 @@ sealed interface Screen {
 
     data object Doctor : Screen
 
-    data object Ask : Screen
-
     data object WhyThisTime : Screen
 
     data object Baqarah : Screen

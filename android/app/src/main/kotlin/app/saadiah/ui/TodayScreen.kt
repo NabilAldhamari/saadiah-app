@@ -52,9 +52,6 @@ data class TodayActions(
     val onOpenDoctor: () -> Unit,
     val onOpenPrayer: (app.saadiah.model.Prayer) -> Unit = {},
     val onOpenBaqarah: () -> Unit = {},
-    val onMarkBaqarahRead: () -> Unit = {},
-    val baqarahReadCount: Int = 0,
-    val baqarahReadToday: Boolean = false,
 )
 
 @Composable
@@ -92,12 +89,7 @@ fun TodayScreen(
         }
         FastingStrip(state.fasting)
         Observances(state)
-        BaqarahCard(
-            readCount = actions.baqarahReadCount,
-            readToday = actions.baqarahReadToday,
-            onOpen = actions.onOpenBaqarah,
-            onMarkRead = actions.onMarkBaqarahRead,
-        )
+        BaqarahCard(onOpen = actions.onOpenBaqarah)
         Spacer(Modifier.height(SaadiahSpacing.large))
     }
 }
@@ -146,12 +138,7 @@ private fun DateHeader(
 }
 
 @Composable
-private fun BaqarahCard(
-    readCount: Int,
-    readToday: Boolean,
-    onOpen: () -> Unit,
-    onMarkRead: () -> Unit,
-) {
+private fun BaqarahCard(onOpen: () -> Unit) {
     // Deliberately the loudest thing below the prayer list: a filled card with its own
     // glyph rather than another row of text. Every other item here is something to read;
     // this one is something to do, and it is meant to be noticed and opened.
@@ -182,27 +169,6 @@ private fun BaqarahCard(
                 )
                 Caption(strings.todaysReadingHint)
             }
-        }
-        Spacer(Modifier.height(SaadiahSpacing.small))
-        SectionDivider()
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = strings.daysKeptUp(readCount),
-                color = colors.textSecondary,
-                fontSize = SaadiahType.bodySmall.size,
-                modifier = Modifier.weight(1f),
-            )
-            // The word carries the state, so a reader who cannot see the tint still knows.
-            Text(
-                text = if (readToday) strings.readTodayDone else strings.readToday,
-                color = if (readToday) colors.sage else colors.accent,
-                fontSize = SaadiahType.body.size,
-                modifier =
-                    Modifier
-                        .clickable(enabled = !readToday, onClick = onMarkRead)
-                        .minimumTouchTarget()
-                        .padding(horizontal = SaadiahSpacing.snug),
-            )
         }
     }
 }

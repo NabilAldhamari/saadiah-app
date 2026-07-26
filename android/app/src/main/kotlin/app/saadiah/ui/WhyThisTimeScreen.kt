@@ -35,39 +35,24 @@ fun WhyThisTimeScreen(
     onBack: () -> Unit,
 ) {
     val colors = SaadiahTheme.colors
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(colors.bg)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = SaadiahSpacing.screen)
-                .padding(top = SaadiahSpacing.screen),
-    ) {
-        Heading(state)
-        SectionDivider()
-        for (entry in state.entries) {
-            DefinitionRow(entry)
+    Column(modifier = Modifier.fillMaxSize().background(colors.bg)) {
+        ScreenHeader(title = state.title, onBack = onBack)
+        Column(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = SaadiahSpacing.screen),
+        ) {
+            Caption(state.subtitle)
+            SectionDivider()
+            for (entry in state.entries) {
+                DefinitionRow(entry)
+            }
+            Alternative(state.alternative)
+            Actions(onMatchMasjid, onBack)
         }
-        Alternative(state.alternative)
-        Actions(onMatchMasjid, onBack)
     }
-}
-
-@Composable
-private fun Heading(state: WhyThisTimeState) {
-    val colors = SaadiahTheme.colors
-    Text(
-        text = state.title,
-        color = colors.text,
-        fontSize = SaadiahType.titleLarge.size,
-        lineHeight = SaadiahType.titleLarge.lineHeight,
-    )
-    Text(
-        text = state.subtitle,
-        color = colors.textSecondary,
-        fontSize = SaadiahType.bodySmall.size,
-    )
 }
 
 @Composable

@@ -6,7 +6,6 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -48,8 +47,6 @@ private val END_OF_WINDOW = longPreferencesKey("alerts.end.minutes")
 private val LANGUAGE = stringPreferencesKey("language")
 private val THEME = stringPreferencesKey("theme")
 private val BAQARAH_REMINDER = stringPreferencesKey("baqarah.reminder")
-private val BAQARAH_READ_COUNT = intPreferencesKey("baqarah.read.count")
-private val BAQARAH_LAST_READ = stringPreferencesKey("baqarah.last.read")
 private val CUSTOM_ADHKAR = stringSetPreferencesKey("adhkar.custom")
 
 private val Context.settingsStore: DataStore<Preferences> by preferencesDataStore(name = STORE_NAME)
@@ -89,8 +86,6 @@ private fun Preferences.toSettings(): Settings {
         language = enumOrNull<Language>(LANGUAGE) ?: defaults.language,
         theme = enumOrNull<AppTheme>(THEME) ?: defaults.theme,
         baqarahReminder = enumOrNull<BaqarahReminder>(BAQARAH_REMINDER) ?: defaults.baqarahReminder,
-        baqarahReadCount = this[BAQARAH_READ_COUNT] ?: defaults.baqarahReadCount,
-        baqarahLastRead = this[BAQARAH_LAST_READ],
         customAdhkar = decodeCustomAdhkar(this[CUSTOM_ADHKAR].orEmpty()),
     )
 }
@@ -112,8 +107,6 @@ private fun MutablePreferences.write(settings: Settings) {
     this[LANGUAGE] = settings.language.name
     this[THEME] = settings.theme.name
     this[BAQARAH_REMINDER] = settings.baqarahReminder.name
-    this[BAQARAH_READ_COUNT] = settings.baqarahReadCount
-    setOrRemoveWhenUnchosen(BAQARAH_LAST_READ, settings.baqarahLastRead)
     this[CUSTOM_ADHKAR] = encodeCustomAdhkar(settings.customAdhkar)
 }
 

@@ -38,18 +38,21 @@ fun DoctorScreen(
     val records = remember { DeliveryLog(context).recent() }
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-        Column(
-            modifier =
-                Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.large),
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             ScreenHeader(title = strings.alertsArriveQuestion, onBack = onBack)
-            Checks(context)
-            Spacer(Modifier.height(SaadiahSpacing.large))
-            Guidance(onOpenSettings = onOpenSettings)
-            Spacer(Modifier.height(SaadiahSpacing.large))
-            DeliveryHistory(records)
+            Column(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.large),
+            ) {
+                Checks(context)
+                Spacer(Modifier.height(SaadiahSpacing.large))
+                Guidance(onOpenSettings = onOpenSettings)
+                Spacer(Modifier.height(SaadiahSpacing.large))
+                DeliveryHistory(records)
+            }
         }
     }
 }
@@ -104,7 +107,7 @@ private fun DeliveryHistory(records: List<DeliveryRecord>) {
                     .heightIn(min = MinimumTapTarget)
                     .padding(vertical = SaadiahSpacing.medium / 2),
         ) {
-            Body("${record.prayerName} — ${record.describeDelay()}")
+            Body("${record.prayerName} — ${record.describeDelay(strings)}")
             HorizontalDivider()
         }
     }

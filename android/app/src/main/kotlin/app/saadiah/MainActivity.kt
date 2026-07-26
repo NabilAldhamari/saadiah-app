@@ -18,7 +18,6 @@ import app.saadiah.alarm.canPostNotifications
 import app.saadiah.alarm.ensureChannels
 import app.saadiah.data.Settings
 import app.saadiah.data.SettingsStore
-import app.saadiah.data.markBaqarahReadToday
 import app.saadiah.doctor.guidanceIntents
 import app.saadiah.model.Language
 import app.saadiah.ui.AppActions
@@ -28,9 +27,6 @@ import app.saadiah.ui.SaadiahApp
 import app.saadiah.ui.SaadiahTheme
 import app.saadiah.ui.stringsFor
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 class MainActivity : ComponentActivity() {
     private val requestNotifications =
@@ -67,12 +63,6 @@ class MainActivity : ComponentActivity() {
                         onChangeSettings = { changed -> save(store, alarms) { changed } },
                         onChangeCity = { chosen -> save(store, alarms) { it.copy(city = chosen) } },
                         onOpenBackgroundSettings = ::openBackgroundSettings,
-                        onMarkBaqarahRead = {
-                            save(
-                                store,
-                                alarms,
-                            ) { current -> current.markBaqarahReadToday(todayIn(current)) }
-                        },
                     ),
             )
         }
@@ -91,13 +81,6 @@ class MainActivity : ComponentActivity() {
             alarms.arm()
         }
     }
-
-    private fun todayIn(settings: Settings): String =
-        Clock.System
-            .now()
-            .toLocalDateTime(settings.city?.timeZone ?: TimeZone.currentSystemDefault())
-            .date
-            .toString()
 
     private fun openBackgroundSettings() {
         guidanceIntents(this).firstOrNull { runCatching { startActivity(it) }.isSuccess }

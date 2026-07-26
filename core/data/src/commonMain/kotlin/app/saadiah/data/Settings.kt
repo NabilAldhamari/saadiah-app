@@ -33,16 +33,5 @@ data class Settings(
     val language: Language = Language.SYSTEM,
     val theme: AppTheme = AppTheme.SYSTEM,
     val baqarahReminder: BaqarahReminder = BaqarahReminder.OFF,
-    // Kept as a count and a date rather than a list of days: the reader wants to know they
-    // kept it up, not to audit which mornings they missed.
-    val baqarahReadCount: Int = 0,
-    val baqarahLastRead: String? = null,
     val customAdhkar: List<CustomDhikr> = emptyList(),
 )
-
-/**
- * Counts a day, not a tap. Marking twice in one day leaves the count where it was, so the
- * number stays a record of days kept up rather than of button presses.
- */
-fun Settings.markBaqarahReadToday(today: String): Settings =
-    if (baqarahLastRead == today) this else copy(baqarahReadCount = baqarahReadCount + 1, baqarahLastRead = today)

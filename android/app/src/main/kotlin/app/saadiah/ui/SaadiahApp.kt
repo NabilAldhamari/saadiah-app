@@ -79,9 +79,6 @@ fun SaadiahApp(
             TabBar(tabs = tabsFor(navigator))
         }
     }
-    if (navigator.current.isTabRoot) {
-        AskButton { navigator.go(Screen.Ask) }
-    }
 }
 
 @Suppress("LongParameterList")
@@ -145,9 +142,6 @@ private fun TabRoot(
                         onOpenDoctor = { navigator.go(Screen.WhyThisTime) },
                         onOpenPrayer = { navigator.go(Screen.PrayerDetail(it)) },
                         onOpenBaqarah = { navigator.go(Screen.Baqarah) },
-                        onMarkBaqarahRead = actions.onMarkBaqarahRead,
-                        baqarahReadCount = settings.baqarahReadCount,
-                        baqarahReadToday = settings.baqarahLastRead == today(city).toString(),
                     ),
             )
     }
@@ -162,7 +156,6 @@ private fun PushedScreen(
 ) {
     val back: () -> Unit = { navigator.back() }
     when (screen) {
-        Screen.Ask -> AskScreen(tradition = place.tradition, onBack = back)
         Screen.Baqarah ->
             BaqarahScreen(
                 onBack = back,

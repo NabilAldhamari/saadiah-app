@@ -2,6 +2,8 @@ package app.saadiah.doctor
 
 import android.content.Context
 import androidx.core.content.edit
+import app.saadiah.ui.Strings
+import app.saadiah.ui.spelledOut
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -12,7 +14,6 @@ private const val FIELD_SEPARATOR = "|"
 private const val RECORD_SEPARATOR = "\n"
 private const val FIELD_COUNT = 3
 private const val MAX_RECORDS = 20
-private const val MINUTES_PER_HOUR = 60L
 
 /** A minute's drift is invisible to a person; beyond that the alert reads as late. */
 val TOLERANCE = 1.minutes
@@ -25,9 +26,9 @@ data class DeliveryRecord(
     val actual: Instant,
     val delivery: Delivery,
 ) {
-    fun describeDelay(): String {
-        if (delivery == Delivery.ON_TIME) return "on time"
-        return "${(actual - expected).spelledOut()} late"
+    fun describeDelay(strings: Strings): String {
+        if (delivery == Delivery.ON_TIME) return strings.onTime
+        return strings.lateBy((actual - expected).spelledOut(strings))
     }
 }
 
@@ -79,19 +80,3 @@ class DeliveryLog(
         )
     }
 }
-
-private fun Duration.spelledOut(): String {
-    val total = inWholeMinutes
-    if (total < 1L) return "$inWholeSeconds ${plural(inWholeSeconds, "second")}"
-    val hours = total / MINUTES_PER_HOUR
-    val minutes = total % MINUTES_PER_HOUR
-    return listOfNotNull(
-        hours.takeIf { it > 0L }?.let { "$it ${plural(it, "hour")}" },
-        minutes.takeIf { it > 0L }?.let { "$it ${plural(it, "minute")}" },
-    ).joinToString(separator = " ")
-}
-
-private fun plural(
-    value: Long,
-    word: String,
-): String = if (value == 1L) word else "${word}s"
