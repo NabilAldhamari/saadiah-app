@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import app.saadiah.data.Settings
@@ -112,7 +114,15 @@ private fun TabRoot(
     actions: AppActions,
 ) {
     when (screen) {
-        Screen.Calendar -> CalendarScreen(state = thisMonth(city, tradition, strings))
+        Screen.Calendar -> {
+            val shown = remember { mutableStateOf(todayHijri(today(city))) }
+            val month = shown.value
+            CalendarScreen(
+                state = calendarState(month.year, month.month, tradition, strings),
+                page = monthGrid(month.year, month.month, tradition, strings),
+                onJumpToToday = { shown.value = todayHijri(today(city)) },
+            )
+        }
         Screen.Adhkar ->
             AdhkarScreen(
                 tradition = tradition,
@@ -128,6 +138,7 @@ private fun TabRoot(
                         onChange = actions.onChangeSettings,
                         onChangeCity = { navigator.go(Screen.PickingCity) },
                         onOpenDoctor = { navigator.go(Screen.Doctor) },
+                        onMatchMasjid = { navigator.go(Screen.MatchMasjid) },
                         onOpenBaqarah = { navigator.go(Screen.Baqarah) },
                     ),
             )
@@ -162,6 +173,16 @@ private fun PushedScreen(
                 onRead = { navigator.go(Screen.Reading(it)) },
                 tradition = place.tradition,
             )
+        Screen.MatchMasjid ->
+            MatchMasjidScreen(
+                city = place.city,
+                profile = place.profile,
+                onApply = { matched ->
+                    actions.onApplyMatchedProfile(matched)
+                    navigator.back()
+                },
+                onBack = back,
+            )
         Screen.Doctor -> DoctorScreen(onOpenSettings = actions.onOpenBackgroundSettings, onBack = back)
         Screen.PickingCity ->
             CityPickerScreen(
@@ -175,7 +196,7 @@ private fun PushedScreen(
         Screen.WhyThisTime ->
             WhyThisTimeScreen(
                 state = whyThisTimeState(place.city, place.profile, today(place.city), strings),
-                onMatchMasjid = { navigator.go(Screen.Doctor) },
+                onMatchMasjid = { navigator.go(Screen.MatchMasjid) },
                 onBack = back,
             )
         else -> Reading(screen, place, back)
@@ -244,15 +265,6 @@ private fun tabsFor(navigator: Navigator): List<Tab> {
             navigator.switchTab(Screen.More)
         },
     )
-}
-
-private fun thisMonth(
-    city: City,
-    tradition: Tradition,
-    strings: Strings,
-): CalendarState {
-    val hijri = todayHijri(today(city))
-    return calendarState(year = hijri.year, month = hijri.month, tradition = tradition, strings = strings)
 }
 
 private fun today(city: City): LocalDate =

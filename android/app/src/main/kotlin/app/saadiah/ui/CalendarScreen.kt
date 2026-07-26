@@ -6,9 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import app.saadiah.design.ObservanceMarker
 import app.saadiah.design.ObservanceRow
 import app.saadiah.design.SaadiahRadius
 import app.saadiah.design.SaadiahSpacing
@@ -36,11 +33,14 @@ import app.saadiah.design.minimumTouchTarget
 private val LEADING_COLUMN = 44.dp
 private val HAIRLINE = 1.dp
 
-/** DESIGN.md §6.2: list is the default view and grid is the alternative. */
 enum class CalendarView { LIST, GRID }
 
 @Composable
-fun CalendarScreen(state: CalendarState) {
+fun CalendarScreen(
+    state: CalendarState,
+    page: MonthPage,
+    onJumpToToday: () -> Unit,
+) {
     var view by remember { mutableStateOf(CalendarView.LIST) }
     val colors = SaadiahTheme.colors
 
@@ -53,11 +53,23 @@ fun CalendarScreen(state: CalendarState) {
                 .padding(top = SaadiahSpacing.screen),
     ) {
         MonthHeading(state)
-        ViewSwitch(selected = view, onSelect = { view = it })
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            ViewSwitch(selected = view, onSelect = { view = it }, modifier = Modifier.weight(1f))
+            Text(
+                text = strings.jumpToToday,
+                color = SaadiahTheme.colors.accent,
+                fontSize = SaadiahType.body.size,
+                modifier =
+                    Modifier
+                        .clickable(onClick = onJumpToToday)
+                        .minimumTouchTarget()
+                        .padding(horizontal = SaadiahSpacing.snug),
+            )
+        }
         SectionDivider()
         when (view) {
             CalendarView.LIST -> DayList(state)
-            CalendarView.GRID -> MonthGrid(state)
+            CalendarView.GRID -> MonthGrid(page)
         }
     }
 }
@@ -83,9 +95,10 @@ private fun MonthHeading(state: CalendarState) {
 private fun ViewSwitch(
     selected: CalendarView,
     onSelect: (CalendarView) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = SaadiahSpacing.medium),
+        modifier = modifier.fillMaxWidth().padding(top = SaadiahSpacing.medium),
         horizontalArrangement = Arrangement.spacedBy(SaadiahSpacing.small),
     ) {
         for (option in CalendarView.entries) {
@@ -165,56 +178,3 @@ private fun ConflictNote(note: String) {
                 .padding(SaadiahSpacing.medium),
     )
 }
-
-@Composable
-private fun MonthGrid(state: CalendarState) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = strings.calendarLegend,
-            color = SaadiahTheme.colors.textSecondary,
-            fontSize = SaadiahType.bodySmall.size,
-        )
-        Spacer(Modifier.height(SaadiahSpacing.small))
-        for (day in state.days) {
-            ObservanceRow(
-                title = "${day.hijriDay} — ${day.title}",
-                subtitle = day.gregorian,
-                marker = day.marker,
-                alertEnabled = day.alertEnabled,
-                onToggleAlert = {},
-            )
-        }
-        LegendNamingEveryMarkerInWords()
-        state.conflictNote?.let { ConflictNote(it) }
-    }
-}
-
-@Composable
-private fun LegendNamingEveryMarkerInWords() {
-    Spacer(Modifier.height(SaadiahSpacing.medium))
-    for (entry in ObservanceMarker.entries) {
-        ObservanceRow(
-            title = entry.inWords(),
-            subtitle = entry.shapeInWords(),
-            marker = entry,
-            alertEnabled = false,
-            onToggleAlert = {},
-        )
-    }
-}
-
-@Composable
-private fun ObservanceMarker.inWords(): String =
-    when (this) {
-        ObservanceMarker.RECOMMENDED_FAST -> strings.legendFast
-        ObservanceMarker.PROHIBITED_FAST -> strings.legendDoNotFast
-        ObservanceMarker.HIJAMAH -> strings.legendHijamah
-    }
-
-@Composable
-private fun ObservanceMarker.shapeInWords(): String =
-    when (this) {
-        ObservanceMarker.RECOMMENDED_FAST -> strings.shapeFilledCircle
-        ObservanceMarker.PROHIBITED_FAST -> strings.shapeHorizontalBar
-        ObservanceMarker.HIJAMAH -> strings.shapeRingOutline
-    }

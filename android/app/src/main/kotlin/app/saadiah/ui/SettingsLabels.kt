@@ -3,6 +3,7 @@ package app.saadiah.ui
 import app.saadiah.model.AppTheme
 import app.saadiah.model.BaqarahReminder
 import app.saadiah.model.CombineMode
+import app.saadiah.model.HighLatitudeRule
 import app.saadiah.model.Language
 import app.saadiah.model.Madhab
 import app.saadiah.model.Prayer
@@ -59,4 +60,11 @@ internal fun AppTheme.spelledOut(strings: Strings): String =
         AppTheme.LIGHT -> strings.themeLight
         AppTheme.DARK -> strings.themeDark
         AppTheme.GREEN -> strings.themeGreen
+    }
+
+internal fun HighLatitudeRule.spelledOutRule(strings: Strings): String =
+    when (this) {
+        HighLatitudeRule.MIDDLE_OF_NIGHT -> strings.middleOfNight
+        HighLatitudeRule.SEVENTH_OF_NIGHT -> strings.seventhOfNight
+        HighLatitudeRule.TWILIGHT_ANGLE -> strings.twilightAngle
     }

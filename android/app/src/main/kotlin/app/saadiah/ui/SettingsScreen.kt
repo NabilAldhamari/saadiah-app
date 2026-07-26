@@ -89,6 +89,9 @@ fun SettingsScreen(
 
         Section(strings.sectionChecks) {
             ChoiceRow(strings.alertsArriveQuestion, false, strings.open, actions.onOpenDoctor)
+            // Its own entry, so it is run once for all five prayers rather than rediscovered
+            // from whichever prayer's Why sheet a reader happens to open.
+            ChoiceRow(strings.matchMyMasjid, false, strings.open, actions.onMatchMasjid)
         }
         Section(strings.sectionAbout) {
             Body(strings.privacyNote)

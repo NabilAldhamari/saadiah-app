@@ -310,6 +310,14 @@ object ArabicStrings : Strings {
 
     override fun whyIsItAt(time: String) = "لماذا $time؟"
 
+    override val jumpToToday = "اليوم"
+    override val matchMyMasjidWhy = "أدخل أوقات مسجدك المطبوعة ليجد التطبيق الإعدادات الموافقة لها."
+    override val applyProfile = "تطبيق هذه الإعدادات"
+    override val matchedProfile = "أقرب تطابق"
+    override val lowConfidence =
+        "هذه الأوقات لا توافق حسابًا واحدًا بوضوح. راجع ما أدخلته، أو طبّق هذا واضبط صلاة يدويًا."
+    override val enterYourMasjidTimes = "استبدل أي وقت لديك من مسجدك، واترك البقية كما هي."
+
     override fun prayerTodayIn(
         prayer: String,
         city: String,
