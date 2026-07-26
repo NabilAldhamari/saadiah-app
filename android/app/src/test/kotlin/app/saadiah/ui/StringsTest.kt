@@ -21,7 +21,7 @@ private val ARABIC_SAMPLE =
         listOf(back, comingSoon, tabToday, tabMore, titleSettings, titleChooseCity) +
             listOf(sectionLanguage, sectionWhichPrayers, privacyNote, everyPrayerSilent) +
             listOf(doNotWarnMe, followMyPhone, searchForYourCity, noCityMatches) +
-            listOf(alertsArriveQuestion, noAlertYet, askNotConnected, adhkarNotBundled) +
+            listOf(alertsArriveQuestion, noAlertYet, adhkarNotBundled) +
             listOf(baqarahNotBundled, nawafil, legendFast, itIsTimeForThisPrayer) +
             listOf(fastingRecommended, whyHighLatitude, hijamah, tomorrow)
     }

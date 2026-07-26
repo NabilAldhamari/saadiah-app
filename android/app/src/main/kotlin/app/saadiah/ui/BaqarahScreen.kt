@@ -84,7 +84,7 @@ private fun MeritCard(merit: BaqarahMerit) {
             Spacer(Modifier.height(SaadiahSpacing.snug))
             SectionDivider()
             Text(
-                text = "${strings.quoteBy} ${merit.source}",
+                text = "— ${merit.source}",
                 color = colors.textSecondary,
                 fontSize = SaadiahType.bodySmall.size,
             )
