@@ -34,33 +34,33 @@ fun BaqarahScreen(
     val colors = SaadiahTheme.colors
     val merits = baqarahMerits(tradition)
 
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(colors.bg)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = SaadiahSpacing.screen)
-                .padding(top = SaadiahSpacing.screen),
-    ) {
+    Column(modifier = Modifier.fillMaxSize().background(colors.bg)) {
         ScreenHeader(title = strings.titleBaqarah, onBack = onBack)
-        Body(strings.baqarahSubtitle)
-        Spacer(Modifier.height(SaadiahSpacing.medium))
-        ReadRow(strings.readAlBaqarah) { onRead(BAQARAH_SURA) }
-        ReadRow(strings.readAlImran) { onRead(AL_IMRAN_SURA) }
-        SectionDivider()
+        Column(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = SaadiahSpacing.screen),
+        ) {
+            Body(strings.baqarahSubtitle)
+            Spacer(Modifier.height(SaadiahSpacing.medium))
+            ReadRow(strings.readAlBaqarah) { onRead(BAQARAH_SURA) }
+            ReadRow(strings.readAlImran) { onRead(AL_IMRAN_SURA) }
+            SectionDivider()
 
-        if (merits.isEmpty()) {
-            Body(strings.comingSoon)
-            Spacer(Modifier.height(SaadiahSpacing.small))
-            Caption(strings.baqarahNotBundled)
-        } else {
-            for (merit in merits) {
-                MeritCard(merit)
-                Spacer(Modifier.height(SaadiahSpacing.medium))
+            if (merits.isEmpty()) {
+                Body(strings.comingSoon)
+                Spacer(Modifier.height(SaadiahSpacing.small))
+                Caption(strings.baqarahNotBundled)
+            } else {
+                for (merit in merits) {
+                    MeritCard(merit)
+                    Spacer(Modifier.height(SaadiahSpacing.medium))
+                }
             }
+            Spacer(Modifier.height(SaadiahSpacing.huge))
         }
-        Spacer(Modifier.height(SaadiahSpacing.huge))
     }
 }
 
