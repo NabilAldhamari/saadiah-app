@@ -307,4 +307,20 @@ object ArabicStrings : Strings {
     override val noCustomAdhkar = "لم تُضف شيئًا بعد. ما تضيفه هنا يُحفظ على هذا الجهاز."
     override val timesLabel = "عدد المرات"
     override val bundledAdhkar = "أذكار الصباح والمساء"
+
+    override fun whyIsItAt(time: String) = "لماذا $time؟"
+
+    override fun prayerTodayIn(
+        prayer: String,
+        city: String,
+    ) = "$prayer اليوم في $city"
+
+    override val onTime = "في وقته"
+
+    override fun lateBy(duration: String) = "متأخر بـ $duration"
+
+    override val duaMorningAdhkar = "أذكار الصباح"
+    override val duaEveningAdhkar = "أذكار المساء"
+    override val duaAyatAlKursi = "آية الكرسي بعد الصلاة"
+    override val duaTasbih = "التسبيح بعد الصلاة"
 }

@@ -262,6 +262,22 @@ interface Strings {
     val noCustomAdhkar: String
     val timesLabel: String
     val bundledAdhkar: String
+
+    fun whyIsItAt(time: String): String
+
+    fun prayerTodayIn(
+        prayer: String,
+        city: String,
+    ): String
+
+    val onTime: String
+
+    fun lateBy(duration: String): String
+
+    val duaMorningAdhkar: String
+    val duaEveningAdhkar: String
+    val duaAyatAlKursi: String
+    val duaTasbih: String
 }
 
 val LocalStrings: ProvidableCompositionLocal<Strings> = staticCompositionLocalOf { EnglishStrings }

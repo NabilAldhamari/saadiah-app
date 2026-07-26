@@ -41,8 +41,8 @@ fun whyThisTimeState(
     val otherAsr = calculator.compute(city, date, profile.copy(madhab = other))[Prayer.ASR]
 
     return WhyThisTimeState(
-        title = "Why ${asr.asClockTime(city.timeZone)}?",
-        subtitle = "ʿAṣr today in ${city.name}",
+        title = strings.whyIsItAt(asr.asClockTime(city.timeZone)),
+        subtitle = strings.prayerTodayIn(strings.prayerNames[Prayer.ASR.ordinal], city.name),
         entries =
             listOf(
                 WhyEntry(strings.whyAngle, "${profile.angles.fajr}° / ${profile.angles.isha}°"),
