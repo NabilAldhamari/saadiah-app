@@ -27,20 +27,31 @@ jobs:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: echo "$KEYSTORE_BASE64" | base64 -d > keystore.jks
 
-      - name: Build signed artefacts
+      # Two invocations, deliberately. Per-ABI APKs and a bundle cannot be produced by one:
+      # AGP fails with "Multiple shrunk-resources files found" because the shrinker emits one
+      # per split and a bundle expects exactly one. The convention plugin turns splitting off
+      # whenever a bundle task is requested, so asking for both together would also leave the
+      # guards below with no arm64 APK to measure.
+      - name: Build signed APKs
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew :android:app:assembleRelease :android:app:bundleRelease --no-daemon
-
-      - name: Verify baseline profile is embedded
-        run: scripts/check-baseline-profile.sh
+        run: ./gradlew :android:app:assembleRelease --no-daemon
 
       - name: Guards
         run: |
+          scripts/check-baseline-profile.sh
           scripts/check-apk-size.sh
           scripts/check-forbidden-strings.sh
+          scripts/check-permissions.sh
+
+      - name: Build signed bundle
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew :android:app:bundleRelease --no-daemon
 
       - name: Collect artefacts and hashes
         id: hash
