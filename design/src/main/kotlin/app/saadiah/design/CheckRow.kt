@@ -21,14 +21,19 @@ enum class CheckStatus { PASS, FAIL }
  * DESIGN.md §6.6: a failure is carried by the glyph's shape, its colour, and a visible
  * action. A reader who sees neither colour still learns the check failed.
  *
+ * [statusDescription] is what a screen reader announces for the glyph. It is a parameter
+ * because this module cannot see the app's translation table, and the literals that stood
+ * here read English to an Arabic reader.
+ *
  * §5 places `action` before `modifier`. That is the contract, and reordering it to satisfy
  * the Compose convention would change every positional call site.
  */
-@Suppress("ModifierParameter")
+@Suppress("ModifierParameter", "LongParameterList")
 @Composable
 fun CheckRow(
     label: String,
     status: CheckStatus,
+    statusDescription: String,
     action: (@Composable () -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -41,7 +46,7 @@ fun CheckRow(
     ) {
         Icon(
             painter = painterResource(if (passing) R.drawable.ic_check else R.drawable.ic_alert_triangle),
-            contentDescription = if (passing) "Passing" else "Needs attention",
+            contentDescription = statusDescription,
             tint = if (passing) colors.sage else colors.warning,
             modifier = Modifier.size(GLYPH),
         )

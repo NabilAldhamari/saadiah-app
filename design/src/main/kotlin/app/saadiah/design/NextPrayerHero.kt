@@ -17,7 +17,14 @@ private const val ISOLATE_END = '⁩'
 /**
  * DESIGN.md §6.1: the one hero on the one screen that has one. The Latin and Arabic names
  * sit on a line together, so each is wrapped in a bidi isolate — a mixed run is exactly
- * where direction breaks first. The signature is fixed by §5 and may not gain a parameter.
+ * where direction breaks first.
+ *
+ * [heading] and [whyLabel] are parameters rather than literals because this module cannot see
+ * the app's translation table, and the two English literals that stood here shipped untranslated
+ * on the one screen every reader opens first. §5 records the wider signature.
+ *
+ * In Arabic both names resolve to the same word, so the pair collapses to one rather than
+ * rendering "الفجر · الفجر".
  */
 @Suppress("LongParameterList")
 @Composable
@@ -26,6 +33,8 @@ fun NextPrayerHero(
     prayerNameArabic: String,
     time: String,
     remaining: String,
+    heading: String,
+    whyLabel: String,
     onWhyThisTime: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -34,13 +43,9 @@ fun NextPrayerHero(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        HeroLine("Next prayer", colors.textSecondary, SaadiahType.body)
+        HeroLine(heading, colors.textSecondary, SaadiahType.body)
         Spacer(Modifier.height(SaadiahSpacing.small))
-        HeroLine(
-            "$ISOLATE_START$prayerName$ISOLATE_END · $ISOLATE_START$prayerNameArabic$ISOLATE_END",
-            colors.accent,
-            SaadiahType.titleLarge,
-        )
+        HeroLine(bothNames(prayerName, prayerNameArabic), colors.accent, SaadiahType.titleLarge)
         Spacer(Modifier.height(SaadiahSpacing.tiny))
         HeroLine(time, colors.text, SaadiahType.display)
         Spacer(Modifier.height(SaadiahSpacing.small))
@@ -48,11 +53,21 @@ fun NextPrayerHero(
         Spacer(Modifier.height(SaadiahSpacing.medium))
         LabelledIconButton(
             icon = painterResource(R.drawable.ic_info),
-            label = "Why this time?",
+            label = whyLabel,
             onClick = onWhyThisTime,
         )
     }
 }
+
+fun bothNames(
+    name: String,
+    arabic: String,
+): String =
+    if (name == arabic) {
+        "$ISOLATE_START$name$ISOLATE_END"
+    } else {
+        "$ISOLATE_START$name$ISOLATE_END · $ISOLATE_START$arabic$ISOLATE_END"
+    }
 
 @Composable
 private fun HeroLine(

@@ -9,6 +9,7 @@ import androidx.core.app.NotificationManagerCompat
 import app.saadiah.R
 import app.saadiah.data.SettingsStore
 import app.saadiah.doctor.DeliveryLog
+import app.saadiah.model.AdhanSound
 import app.saadiah.model.AlarmKind
 import app.saadiah.model.Prayer
 import app.saadiah.ui.Strings
@@ -60,10 +61,11 @@ class AlarmReceiver : BroadcastReceiver() {
         val prayer = intent.getStringExtra(EXTRA_PRAYER)?.let(Prayer::valueOf)
         val lead = intent.getLongExtra(EXTRA_LEAD_MINUTES, 0L).minutes
         // An alert in a language the reader did not choose is no use to them.
-        val words = stringsFor(runBlocking { SettingsStore(context).settings.first() }.language)
+        val stored = runBlocking { SettingsStore(context).settings.first() }
+        val words = stringsFor(stored.language)
 
         if (prayer != null) {
-            wordingFor(kind, prayer, lead, words)?.let { announce(context, prayer, it) }
+            wordingFor(kind, prayer, lead, words)?.let { announce(context, prayer, it, stored.adhanSound) }
         }
         if (kind == AlarmKind.AT_TIME && prayer != null) {
             recordDelivery(context, prayer, intent.getLongExtra(EXTRA_EXPECTED_AT, 0L))
@@ -108,12 +110,13 @@ class AlarmReceiver : BroadcastReceiver() {
         context: Context,
         prayer: Prayer,
         wording: String,
+        sound: AdhanSound,
     ) {
         if (!canPostNotifications(context)) return
         ensureChannels(context)
         val notification =
             NotificationCompat
-                .Builder(context, PRAYER_CHANNEL_ID)
+                .Builder(context, prayerChannelFor(sound))
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(prayer.announcement)
                 .setContentText(wording)

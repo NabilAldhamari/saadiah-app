@@ -14,17 +14,14 @@ import kotlin.time.Duration.Companion.minutes
 
 private val ARABIC = '؀'..'ۿ'
 
-// A spread across every screen rather than the whole table: enough that English pasted
-// into the Arabic side shows up, without restating the file.
-private val ARABIC_SAMPLE =
-    with(ArabicStrings) {
-        listOf(back, comingSoon, tabToday, tabMore, titleSettings, titleChooseCity) +
-            listOf(sectionLanguage, sectionWhichPrayers, privacyNote, everyPrayerSilent) +
-            listOf(doNotWarnMe, followMyPhone, searchForYourCity, noCityMatches) +
-            listOf(alertsArriveQuestion, noAlertYet, adhkarNotBundled) +
-            listOf(baqarahNotBundled, nawafil, legendFast, itIsTimeForThisPrayer) +
-            listOf(fastingRecommended, whyHighLatitude, hijamah, tomorrow)
-    }
+// Every no-argument String getter on the interface, read back off the table by reflection.
+// This was a hand-listed sample of two dozen values, and the entries it did not name went
+// unchecked — which is how "AM"/"PM" reached every clock in the Arabic build. A sample only
+// ever covers what someone remembered to add to it; the interface knows the whole list.
+private fun arabicValues(): Map<String, String> =
+    Strings::class.java.methods
+        .filter { it.parameterCount == 0 && it.returnType == String::class.java }
+        .associate { it.name to (it.invoke(ArabicStrings) as String) }
 
 /**
  * The language setting used to change nothing at all, so these assert the switch actually
@@ -47,13 +44,26 @@ class StringsTest {
 
     /**
      * The interface already makes a *missing* translation a compile error. What it cannot
-     * catch is English pasted into the Arabic table, so a spread of it is read back here.
+     * catch is English pasted into the Arabic table, so every entry is read back here.
      */
     @Test
-    fun theArabicTableIsActuallyInArabic() {
-        val untranslated = ARABIC_SAMPLE.filter { value -> value.none { it in ARABIC } }
+    fun everyStringInTheArabicTableIsActuallyInArabic() {
+        val untranslated = arabicValues().filterValues { value -> value.none { it in ARABIC } }
 
-        assertTrue(untranslated.isEmpty(), "these were left in English: $untranslated")
+        assertTrue(untranslated.isEmpty(), "these were left in English: ${untranslated.keys}")
+    }
+
+    @Test
+    fun theTableIsBigEnoughThatReflectionFoundIt() {
+        assertTrue(arabicValues().size > 100, "reflection found only ${arabicValues().size} strings")
+    }
+
+    @Test
+    fun everyCalculationMethodIsNamedInBothTables() {
+        for (method in app.saadiah.prayer.Method.entries) {
+            assertTrue(method.name in EnglishStrings.methodNames, "${method.name} has no English name")
+            assertTrue(method.name in ArabicStrings.methodNames, "${method.name} has no Arabic name")
+        }
     }
 
     @Test

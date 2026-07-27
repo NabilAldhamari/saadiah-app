@@ -14,14 +14,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import app.saadiah.design.LabelledIconButton
-import app.saadiah.design.R
 import app.saadiah.design.SaadiahRadius
 import app.saadiah.design.SaadiahSpacing
 import app.saadiah.design.SaadiahTheme
 import app.saadiah.design.SaadiahType
 import app.saadiah.design.SectionDivider
+import app.saadiah.design.bothNames
 
 @Composable
 fun PrayerDetailScreen(
@@ -29,55 +27,37 @@ fun PrayerDetailScreen(
     onBack: () -> Unit,
 ) {
     val colors = SaadiahTheme.colors
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(colors.bg)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = SaadiahSpacing.screen)
-                .padding(top = SaadiahSpacing.screen),
-    ) {
-        DetailHeading(detail)
-        SectionDivider()
-        Caption(strings.nawafil)
-        for (nafilah in detail.nawafil) {
-            NafilahRow(nafilah)
+    Column(modifier = Modifier.fillMaxSize().background(colors.bg)) {
+        ScreenHeader(title = bothNames(detail.latin, detail.arabic), onBack = onBack)
+        Column(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = SaadiahSpacing.screen),
+        ) {
+            Text(
+                text = detail.time,
+                color = colors.accent,
+                fontSize = SaadiahType.titleMedium.size,
+            )
+            SectionDivider()
+            Caption(strings.nawafil)
+            for (nafilah in detail.nawafil) {
+                NafilahRow(nafilah)
+            }
+            if (detail.nawafil.isEmpty()) {
+                Body(strings.noNawafil)
+            }
+            SectionDivider()
+            Caption(strings.duaAndAdhkar)
+            for (dua in detail.duas) {
+                DuaRow(dua)
+            }
+            SourcingNote(detail.sourcingNote)
+            Spacer(Modifier.height(SaadiahSpacing.huge))
         }
-        if (detail.nawafil.isEmpty()) {
-            Body(strings.noNawafil)
-        }
-        SectionDivider()
-        Caption(strings.duaAndAdhkar)
-        for (dua in detail.duas) {
-            DuaRow(dua)
-        }
-        SourcingNote(detail.sourcingNote)
-        Spacer(Modifier.height(SaadiahSpacing.medium))
-        LabelledIconButton(
-            icon = painterResource(R.drawable.ic_today),
-            label = strings.back,
-            onClick = onBack,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Spacer(Modifier.height(SaadiahSpacing.large))
     }
-}
-
-@Composable
-private fun DetailHeading(detail: PrayerDetail) {
-    val colors = SaadiahTheme.colors
-    Text(
-        text = "${detail.latin} · ${detail.arabic}",
-        color = colors.text,
-        fontSize = SaadiahType.titleLarge.size,
-        lineHeight = SaadiahType.titleLarge.lineHeight,
-    )
-    Text(
-        text = detail.time,
-        color = colors.accent,
-        fontSize = SaadiahType.titleMedium.size,
-    )
 }
 
 @Composable

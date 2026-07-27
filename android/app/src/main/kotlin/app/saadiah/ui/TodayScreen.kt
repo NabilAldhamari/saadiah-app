@@ -17,14 +17,17 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import app.saadiah.design.NextPrayerHero
 import app.saadiah.design.ObservanceRow
@@ -66,31 +69,40 @@ fun TodayScreen(
     val state = remember(city, profile, tradition, now, words) { todayState(city, profile, tradition, now, words) }
     val colors = SaadiahTheme.colors
 
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(colors.bg)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = SaadiahSpacing.screen)
-                .padding(top = SaadiahSpacing.screen),
-    ) {
-        DateHeader(state, actions.onChangeCity)
-        SectionDivider()
-        Hero(state, actions.onOpenDoctor)
-        SectionDivider()
-        for (row in state.rows) {
-            PrayerRow(
-                name = row.name,
-                time = row.time,
-                isCurrent = row.isCurrent,
-                modifier = Modifier.clickable { actions.onOpenPrayer(row.prayer) },
-            )
+    Column(modifier = Modifier.fillMaxSize().background(colors.bg)) {
+        // The Hijri date is this screen's title, so it is what the pinned header carries.
+        // It stays put while the prayer list scrolls under it.
+        //
+        // Always right-to-left: the label is Arabic — "٩ محرم ١٤٤٨ هـ" — and in a left-to-right
+        // layout the year and the هـ that qualifies it end up on opposite sides of the month.
+        // It is Arabic text in an English app, not English text.
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            ScreenHeader(title = state.hijriLabel)
         }
-        FastingStrip(state.fasting)
-        Observances(state)
-        BaqarahCard(onOpen = actions.onOpenBaqarah)
-        Spacer(Modifier.height(SaadiahSpacing.large))
+        Column(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = SaadiahSpacing.screen),
+        ) {
+            PlaceLine(state, actions.onChangeCity)
+            SectionDivider()
+            Hero(state, actions.onOpenDoctor)
+            SectionDivider()
+            for (row in state.rows) {
+                PrayerRow(
+                    name = row.name,
+                    time = row.time,
+                    isNext = row.isNext,
+                    modifier = Modifier.clickable { actions.onOpenPrayer(row.prayer) },
+                )
+            }
+            FastingStrip(state.fasting)
+            Observances(state)
+            BaqarahCard(onOpen = actions.onOpenBaqarah)
+            Spacer(Modifier.height(SaadiahSpacing.huge))
+        }
     }
 }
 
@@ -104,37 +116,30 @@ private fun Hero(
         prayerNameArabic = state.nextPrayerArabic,
         time = state.nextPrayerTime,
         remaining = state.remaining,
+        heading = strings.nextPrayer,
+        whyLabel = strings.whyThisTimeQuestion,
         onWhyThisTime = onWhyThisTime,
     )
 }
 
 @Composable
-private fun DateHeader(
+private fun PlaceLine(
     state: TodayState,
     onChangeCity: () -> Unit,
 ) {
     val colors = SaadiahTheme.colors
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = state.hijriLabel,
-            color = colors.text,
-            fontSize = SaadiahType.titleMedium.size,
-            lineHeight = SaadiahType.titleMedium.lineHeight,
-        )
-        Spacer(Modifier.height(SaadiahSpacing.tiny))
-        Text(
-            text = "${state.gregorianLabel} · ${state.cityName}",
-            color = colors.textSecondary,
-            fontSize = SaadiahType.bodySmall.size,
-            lineHeight = SaadiahType.bodySmall.lineHeight,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .clickable(onClick = onChangeCity)
-                    .minimumTouchTarget(),
-            textAlign = TextAlign.Start,
-        )
-    }
+    Text(
+        text = "${state.gregorianLabel} · ${state.cityName}",
+        color = colors.textSecondary,
+        fontSize = SaadiahType.bodySmall.size,
+        lineHeight = SaadiahType.bodySmall.lineHeight,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onChangeCity)
+                .minimumTouchTarget(),
+        textAlign = TextAlign.Start,
+    )
 }
 
 @Composable
@@ -184,6 +189,7 @@ private fun FastingStrip(prompts: List<FastingPrompt>) {
             subtitle = prompt.timing,
             marker = prompt.marker,
             alertEnabled = true,
+            alertDescription = strings.alertOnFor(prompt.title),
             onToggleAlert = {},
         )
     }
@@ -199,6 +205,7 @@ private fun Observances(state: TodayState) {
             subtitle = observance.subtitle,
             marker = observance.marker,
             alertEnabled = observance.alertEnabled,
+            alertDescription = alertLabelFor(observance.title, observance.alertEnabled, strings),
             onToggleAlert = {},
         )
     }

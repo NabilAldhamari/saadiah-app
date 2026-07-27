@@ -50,31 +50,18 @@ fun WhyThisTimeScreen(
                 DefinitionRow(entry)
             }
             Alternative(state.alternative)
-            Actions(onMatchMasjid, onBack)
+            // The header is the way back. A second back control at the foot of the scroll
+            // was the "exactly one way back" defect, not a convenience.
+            Spacer(Modifier.height(SaadiahSpacing.medium))
+            LabelledIconButton(
+                icon = painterResource(R.drawable.ic_info),
+                label = strings.matchMyMasjid,
+                onClick = onMatchMasjid,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(SaadiahSpacing.huge))
         }
     }
-}
-
-@Composable
-private fun Actions(
-    onMatchMasjid: () -> Unit,
-    onBack: () -> Unit,
-) {
-    Spacer(Modifier.height(SaadiahSpacing.medium))
-    LabelledIconButton(
-        icon = painterResource(R.drawable.ic_info),
-        label = strings.matchMyMasjid,
-        onClick = onMatchMasjid,
-        modifier = Modifier.fillMaxWidth(),
-    )
-    Spacer(Modifier.height(SaadiahSpacing.snug))
-    LabelledIconButton(
-        icon = painterResource(R.drawable.ic_today),
-        label = strings.back,
-        onClick = onBack,
-        modifier = Modifier.fillMaxWidth(),
-    )
-    Spacer(Modifier.height(SaadiahSpacing.large))
 }
 
 @Composable

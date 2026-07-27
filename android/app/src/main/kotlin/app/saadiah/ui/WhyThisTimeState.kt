@@ -41,7 +41,7 @@ fun whyThisTimeState(
     val otherAsr = calculator.compute(city, date, profile.copy(madhab = other))[Prayer.ASR]
 
     return WhyThisTimeState(
-        title = strings.whyIsItAt(asr.asClockTime(city.timeZone)),
+        title = strings.whyIsItAt(asr.asClockTime(city.timeZone, strings)),
         subtitle = strings.prayerTodayIn(strings.prayerNames[Prayer.ASR.ordinal], city.name),
         entries =
             listOf(
@@ -53,7 +53,7 @@ fun whyThisTimeState(
                     if (profile.adjustments.isEmpty()) strings.tuningNone else strings.tuningSet,
                 ),
             ),
-        alternative = alternativeSentence(other, otherAsr.asClockTime(city.timeZone), otherAsr - asr, strings),
+        alternative = alternativeSentence(other, otherAsr.asClockTime(city.timeZone, strings), otherAsr - asr, strings),
     )
 }
 

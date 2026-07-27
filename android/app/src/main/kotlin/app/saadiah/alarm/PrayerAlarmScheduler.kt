@@ -7,9 +7,9 @@ import android.content.Intent
 import android.os.Build
 import app.saadiah.data.Settings
 import app.saadiah.data.SettingsStore
+import app.saadiah.data.timingProfileFor
 import app.saadiah.model.AlarmKind
 import app.saadiah.model.AlarmSpec
-import app.saadiah.prayer.inferProfile
 import app.saadiah.schedule.AlertSettings
 import app.saadiah.schedule.budget
 import app.saadiah.schedule.schedule
@@ -41,11 +41,7 @@ class PrayerAlarmScheduler(
         // A receiver has no scope of its own, and the horizon must be armed before it returns.
         val stored = runBlocking { SettingsStore(context).settings.first() }
         val city = stored.city ?: DEFAULT_CITY
-        val profile =
-            inferProfile(city.country)
-                .let { base ->
-                    stored.madhab?.let { base.copy(madhab = it) } ?: base
-                }.copy(combineMode = stored.combineMode)
+        val profile = stored.timingProfileFor(city)
         val settings =
             AlertSettings(
                 city = city,

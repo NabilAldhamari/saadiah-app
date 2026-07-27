@@ -29,7 +29,11 @@ private val TOGGLE_SIZE = 24.dp
 /** DESIGN.md §6.2: every marker is a shape as well as a colour — filled, bar, or ring. */
 enum class ObservanceMarker { RECOMMENDED_FAST, PROHIBITED_FAST, HIJAMAH }
 
-/** The signature is fixed by DESIGN.md §5 and may not gain a parameter. */
+/**
+ * [alertDescription] is what a screen reader announces for the bell. It is a parameter
+ * because this module cannot see the translation table; the literal that stood here read
+ * English to an Arabic reader. §5 records the wider signature.
+ */
 @Suppress("LongParameterList")
 @Composable
 fun ObservanceRow(
@@ -37,6 +41,7 @@ fun ObservanceRow(
     subtitle: String,
     marker: ObservanceMarker,
     alertEnabled: Boolean,
+    alertDescription: String,
     onToggleAlert: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -61,7 +66,7 @@ fun ObservanceRow(
                 lineHeight = SaadiahType.bodySmall.lineHeight,
             )
         }
-        AlertToggle(enabled = alertEnabled, title = title, onToggle = onToggleAlert)
+        AlertToggle(enabled = alertEnabled, description = alertDescription, onToggle = onToggleAlert)
     }
 }
 
@@ -85,11 +90,10 @@ private fun Marker(marker: ObservanceMarker) {
 @Composable
 private fun AlertToggle(
     enabled: Boolean,
-    title: String,
+    description: String,
     onToggle: () -> Unit,
 ) {
     val colors = SaadiahTheme.colors
-    val description = if (enabled) "Alert on for $title" else "Alert off for $title"
     Icon(
         painter = painterResource(if (enabled) R.drawable.ic_bell else R.drawable.ic_bell_off),
         contentDescription = description,

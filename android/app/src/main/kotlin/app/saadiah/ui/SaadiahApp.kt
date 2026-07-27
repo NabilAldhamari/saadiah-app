@@ -19,16 +19,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import app.saadiah.data.Settings
+import app.saadiah.data.timingProfileFor
 import app.saadiah.design.R
 import app.saadiah.design.Tab
 import app.saadiah.design.TabBar
 import app.saadiah.model.City
-import app.saadiah.model.Madhab
 import app.saadiah.model.Prayer
 import app.saadiah.model.TimingProfile
 import app.saadiah.model.Tradition
 import app.saadiah.prayer.PrayerCalculator
-import app.saadiah.prayer.inferProfile
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toLocalDateTime
@@ -46,11 +45,7 @@ fun SaadiahApp(
     actions: AppActions,
 ) {
     val tradition = settings.tradition ?: Tradition.SUNNI
-    val profile =
-        androidx.compose.runtime.remember(city, settings) {
-            inferProfile(city.country)
-                .copy(madhab = settings.madhab ?: Madhab.SHAFI, combineMode = settings.combineMode)
-        }
+    val profile = androidx.compose.runtime.remember(city, settings) { settings.timingProfileFor(city) }
 
     BackHandler(enabled = navigator.canGoBack) { navigator.back() }
 
@@ -98,7 +93,7 @@ private fun Destination(
     if (screen.isTabRoot) {
         TabRoot(screen, city, settings, profile, tradition, navigator, actions)
     } else {
-        PushedScreen(screen, Place(city, profile, tradition), navigator, actions)
+        PushedScreen(screen, Place(city, profile, tradition), settings, navigator, actions)
     }
 }
 
@@ -121,6 +116,8 @@ private fun TabRoot(
                 state = calendarState(month.year, month.month, tradition, strings),
                 page = monthGrid(month.year, month.month, tradition, strings),
                 onJumpToToday = { shown.value = todayHijri(today(city)) },
+                onPreviousMonth = { shown.value = month.previousMonth() },
+                onNextMonth = { shown.value = month.nextMonth() },
             )
         }
         Screen.Adhkar ->
@@ -158,10 +155,12 @@ private fun TabRoot(
     }
 }
 
+@Suppress("LongParameterList")
 @Composable
 private fun PushedScreen(
     screen: Screen,
     place: Place,
+    settings: Settings,
     navigator: Navigator,
     actions: AppActions,
 ) {
@@ -199,14 +198,17 @@ private fun PushedScreen(
                 onMatchMasjid = { navigator.go(Screen.MatchMasjid) },
                 onBack = back,
             )
-        else -> Reading(screen, place, back)
+        else -> Reading(screen, place, settings, actions, back)
     }
 }
 
+@Suppress("LongParameterList")
 @Composable
 private fun Reading(
     screen: Screen,
     place: Place,
+    settings: Settings,
+    actions: AppActions,
     back: () -> Unit,
 ) {
     when (screen) {
@@ -215,6 +217,12 @@ private fun Reading(
                 sura = screen.sura,
                 title = if (screen.sura == BAQARAH_SURA) strings.titleAlBaqarah else strings.titleAlImran,
                 onBack = back,
+                startAt = settings.readingPositions[screen.sura] ?: 1,
+                onRemember = { ayah ->
+                    actions.onChangeSettings(
+                        settings.copy(readingPositions = settings.readingPositions + (screen.sura to ayah)),
+                    )
+                },
             )
         is Screen.PrayerDetail -> PrayerDetail(place, screen.prayer, back)
         else -> Unit
@@ -227,6 +235,8 @@ private const val TRAVEL = 12
 
 const val BAQARAH_SURA = 2
 const val AL_IMRAN_SURA = 3
+const val BAQARAH_AYAT = 286
+const val AL_IMRAN_AYAT = 200
 
 private data class Place(
     val city: City,
@@ -243,7 +253,7 @@ private fun PrayerDetail(
     val city = place.city
     val timings = PrayerCalculator().compute(city, today(city), place.profile)
     PrayerDetailScreen(
-        detail = prayerDetail(prayer, timings[prayer].asClockTime(city.timeZone), place.tradition, strings),
+        detail = prayerDetail(prayer, timings[prayer].asClockTime(city.timeZone, strings), place.tradition, strings),
         onBack = onBack,
     )
 }

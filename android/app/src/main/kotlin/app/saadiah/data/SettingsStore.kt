@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import app.saadiah.model.AdhanSound
 import app.saadiah.model.AppTheme
 import app.saadiah.model.BaqarahReminder
 import app.saadiah.model.City
@@ -31,7 +32,7 @@ import kotlin.time.Duration.Companion.minutes
 private const val STORE_NAME = "settings"
 
 private val TRADITION = stringPreferencesKey("tradition")
-private val MADHAB = stringPreferencesKey("madhab")
+internal val MADHAB = stringPreferencesKey("madhab")
 private val CITY_ID = longPreferencesKey("city.id")
 private val CITY_NAME = stringPreferencesKey("city.name")
 private val CITY_ARABIC_NAME = stringPreferencesKey("city.name.arabic")
@@ -40,14 +41,17 @@ private val CITY_ADMIN1 = stringPreferencesKey("city.admin1")
 private val CITY_LATITUDE = stringPreferencesKey("city.latitude")
 private val CITY_LONGITUDE = stringPreferencesKey("city.longitude")
 private val CITY_TIME_ZONE = stringPreferencesKey("city.timezone")
-private val COMBINE_MODE = stringPreferencesKey("combine.mode")
+internal val COMBINE_MODE = stringPreferencesKey("combine.mode")
 private val ENABLED_PRAYERS = stringSetPreferencesKey("alerts.prayers")
 private val PRE_ALERT = longPreferencesKey("alerts.pre.minutes")
 private val END_OF_WINDOW = longPreferencesKey("alerts.end.minutes")
 private val LANGUAGE = stringPreferencesKey("language")
 private val THEME = stringPreferencesKey("theme")
 private val BAQARAH_REMINDER = stringPreferencesKey("baqarah.reminder")
+private val ADHAN_SOUND = stringPreferencesKey("alerts.adhan")
 private val CUSTOM_ADHKAR = stringSetPreferencesKey("adhkar.custom")
+private val READING_POSITIONS = stringSetPreferencesKey("reading.positions")
+internal const val POSITION_SEPARATOR = ':'
 
 private val Context.settingsStore: DataStore<Preferences> by preferencesDataStore(name = STORE_NAME)
 
@@ -86,11 +90,25 @@ private fun Preferences.toSettings(): Settings {
         language = enumOrNull<Language>(LANGUAGE) ?: defaults.language,
         theme = enumOrNull<AppTheme>(THEME) ?: defaults.theme,
         baqarahReminder = enumOrNull<BaqarahReminder>(BAQARAH_REMINDER) ?: defaults.baqarahReminder,
+        adhanSound = enumOrNull<AdhanSound>(ADHAN_SOUND) ?: defaults.adhanSound,
         customAdhkar = decodeCustomAdhkar(this[CUSTOM_ADHKAR].orEmpty()),
+        readingPositions = readReadingPositions(),
+        timingProfile = readTimingProfile(),
     )
 }
 
-private inline fun <reified T : Enum<T>> Preferences.enumOrNull(key: Preferences.Key<String>): T? =
+// A malformed entry is dropped rather than throwing: a bad bookmark should cost the reader
+// their place in one sura, not every setting they have.
+private fun Preferences.readReadingPositions(): Map<Int, Int> =
+    this[READING_POSITIONS]
+        .orEmpty()
+        .mapNotNull { entry ->
+            val sura = entry.substringBefore(POSITION_SEPARATOR).toIntOrNull()
+            val ayah = entry.substringAfter(POSITION_SEPARATOR, missingDelimiterValue = "").toIntOrNull()
+            if (sura == null || ayah == null) null else sura to ayah
+        }.toMap()
+
+internal inline fun <reified T : Enum<T>> Preferences.enumOrNull(key: Preferences.Key<String>): T? =
     this[key]?.let { stored -> enumValues<T>().firstOrNull { it.name == stored } }
 
 private fun Preferences.readEnabledPrayers(): Set<Prayer>? =
@@ -107,7 +125,11 @@ private fun MutablePreferences.write(settings: Settings) {
     this[LANGUAGE] = settings.language.name
     this[THEME] = settings.theme.name
     this[BAQARAH_REMINDER] = settings.baqarahReminder.name
+    this[ADHAN_SOUND] = settings.adhanSound.name
     this[CUSTOM_ADHKAR] = encodeCustomAdhkar(settings.customAdhkar)
+    this[READING_POSITIONS] =
+        settings.readingPositions.map { (sura, ayah) -> "$sura$POSITION_SEPARATOR$ayah" }.toSet()
+    writeTimingProfile(settings.timingProfile)
 }
 
 private data class StoredPlace(
@@ -152,7 +174,7 @@ private fun MutablePreferences.writeCity(city: City?) {
     setOrRemoveWhenUnchosen(CITY_TIME_ZONE, city?.timeZone?.id)
 }
 
-private fun <V : Any> MutablePreferences.setOrRemoveWhenUnchosen(
+internal fun <V : Any> MutablePreferences.setOrRemoveWhenUnchosen(
     key: Preferences.Key<V>,
     value: V?,
 ) {

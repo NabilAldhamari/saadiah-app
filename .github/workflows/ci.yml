@@ -38,7 +38,9 @@ jobs:
         run: |
           scripts/check-apk-size.sh
           scripts/check-forbidden-strings.sh
+          scripts/check-permissions.sh
           scripts/check-rtl.sh
+          scripts/check-ui-strings.sh
 
       - uses: actions/upload-artifact@v4
         if: failure()

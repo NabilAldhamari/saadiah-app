@@ -26,6 +26,7 @@ import app.saadiah.design.SaadiahTheme
 import app.saadiah.design.SaadiahType
 import app.saadiah.design.SectionDivider
 import app.saadiah.design.minimumTouchTarget
+import app.saadiah.model.AdhanSound
 import app.saadiah.model.AppTheme
 import app.saadiah.model.BaqarahReminder
 import app.saadiah.model.CombineMode
@@ -48,9 +49,10 @@ private fun Settings.alertablePrayers(): List<Prayer> =
 private fun Set<Prayer>.toggle(prayer: Prayer): Set<Prayer> = if (prayer in this) this - prayer else this + prayer
 
 /**
- * Grouped into sections a reader can scan. It was one long column of radio rows before,
- * where the location, the fiqh choices and every alert control ran together with nothing
- * to tell them apart.
+ * Two levels, not one. Eleven equally-weighted headings read as eleven unrelated decisions;
+ * the three alert controls are one decision made three ways, and so are the two calculation
+ * ones. Those nest under a single group heading, and a rule closes every group so a reader
+ * can see where one ends.
  *
  * Tradition and madhhab are still offered with no preselected answer: a default there
  * would quietly scope a reader's content and their ʿAṣr for them.
@@ -62,53 +64,47 @@ fun SettingsScreen(
     actions: SettingsActions,
 ) {
     val colors = SaadiahTheme.colors
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(colors.bg)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = SaadiahSpacing.screen)
-                .padding(top = SaadiahSpacing.screen),
-    ) {
-        Text(
-            text = strings.titleSettings,
-            color = colors.text,
-            fontSize = SaadiahType.titleLarge.size,
-            lineHeight = SaadiahType.titleLarge.lineHeight,
-        )
+    Column(modifier = Modifier.fillMaxSize().background(colors.bg)) {
+        ScreenHeader(title = strings.titleSettings)
+        Column(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = SaadiahSpacing.screen),
+        ) {
+            Group(strings.sectionLocation) {
+                ChoiceRow(cityName, selected = true, stateWord = strings.change, onSelect = actions.onChangeCity)
+            }
+            ThemeGroup(settings, actions.onChange)
+            LanguageGroup(settings, actions.onChange)
+            CalculationGroup(settings, actions.onChange)
+            AlertGroup(settings, actions.onChange)
+            BaqarahGroup(settings, actions)
 
-        Section(strings.sectionLocation) {
-            ChoiceRow(cityName, selected = true, stateWord = strings.change, onSelect = actions.onChangeCity)
+            Group(strings.sectionChecks) {
+                ChoiceRow(strings.alertsArriveQuestion, false, strings.open, actions.onOpenDoctor)
+                // Its own entry, so it is run once for all five prayers rather than rediscovered
+                // from whichever prayer's Why sheet a reader happens to open.
+                ChoiceRow(strings.matchMyMasjid, false, strings.open, actions.onMatchMasjid)
+            }
+            Group(strings.sectionAbout) {
+                Body(strings.privacyNote)
+                Spacer(Modifier.height(SaadiahSpacing.small))
+                // CC BY 4.0 requires the credit to be visible to the reader, not only in the repo.
+                Caption(strings.geoNamesCredit)
+            }
+            Spacer(Modifier.height(SaadiahSpacing.huge))
         }
-        ThemeSection(settings, actions.onChange)
-        LanguageSection(settings, actions.onChange)
-        FiqhSections(settings, actions.onChange)
-        AlertSections(settings, actions.onChange)
-        BaqarahSection(settings, actions)
-
-        Section(strings.sectionChecks) {
-            ChoiceRow(strings.alertsArriveQuestion, false, strings.open, actions.onOpenDoctor)
-            // Its own entry, so it is run once for all five prayers rather than rediscovered
-            // from whichever prayer's Why sheet a reader happens to open.
-            ChoiceRow(strings.matchMyMasjid, false, strings.open, actions.onMatchMasjid)
-        }
-        Section(strings.sectionAbout) {
-            Body(strings.privacyNote)
-            Spacer(Modifier.height(SaadiahSpacing.small))
-            // CC BY 4.0 requires the credit to be visible to the reader, not only in the repo.
-            Caption(strings.geoNamesCredit)
-        }
-        Spacer(Modifier.height(SaadiahSpacing.huge))
     }
 }
 
 @Composable
-private fun ThemeSection(
+private fun ThemeGroup(
     settings: Settings,
     onChange: (Settings) -> Unit,
 ) {
-    Section(strings.sectionTheme) {
+    Group(strings.sectionTheme) {
         for (option in AppTheme.entries) {
             ChoiceRow(option.spelledOut(strings), settings.theme == option) {
                 onChange(settings.copy(theme = option))
@@ -118,11 +114,11 @@ private fun ThemeSection(
 }
 
 @Composable
-private fun LanguageSection(
+private fun LanguageGroup(
     settings: Settings,
     onChange: (Settings) -> Unit,
 ) {
-    Section(strings.sectionLanguage) {
+    Group(strings.sectionLanguage) {
         for (option in Language.entries) {
             ChoiceRow(option.spelledOut(strings), settings.language == option) {
                 onChange(settings.copy(language = option))
@@ -133,67 +129,78 @@ private fun LanguageSection(
 }
 
 @Composable
-private fun FiqhSections(
+private fun CalculationGroup(
     settings: Settings,
     onChange: (Settings) -> Unit,
 ) {
-    Section(strings.sectionMadhab, strings.sectionMadhabWhy) {
-        for (option in Madhab.entries) {
-            ChoiceRow(option.spelledOut(strings), settings.madhab == option) {
-                onChange(settings.copy(madhab = option))
+    Group(strings.sectionCalculation) {
+        Block(strings.sectionMadhab, strings.sectionMadhabWhy) {
+            for (option in Madhab.entries) {
+                ChoiceRow(option.spelledOut(strings), settings.madhab == option) {
+                    onChange(settings.copy(madhab = option))
+                }
             }
         }
-    }
-    Section(strings.sectionCombining) {
-        for (option in CombineMode.entries) {
-            ChoiceRow(option.spelledOut(strings), settings.combineMode == option) {
-                onChange(settings.copy(combineMode = option))
+        Block(strings.sectionCombining) {
+            for (option in CombineMode.entries) {
+                ChoiceRow(option.spelledOut(strings), settings.combineMode == option) {
+                    onChange(settings.copy(combineMode = option))
+                }
             }
         }
     }
 }
 
 @Composable
-private fun AlertSections(
+private fun AlertGroup(
     settings: Settings,
     onChange: (Settings) -> Unit,
 ) {
-    Section(strings.sectionWhichPrayers) {
-        for (prayer in settings.alertablePrayers()) {
-            val alerting = prayer in settings.enabledPrayers
-            ChoiceRow(
-                label = prayer.spelledOut(strings),
-                selected = alerting,
-                stateWord = if (alerting) strings.alerting else strings.silent,
-                onSelect = { onChange(settings.copy(enabledPrayers = settings.enabledPrayers.toggle(prayer))) },
-            )
-        }
-        if (settings.enabledPrayers.none { it in settings.alertablePrayers() }) {
-            Body(strings.everyPrayerSilent)
-        }
-    }
-    Section(strings.sectionWarnBefore) {
-        for (choice in PRE_ALERT_CHOICES) {
-            ChoiceRow(choice.asWarning(strings), settings.preAlert == choice) {
-                onChange(settings.copy(preAlert = choice))
+    Group(strings.sectionAlerts) {
+        Block(strings.sectionWhichPrayers) {
+            for (prayer in settings.alertablePrayers()) {
+                val alerting = prayer in settings.enabledPrayers
+                ChoiceRow(
+                    label = prayer.spelledOut(strings),
+                    selected = alerting,
+                    stateWord = if (alerting) strings.alerting else strings.silent,
+                    onSelect = { onChange(settings.copy(enabledPrayers = settings.enabledPrayers.toggle(prayer))) },
+                )
+            }
+            if (settings.enabledPrayers.none { it in settings.alertablePrayers() }) {
+                Body(strings.everyPrayerSilent)
             }
         }
-    }
-    Section(strings.sectionWarnClosing) {
-        for (choice in END_OF_WINDOW_CHOICES) {
-            ChoiceRow(choice.asClosingWarning(strings), settings.endOfWindow == choice) {
-                onChange(settings.copy(endOfWindow = choice))
+        Block(strings.sectionWarnBefore) {
+            for (choice in PRE_ALERT_CHOICES) {
+                ChoiceRow(choice.asWarning(strings), settings.preAlert == choice) {
+                    onChange(settings.copy(preAlert = choice))
+                }
+            }
+        }
+        Block(strings.sectionAdhan, strings.sectionAdhanWhy) {
+            for (option in AdhanSound.entries) {
+                ChoiceRow(option.spelledOut(strings), settings.adhanSound == option) {
+                    onChange(settings.copy(adhanSound = option))
+                }
+            }
+        }
+        Block(strings.sectionWarnClosing) {
+            for (choice in END_OF_WINDOW_CHOICES) {
+                ChoiceRow(choice.asClosingWarning(strings), settings.endOfWindow == choice) {
+                    onChange(settings.copy(endOfWindow = choice))
+                }
             }
         }
     }
 }
 
 @Composable
-private fun BaqarahSection(
+private fun BaqarahGroup(
     settings: Settings,
     actions: SettingsActions,
 ) {
-    Section(strings.sectionBaqarah, strings.sectionBaqarahWhy) {
+    Group(strings.sectionBaqarah, strings.sectionBaqarahWhy) {
         for (option in BaqarahReminder.entries) {
             ChoiceRow(option.spelledOut(strings), settings.baqarahReminder == option) {
                 actions.onChange(settings.copy(baqarahReminder = option))
@@ -204,13 +211,14 @@ private fun BaqarahSection(
 }
 
 @Composable
-private fun Section(
+private fun Group(
     title: String,
     explanation: String? = null,
     content: @Composable () -> Unit,
 ) {
+    // The rule sits after the content rather than before the heading, so it reads as closing
+    // the group above it instead of decorating the one below.
     Spacer(Modifier.height(SaadiahSpacing.large))
-    SectionDivider()
     Text(
         text = title,
         color = SaadiahTheme.colors.text,
@@ -219,6 +227,27 @@ private fun Section(
     )
     explanation?.let { Caption(it) }
     Spacer(Modifier.height(SaadiahSpacing.small))
+    content()
+    Spacer(Modifier.height(SaadiahSpacing.large))
+    SectionDivider()
+}
+
+@Composable
+private fun Block(
+    title: String,
+    explanation: String? = null,
+    content: @Composable () -> Unit,
+) {
+    // One question inside a group: quieter than the group's own name, and never ruled off.
+    Spacer(Modifier.height(SaadiahSpacing.medium))
+    Text(
+        text = title,
+        color = SaadiahTheme.colors.textSecondary,
+        fontSize = SaadiahType.titleSmall.size,
+        lineHeight = SaadiahType.titleSmall.lineHeight,
+    )
+    explanation?.let { Caption(it) }
+    Spacer(Modifier.height(SaadiahSpacing.snug))
     content()
 }
 

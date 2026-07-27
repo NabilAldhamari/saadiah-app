@@ -15,7 +15,6 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
 
 private val CAIRO =
@@ -28,6 +27,8 @@ private val CAIRO =
         timeZone = TimeZone.of("Africa/Cairo"),
     )
 private val DATE = LocalDate(2024, 3, 11)
+private const val MINUTES_IN_DAY = 1440
+private const val PROBE_STEP = 17
 
 /** The clock is an input, so every boundary can be stood on exactly. */
 class TodayStateTest {
@@ -77,18 +78,51 @@ class TodayStateTest {
         assertEquals(expected = "Fajr", actual = state.nextPrayerLatin)
     }
 
+    /** The highlight answers the same question the hero does, so the two never disagree. */
     @Test
-    fun theCurrentPrayerIsTheOneMostRecentlyPassed() {
-        val state = stateAt(timings[Prayer.ASR] + 1.minutes)
+    fun theHighlightedRowIsTheOneTheHeroNames() {
+        for (passed in listOf(Prayer.FAJR, Prayer.DHUHR, Prayer.ASR, Prayer.MAGHRIB)) {
+            val state = stateAt(timings[passed] + 1.minutes)
 
-        assertEquals(expected = listOf("Asr"), actual = state.rows.filter { it.isCurrent }.map { it.name })
+            assertEquals(
+                expected = listOf(state.nextPrayerLatin),
+                actual = state.rows.filter { it.isNext }.map { it.name },
+                message = "a minute after $passed",
+            )
+        }
     }
 
     @Test
-    fun beforeFajrNoRowIsCurrent() {
+    fun theHighlightMovesOnAtEveryBoundary() {
+        val marked =
+            listOf(Prayer.FAJR, Prayer.DHUHR, Prayer.ASR, Prayer.MAGHRIB).map { passed ->
+                stateAt(timings[passed] + 1.minutes).rows.single { it.isNext }.name
+            }
+
+        assertEquals(expected = listOf("Dhuhr", "Asr", "Maghrib", "Isha"), actual = marked)
+    }
+
+    @Test
+    fun beforeFajrTheFajrRowIsTheHighlightedOne() {
         val state = stateAt(timings[Prayer.FAJR] - 1.minutes)
 
-        assertTrue(state.rows.none { it.isCurrent })
+        assertEquals(expected = listOf("Fajr"), actual = state.rows.filter { it.isNext }.map { it.name })
+    }
+
+    @Test
+    fun afterIshaTheHighlightReturnsToFajrForTomorrow() {
+        val state = stateAt(timings[Prayer.ISHA] + 1.minutes)
+
+        assertEquals(expected = listOf("Fajr"), actual = state.rows.filter { it.isNext }.map { it.name })
+    }
+
+    @Test
+    fun exactlyOneRowIsEverHighlighted() {
+        for (minutes in 0 until MINUTES_IN_DAY step PROBE_STEP) {
+            val state = stateAt(timings[Prayer.FAJR] + minutes.minutes)
+
+            assertEquals(expected = 1, actual = state.rows.count { it.isNext }, message = "at +$minutes")
+        }
     }
 
     @Test

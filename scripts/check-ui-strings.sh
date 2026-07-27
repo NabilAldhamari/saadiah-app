@@ -6,14 +6,19 @@ set -euo pipefail
 # The Strings interface makes a *missing* translation a compile error, but it cannot stop a
 # literal being written straight into a composable, so that is what this catches.
 #
-# A literal is suspicious when it is inside :android:app UI code, holds two or more words of
-# Latin letters, and is not in one of the translation tables themselves.
+# A literal is suspicious when it is inside UI code, holds two or more words of Latin letters,
+# and is not in one of the translation tables themselves.
+#
+# :design is scanned too. It was not, and that is exactly where "Next prayer" and
+# "Why this time?" sat untranslated on the first screen of the app while this check passed
+# green. A component module cannot see the Strings table, so a literal there is not a shortcut
+# to fix later — it is a string no translation can ever reach. Take the label as a parameter.
 #
 # Source citations are exempt. "Ṣaḥīḥ Muslim 596" is a reference, not copy: translating it
 # would make it harder to check, which is the opposite of why it is shown.
 
 readonly UI="android/app/src/main/kotlin/app/saadiah"
-readonly TABLES="Strings.kt|EnglishStrings.kt|ArabicStrings.kt|ArabicNames.kt"
+readonly DESIGN="design/src/main/kotlin/app/saadiah"
 
 found=0
 while IFS= read -r file; do
@@ -30,7 +35,7 @@ while IFS= read -r file; do
     echo "${hits}" | sed 's/^/    /' >&2
     found=1
   fi
-done < <(find "${UI}" -name '*.kt')
+done < <(find "${UI}" "${DESIGN}" -name '*.kt')
 
 if (( found == 0 )); then
   echo "check-ui-strings: no prose literals outside the translation tables."

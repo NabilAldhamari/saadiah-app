@@ -4,7 +4,10 @@ package app.saadiah.ui
 // scatter one language across several files for no reader's benefit.
 @Suppress("TooManyFunctions")
 object EnglishStrings : Strings {
+    override val rendersArabic = false
+
     override val back = "Back"
+    override val cancel = "Cancel"
     override val open = "open"
     override val chosen = "chosen"
     override val change = "change"
@@ -26,8 +29,16 @@ object EnglishStrings : Strings {
     override val todaysReadingHint = "Today's reading. Tap to read why it is kept up."
     override val fastingAhead = "Fasting ahead"
 
+    override val nextPrayer = "Next prayer"
+    override val whyThisTimeQuestion = "Why this time?"
+
+    override val ante = "AM"
+    override val post = "PM"
+
     override val sectionLocation = "Location"
     override val sectionLanguage = "Language"
+    override val sectionCalculation = "Prayer time calculation"
+    override val sectionAlerts = "Alerts"
     override val sectionMadhab = "ʿAṣr madhhab"
     override val sectionMadhabWhy = "Changes when ʿAṣr begins."
     override val sectionCombining = "Combining prayers"
@@ -101,14 +112,23 @@ object EnglishStrings : Strings {
             "Nothing is shown in the meantime, because a merit written from memory and attributed to " +
             "the Prophet ﷺ would read exactly like a sourced one."
 
+    override val meritNarration = "Narration"
+    override val meritReflection = "A reflection"
+    override val translationOfMeaning = "Translation of the meaning"
+
     override val nawafil = "Nawāfil"
     override val noNawafil = "No nawāfil accompany this time."
     override val duaAndAdhkar = "Duʿāʾ and adhkār"
     override val duaWordingWithheld = "Wording is not shown until the adhkār corpus is bundled from its source."
 
+    override val checkPassing = "Passing"
+    override val checkNeedsAttention = "Needs attention"
+
     override val calendarList = "List"
     override val calendarGrid = "Grid"
     override val calendarLegend = "Every marked day, by shape"
+    override val previousMonth = "Previous month"
+    override val nextMonth = "Next month"
     override val legendFast = "A day to fast"
     override val legendDoNotFast = "A day not to fast"
     override val legendHijamah = "A day for ḥijāmah"
@@ -273,6 +293,14 @@ object EnglishStrings : Strings {
 
     override fun rakah(count: Int) = "$count rakʿah"
 
+    override val sectionAdhan = "Adhān"
+    override val sectionAdhanWhy =
+        "What a prayer alert sounds like. Plays at alarm volume, so it carries when " +
+            "notifications are silenced."
+    override val adhanDefault = "Your phone's notification sound"
+    override val adhanShort = "Short adhān"
+    override val adhanLong = "Full adhān"
+
     override val prayerChannelName = "Prayer times"
     override val prayerChannelWhat = "Announces each prayer as its time enters."
     override val readingChannelName = "Reading reminders"
@@ -292,6 +320,25 @@ object EnglishStrings : Strings {
     override val readAlImran = "Read Sūrat Āl ʿImrān"
     override val titleAlBaqarah = "سورة البقرة"
     override val titleAlImran = "سورة آل عمران"
+    override val backToStart = "Back to the first āyah"
+
+    override fun ayahCount(count: Int) = "$count āyāt"
+
+    override fun positionInSet(
+        index: Int,
+        total: Int,
+    ) = "$index of $total"
+
+    override fun outOf(total: Int) = "of $total"
+
+    override fun counterSpoken(
+        current: Int,
+        target: Int,
+    ) = "$current of $target. Tap to count."
+
+    override fun alertOnFor(title: String) = "Alert on for $title"
+
+    override fun alertOffFor(title: String) = "Alert off for $title"
 
     override val myAdhkar = "My adhkār"
     override val addDhikr = "Add a dhikr"
@@ -308,10 +355,28 @@ object EnglishStrings : Strings {
     override val matchMyMasjidWhy = "Enter your masjid's printed times and Saadiah finds the settings that fit."
     override val applyProfile = "Apply these settings"
     override val matchedProfile = "Closest match"
+    override val methodNames =
+        mapOf(
+            "MUSLIM_WORLD_LEAGUE" to "Muslim World League",
+            "NORTH_AMERICA" to "North America (ISNA)",
+            "EGYPTIAN" to "Egyptian General Authority",
+            "KARACHI" to "University of Karachi",
+            "UMM_AL_QURA" to "Umm al-Qurā, Makkah",
+            "DIYANET" to "Diyanet, Türkiye",
+            "TEHRAN" to "Institute of Geophysics, Tehran",
+            "JAFARI" to "Jaʿfarī",
+        )
     override val lowConfidence =
         "These times do not fit any single calculation cleanly. Check the ones you entered, or apply " +
             "this and tune a prayer by hand."
     override val enterYourMasjidTimes = "Overwrite any time you have from your masjid. Leave the rest as they are."
+    override val correctWhatYouKnow =
+        "Correct only the times you know. One is enough — the rest are recalculated from whichever " +
+            "calculation fits it, and any line you leave alone is not treated as your masjid's."
+    override val twentyFourHourNotice = "Times are on the 24-hour clock, as a masjid prints them — 18:30, not 6:30 PM."
+    override val nothingCorrectedYet = "Nothing has been corrected yet, so there is nothing to match."
+    override val yourMasjidsTime = "your masjid's time"
+    override val leftAsCalculated = "left as calculated"
 
     override fun prayerTodayIn(
         prayer: String,
@@ -319,6 +384,8 @@ object EnglishStrings : Strings {
     ) = "$prayer today in $city"
 
     override val onTime = "on time"
+
+    override fun offsetMinutes(minutes: Long) = if (minutes < 0) "$minutes minutes" else "+$minutes minutes"
 
     override fun lateBy(duration: String) = "$duration late"
 

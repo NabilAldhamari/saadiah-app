@@ -12,10 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,12 +38,9 @@ import app.saadiah.prayer.SolveResult
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Duration
 
 private val SOLVED_PRAYERS = listOf(Prayer.FAJR, Prayer.DHUHR, Prayer.ASR, Prayer.MAGHRIB, Prayer.ISHA)
-private const val SHORTEST_TIME = 3
-private const val LONGEST_TIME = 4
-private const val LAST_HOUR = 23
-private const val LAST_MINUTE = 59
 
 /**
  * DESIGN.md §6.5. Runs once for all five prayers rather than being rediscovered prayer by
@@ -69,11 +66,17 @@ fun MatchMasjidScreen(
                 .date
         }
     val computed = remember(city, profile, today) { PrayerCalculator().compute(city, today, profile) }
-    val entered =
+    val asCalculated =
         remember(computed) {
-            SOLVED_PRAYERS.associateWith { computed[it].asClockTime(city.timeZone) }.toMutableMap()
+            SOLVED_PRAYERS.associateWith { computed[it].toLocalDateTime(city.timeZone).time.withoutSeconds() }
         }
+    val typed = remember(asCalculated) { mutableStateMapOf<Prayer, LocalTime>().apply { putAll(asCalculated) } }
     var result by remember { mutableStateOf<SolveResult?>(null) }
+
+    // Only a line the reader actually changed is evidence about their masjid. Sending all five
+    // regardless pinned every prayer to the app's own answer, so correcting one time could
+    // never move the other four — which is the whole reason to correct one time.
+    val corrections = typed.filter { (prayer, text) -> text != asCalculated[prayer] }
 
     Column(modifier = Modifier.fillMaxSize().background(colors.bg)) {
         ScreenHeader(title = strings.matchMyMasjid, onBack = onBack)
@@ -86,41 +89,35 @@ fun MatchMasjidScreen(
         ) {
             Caption(strings.matchMyMasjidWhy)
             Spacer(Modifier.height(SaadiahSpacing.small))
-            Caption(strings.enterYourMasjidTimes)
+            Caption(strings.correctWhatYouKnow)
+            Spacer(Modifier.height(SaadiahSpacing.small))
+            Caption(strings.twentyFourHourNotice)
             Spacer(Modifier.height(SaadiahSpacing.medium))
 
             for (prayer in SOLVED_PRAYERS) {
-                TimeField(prayer, entered) { result = null }
+                TimeOfDayField(
+                    label = prayer.spelledOut(strings),
+                    value = typed.getValue(prayer),
+                    supporting = if (prayer in corrections) strings.yourMasjidsTime else strings.leftAsCalculated,
+                    onPicked = {
+                        typed[prayer] = it
+                        result = null
+                    },
+                )
             }
 
             Spacer(Modifier.height(SaadiahSpacing.medium))
+            if (corrections.isEmpty()) {
+                Caption(strings.nothingCorrectedYet)
+                Spacer(Modifier.height(SaadiahSpacing.small))
+            }
             Action(strings.matchMyMasjid) {
-                result = MosqueSolver().solve(entered.toClockTimes(), city, today)
+                if (corrections.isNotEmpty()) result = MosqueSolver().solve(corrections, city, today)
             }
             result?.let { Matched(it, onApply) }
             Spacer(Modifier.height(SaadiahSpacing.huge))
         }
     }
-}
-
-@Composable
-private fun TimeField(
-    prayer: Prayer,
-    entered: MutableMap<Prayer, String>,
-    onEdited: () -> Unit,
-) {
-    var text by remember(prayer) { mutableStateOf(entered.getValue(prayer)) }
-    OutlinedTextField(
-        value = text,
-        onValueChange = { typed ->
-            text = typed
-            entered[prayer] = typed
-            onEdited()
-        },
-        label = { Text(prayer.spelledOut(strings), fontSize = SaadiahType.body.size) },
-        singleLine = true,
-        modifier = Modifier.fillMaxWidth().padding(vertical = SaadiahSpacing.tiny),
-    )
 }
 
 @Composable
@@ -144,9 +141,10 @@ private fun Matched(
             lineHeight = SaadiahType.titleMedium.lineHeight,
         )
         SectionDivider()
-        MatchedRow(strings.whyAngle, result.method.name)
+        MatchedRow(strings.whyAngle, strings.methodNames.getValue(result.method.name))
         MatchedRow(strings.whyMadhab, result.madhab.spelledOut(strings))
         MatchedRow(strings.whyHighLatitude, result.highLatitudeRule.spelledOutRule(strings))
+        Tuning(result)
         // Said plainly rather than hidden: a poor fit usually means a mistyped field, and
         // applying it anyway would bake that mistake into every prayer.
         if (result.confidence == Confidence.LOW) {
@@ -155,6 +153,23 @@ private fun Matched(
         }
         Spacer(Modifier.height(SaadiahSpacing.small))
         Action(strings.applyProfile) { onApply(result) }
+    }
+}
+
+@Composable
+private fun Tuning(result: SolveResult) {
+    // Named prayer by prayer rather than summarised. No published method lands on most
+    // masjids' printed times, so this remainder is what actually makes them match — and a
+    // reader who has just been told "nothing changed" deserves to see the minutes.
+    val offsets = result.tuning.filterValues { it != Duration.ZERO }
+    if (offsets.isEmpty()) {
+        MatchedRow(strings.whyYourTuning, strings.tuningNone)
+        return
+    }
+    SectionDivider()
+    Caption(strings.whyYourTuning)
+    for (prayer in SOLVED_PRAYERS) {
+        offsets[prayer]?.let { MatchedRow(prayer.spelledOut(strings), strings.offsetMinutes(it.inWholeMinutes)) }
     }
 }
 
@@ -199,18 +214,4 @@ private fun Action(
     )
 }
 
-/**
- * A field the reader mistyped is dropped rather than guessed at. The solver scores only the
- * prayers it is given, so a bad row costs that row's evidence instead of skewing the fit.
- */
-internal fun Map<Prayer, String>.toClockTimes(): Map<Prayer, LocalTime> =
-    mapNotNull { (prayer, text) -> text.toClockTime()?.let { prayer to it } }.toMap()
-
-internal fun String.toClockTime(): LocalTime? {
-    val digits = filter { it.isDigit() }
-    if (digits.length !in SHORTEST_TIME..LONGEST_TIME) return null
-    val hour = digits.dropLast(2).toIntOrNull()?.takeIf { it <= LAST_HOUR }
-    val minute = digits.takeLast(2).toIntOrNull()?.takeIf { it <= LAST_MINUTE }
-    if (hour == null || minute == null) return null
-    return LocalTime(hour, minute)
-}
+private fun LocalTime.withoutSeconds(): LocalTime = LocalTime(hour = hour, minute = minute)

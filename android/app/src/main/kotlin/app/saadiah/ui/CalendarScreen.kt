@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -20,9 +21,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import app.saadiah.design.ActionChip
 import app.saadiah.design.ObservanceRow
+import app.saadiah.design.R
 import app.saadiah.design.SaadiahRadius
 import app.saadiah.design.SaadiahSpacing
 import app.saadiah.design.SaadiahTheme
@@ -35,59 +39,64 @@ private val HAIRLINE = 1.dp
 
 enum class CalendarView { LIST, GRID }
 
+@Suppress("LongParameterList")
 @Composable
 fun CalendarScreen(
     state: CalendarState,
     page: MonthPage,
     onJumpToToday: () -> Unit,
+    onPreviousMonth: () -> Unit,
+    onNextMonth: () -> Unit,
 ) {
     var view by remember { mutableStateOf(CalendarView.LIST) }
     val colors = SaadiahTheme.colors
 
-    Column(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .background(colors.bg)
-                .padding(horizontal = SaadiahSpacing.screen)
-                .padding(top = SaadiahSpacing.screen),
-    ) {
-        MonthHeading(state)
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            ViewSwitch(selected = view, onSelect = { view = it }, modifier = Modifier.weight(1f))
-            Text(
-                text = strings.jumpToToday,
-                color = SaadiahTheme.colors.accent,
-                fontSize = SaadiahType.body.size,
-                modifier =
-                    Modifier
-                        .clickable(onClick = onJumpToToday)
-                        .minimumTouchTarget()
-                        .padding(horizontal = SaadiahSpacing.snug),
-            )
-        }
-        SectionDivider()
-        when (view) {
-            CalendarView.LIST -> DayList(state)
-            CalendarView.GRID -> MonthGrid(page)
+    // fillMaxSize, not fillMaxWidth: the background has to reach the bottom of the window
+    // whether or not the month has enough rows to fill it, which is the black band that
+    // showed under short months.
+    Column(modifier = Modifier.fillMaxSize().background(colors.bg)) {
+        ScreenHeader(title = state.monthLabel)
+        Column(modifier = Modifier.weight(1f).padding(horizontal = SaadiahSpacing.screen)) {
+            MonthStep(state, onJumpToToday, onPreviousMonth, onNextMonth)
+            ViewSwitch(selected = view, onSelect = { view = it })
+            SectionDivider()
+            when (view) {
+                CalendarView.LIST -> DayList(state)
+                CalendarView.GRID -> MonthGrid(page)
+            }
         }
     }
 }
 
 @Composable
-private fun MonthHeading(state: CalendarState) {
+private fun MonthStep(
+    state: CalendarState,
+    onToday: () -> Unit,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
+) {
+    // Three buttons, not three coloured words. Each is spelled out rather than left as a bare
+    // chevron: §8 permits no icon-only control in a primary flow, and a month the reader
+    // cannot leave is not a calendar.
     val colors = SaadiahTheme.colors
-    Text(
-        text = state.monthLabel,
-        color = colors.text,
-        fontSize = SaadiahType.titleMedium.size,
-        lineHeight = SaadiahType.titleMedium.lineHeight,
-    )
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = SaadiahSpacing.small),
+        horizontalArrangement = Arrangement.spacedBy(SaadiahSpacing.small),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        // The two steps take mirrored arrows, so "previous" always points back along the
+        // reading direction rather than always pointing left.
+        ActionChip(strings.previousMonth, painterResource(R.drawable.ic_back), onPrevious, Modifier.weight(1f))
+        ActionChip(strings.jumpToToday, painterResource(R.drawable.ic_today), onToday)
+        ActionChip(strings.nextMonth, painterResource(R.drawable.ic_forward), onNext, Modifier.weight(1f))
+    }
     Text(
         text = state.gregorianSpan,
         color = colors.textSecondary,
         fontSize = SaadiahType.bodySmall.size,
         lineHeight = SaadiahType.bodySmall.lineHeight,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.fillMaxWidth().padding(top = SaadiahSpacing.small),
     )
 }
 
@@ -156,6 +165,7 @@ private fun DayRow(day: CalendarDay) {
             subtitle = day.gregorian,
             marker = day.marker,
             alertEnabled = day.alertEnabled,
+            alertDescription = alertLabelFor(day.title, day.alertEnabled, strings),
             onToggleAlert = {},
             modifier = Modifier.weight(1f),
         )

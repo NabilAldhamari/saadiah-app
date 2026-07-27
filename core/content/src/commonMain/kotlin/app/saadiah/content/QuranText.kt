@@ -31,6 +31,39 @@ data class Ayah(
 )
 
 /**
+ * The opening as Tanzil writes it, exactly. Compared against, never displayed from here —
+ * what a reader sees is the slice of the bundled text, so the verbatim requirement holds
+ * even for this line.
+ */
+const val BASMALAH = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"
+
+private const val AL_FATIHAH = 1
+
+/**
+ * A sura ready to read: its opening line, then its āyāt.
+ *
+ * Tanzil prefixes the basmalah to the first āyah of every sura that opens with one, so
+ * rendering the stored text as-is prints "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ الٓمٓ ﴿1﴾" — the opening
+ * counted as part of āyah 1, which for al-Baqarah it is not. Splitting it is a numbering
+ * correction, not decoration.
+ *
+ * In al-Fātiḥah the basmalah *is* āyah 1, so it is never split off there.
+ */
+data class SuraReading(
+    val basmalah: String?,
+    val ayat: List<Ayah>,
+)
+
+fun List<Ayah>.asReading(): SuraReading {
+    val first = firstOrNull() ?: return SuraReading(basmalah = null, ayat = emptyList())
+    if (first.sura == AL_FATIHAH || !first.text.startsWith(BASMALAH)) {
+        return SuraReading(basmalah = null, ayat = this)
+    }
+    val opened = first.copy(text = first.text.removePrefix(BASMALAH).trimStart())
+    return SuraReading(basmalah = BASMALAH, ayat = listOf(opened) + drop(n = 1))
+}
+
+/**
  * Reads the Quran text packed by tools/gen-quran-db.py from the Tanzil Uthmani edition.
  *
  * The text is never normalised here. Tanzil's licence permits verbatim copies only, so a

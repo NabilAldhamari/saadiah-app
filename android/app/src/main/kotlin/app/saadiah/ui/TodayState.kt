@@ -19,7 +19,7 @@ data class PrayerRowState(
     val prayer: Prayer,
     val name: String,
     val time: String,
-    val isCurrent: Boolean,
+    val isNext: Boolean,
 )
 
 data class ObservanceState(
@@ -73,33 +73,33 @@ fun todayState(
         cityName = city.name,
         nextPrayerLatin = nextPrayer.latinLabel(profile.combineMode, strings),
         nextPrayerArabic = nextPrayer.arabicLabel(profile.combineMode, strings),
-        nextPrayerTime = nextAt.asClockTime(city.timeZone),
+        nextPrayerTime = nextAt.asClockTime(city.timeZone, strings),
         remaining = strings.remainingIn((nextAt - now).spelledOut(strings)),
-        rows = rowsFor(timings, city, profile, now, strings),
+        rows = rowsFor(timings, city, profile, nextPrayer, strings),
         observances = observancesFor(hijri, tradition, strings),
         fasting = fastingOutlook(today, hijri, tradition, strings),
     )
 }
 
+// The highlighted row is the prayer the hero names, not the one most recently passed. Marking
+// the prayer already gone put the highlight one row behind the hero all day, which reads as a
+// highlight that is stuck rather than one answering a different question.
 @Suppress("LongParameterList")
 private fun rowsFor(
     timings: app.saadiah.model.DayTimings,
     city: City,
     profile: TimingProfile,
-    now: Instant,
+    next: Prayer,
     strings: Strings,
-): List<PrayerRowState> {
-    val shown = shownPrayers(profile.combineMode)
-    val current = currentPrayerOf(shown, timings, now)
-    return shown.map {
+): List<PrayerRowState> =
+    shownPrayers(profile.combineMode).map {
         PrayerRowState(
             prayer = it,
             name = it.latinLabel(profile.combineMode, strings),
-            time = timings[it].asClockTime(city.timeZone),
-            isCurrent = it == current,
+            time = timings[it].asClockTime(city.timeZone, strings),
+            isNext = it == next,
         )
     }
-}
 
 private fun observancesFor(
     hijri: app.saadiah.model.HijriDate,
@@ -114,12 +114,6 @@ internal fun shownPrayers(combineMode: CombineMode): List<Prayer> =
     } else {
         listOf(Prayer.FAJR, Prayer.DHUHR, Prayer.ASR, Prayer.MAGHRIB, Prayer.ISHA)
     }
-
-private fun currentPrayerOf(
-    shown: List<Prayer>,
-    timings: app.saadiah.model.DayTimings,
-    now: Instant,
-): Prayer? = shown.lastOrNull { timings[it] <= now }
 
 private fun app.saadiah.calendar.ObservanceRule.toState(strings: Strings): ObservanceState? {
     val marker =

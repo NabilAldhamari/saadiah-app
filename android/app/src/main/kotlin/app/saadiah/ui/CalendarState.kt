@@ -128,3 +128,20 @@ private fun spanFor(
 }
 
 fun todayHijri(today: LocalDate): HijriDate = today.toHijriDate()
+
+private const val LAST_MONTH = 12
+
+/** Stepping is on the month, so the day is pinned to the first rather than carried over. */
+fun HijriDate.previousMonth(): HijriDate =
+    if (month == 1) {
+        HijriDate(year = year - 1, month = LAST_MONTH, day = 1)
+    } else {
+        HijriDate(year = year, month = month - 1, day = 1)
+    }
+
+fun HijriDate.nextMonth(): HijriDate =
+    if (month == LAST_MONTH) {
+        HijriDate(year = year + 1, month = 1, day = 1)
+    } else {
+        HijriDate(year = year, month = month + 1, day = 1)
+    }
