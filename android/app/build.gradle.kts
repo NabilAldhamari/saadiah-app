@@ -3,7 +3,17 @@ plugins {
 }
 
 android {
+    // The Kotlin package, and what relative class names in the manifest resolve against.
+    // It stays app.saadiah because that is where the source actually lives.
     namespace = "app.saadiah"
+
+    defaultConfig {
+        // What Play knows the app as, and the only identifier a user's device ever sees.
+        // It is deliberately not the namespace: the listing was created as com.saadiah, and
+        // renaming every source package to match would be a large diff to change one string
+        // that Gradle already models separately.
+        applicationId = "com.saadiah"
+    }
 
     signingConfigs {
         create("release") {
@@ -16,7 +26,20 @@ android {
 
     buildTypes {
         getByName("release") {
-            signingConfig = signingConfigs.getByName("release").takeIf { it.storeFile != null }
+            // The keystore alone is not enough to sign with — the passwords come from the
+            // environment and only the release workflow and the maintainer have them. Keying
+            // off the file alone meant that once a keystore existed in a working tree, every
+            // release build there failed on a missing storePassword, including the ones the
+            // guards need: check-apk-size and check-forbidden-strings both read an assembled
+            // release APK, and neither cares whether it was signed.
+            //
+            // An unsigned build announces itself — AGP names the output *-release-unsigned.apk
+            // — and Play refuses unsigned uploads, so a forgotten variable cannot get past
+            // either. Silently unsigned is recoverable; unbuildable is not.
+            signingConfig =
+                signingConfigs
+                    .getByName("release")
+                    .takeIf { it.storeFile != null && it.storePassword != null }
         }
     }
 
