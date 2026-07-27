@@ -139,6 +139,8 @@ fun NextPrayerHero(
     prayerNameArabic: String,
     time: String,
     remaining: String,
+    heading: String,
+    whyLabel: String,
     onWhyThisTime: () -> Unit,
     modifier: Modifier = Modifier,
 )
@@ -147,8 +149,25 @@ fun NextPrayerHero(
 fun PrayerRow(
     name: String,
     time: String,
-    isCurrent: Boolean,
+    isNext: Boolean,
     modifier: Modifier = Modifier,
+)
+
+@Composable
+fun ActionChip(
+    label: String,
+    icon: Painter,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+)
+
+@Composable
+fun PrimaryButton(
+    label: String,
+    icon: Painter,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    supporting: String? = null,
 )
 
 @Composable
@@ -157,6 +176,7 @@ fun ObservanceRow(
     subtitle: String,
     marker: ObservanceMarker,
     alertEnabled: Boolean,
+    alertDescription: String,
     onToggleAlert: () -> Unit,
     modifier: Modifier = Modifier,
 )
@@ -174,7 +194,8 @@ fun LabelledIconButton(
 @Composable
 fun Counter(
     current: Int,
-    target: Int,
+    outOf: String,
+    spokenDescription: String,
     onIncrement: () -> Unit,
     modifier: Modifier = Modifier,
 )
@@ -183,6 +204,7 @@ fun Counter(
 fun CheckRow(
     label: String,
     status: CheckStatus,
+    statusDescription: String,
     action: (@Composable () -> Unit)? = null,
     modifier: Modifier = Modifier,
 )
@@ -201,10 +223,15 @@ fun ScreenHeader(
 ```
 
 **`ScreenHeader` was missing from the original spec — that's a gap in this document, not
-something implementation skipped.** It is mandatory on every screen and sheet reached by
-navigating forward: Ask, Why this time, Alert check, Match my masjid, every settings sub-page.
-The four root tab destinations (Today, Quran, Adhkār, More) don't need it — they're arrived at
-via the tab bar, not "back"-able.
+something implementation skipped.** It is mandatory on **every** screen, including the four
+root tab destinations (Today, Calendar, Adhkār, More). A tab root takes it without `onBack`.
+
+An earlier revision of this section exempted the tab roots on the grounds that they are not
+"back"-able. That was the wrong test: the header is what gives every screen the same title in
+the same place at the same size, and four roots each inventing their own heading — one at
+`titleLarge`, one at `titleMedium`, one with no title at all — is what made the app read as
+unfinished. Being back-able decides whether the header carries a back control, not whether the
+header exists.
 
 Rules:
 
@@ -216,6 +243,13 @@ Rules:
   full-width button competing visually with body content.
 - `title` is always a localized string. A screen title in the wrong locale is the same bug as a
   hardcoded English label anywhere else — see §7.
+
+**Both buttons take a glyph, and neither has an icon-only variant.** `ActionChip` is outlined in
+`accent` at 1.5dp on a `surface` fill, pill radius, with the glyph before the label. A `line`
+border over `surface` was tried and is wrong: both tokens sit within a hair of `bg`, so the
+result reads as a faintly tinted word rather than as something to press. `PrimaryButton` is the
+filled `accent` block for the one action a screen is asking for, its glyph and label reversed out
+in `bg` — the pair every palette's accent is chosen to contrast against.
 
 Rules that apply to all components:
 
@@ -243,8 +277,13 @@ The only screen with a hero. Vertical order, top to bottom:
    Below it, a bordered `LabelledIconButton` reading "Why this time?".
 4. `SectionDivider`.
 5. **Prayer list.** A vertical list of rows, not a horizontal strip. Name left, time right, both
-   `titleSmall`. The current prayer's row has a filled `surface` background with 8dp radius and
-   its time in `accent` — highlighted by fill *and* colour, never colour alone.
+   `titleSmall`. **The highlighted row is the *next* prayer — the one the hero names.** Marking
+   the prayer most recently passed instead leaves the highlight one row behind the hero all day,
+   which reads as a highlight that is stuck rather than one answering a different question.
+   It carries a filled `surface` background with 8dp radius, a 1dp `accent` outline, a 4dp
+   `accent` bar at the leading edge, and its time in `accent`. Fill alone is not enough: `surface`
+   sits a few percent off `bg` in every palette, correct for a card and far too quiet for the one
+   row on the screen that matters.
 6. **Observances**, at most two, each an `ObservanceRow` with a bell toggle.
 7. **Continue** rows — evening adhkār when appropriate, and the most recent reading thread.
 8. **Tab bar** — four tabs, 26dp icons, `label` text under each. Active tab in `accent`.
@@ -283,6 +322,11 @@ tab doing double duty, not two views. Fix this by building the two as actually d
 2. **Jump to today** — a single action from anywhere in the calendar, list or grid, at any month.
 3. **Per-day prayer time peek** inside the detail sheet from (1), rather than a separate feature.
 
+**Month stepping is not an enrichment — it is what makes the grid a grid.** Previous and next
+month are always reachable, spelled out in words rather than bare chevrons per §8, either side
+of the Gregorian span. Without them "one calendar month at a time" means one month and no other,
+and "jump to today" is the only navigation there is.
+
 Conflicts are explained, not hidden. When Ayyām al-Bīḍ overlaps Tashrīq, show a note in
 `bodySmall` / `textSecondary` saying so.
 
@@ -296,6 +340,30 @@ not a settings item.
 
 Āyah blocks: Quranic text at `quran`, RTL, generous line height, āyah number inline in `accent`
 at `label` size. The active āyah carries a 2dp `accent` bar on its start edge.
+
+**Set as a page, not as a feed.** The reader is one continuous column of naskh with no rule
+between verses — a muṣḥaf has none. Each āyah is closed by its number inside `﴿ ﴾` in `accent` at
+`label` size, in the text run itself rather than in a column beside it, so it stays in reading
+order in both directions. Justified.
+
+**The basmalah is set apart, above the first āyah, centred in `accent`, with a rule beneath it.**
+Tanzil prefixes it to the stored text of āyah 1 for every sura that opens with one, so rendering
+the stored string as-is prints the opening *as part of* āyah 1 — which for al-Baqarah it is not.
+The split is a numbering correction and belongs in `:core:content`, tested, not in the screen.
+In al-Fātiḥah the basmalah **is** āyah 1 and is never split off.
+
+**Reading position is remembered per sura** and restored on reopening — the last āyah at the top
+of the screen, written only once scrolling settles. It is a position and nothing else: never
+shown back as a count, a percentage, or a record of what was finished.
+
+**A reading rail** runs down the leading edge showing how far into the sura the reader is. Its
+denominator is the number of āyāt that can reach the top of the screen, not the total — dividing
+by the total leaves the rail short of full at the end of every sura. **A back-to-first-āyah
+control** appears once the reader has left the top and is spelled out in words, per §8.
+
+**Font.** §3 specifies KFGQPC Hafs Uthmanic. Until that file is licensed and measured against the
+APK budget, the reader falls back to the platform serif, which resolves to Noto Naskh for Arabic —
+the right script, not yet the right face. This is a known gap, not the intended end state.
 
 Attached notes render below their āyah: text notes in `bodySmall` behind a start-edge border;
 voice notes as an inset `surface` panel with a play control, a static waveform, duration and
@@ -394,6 +462,25 @@ Primary action: "Run a 60-second test", full width.
 - ICU message format with all six Arabic plural categories. `count == 1` logic is a bug.
 
 ---
+
+**Two surfaces are right-to-left whatever the language setting says.** Direction follows the
+content, not the UI locale, and both of these are Arabic content sitting inside a possibly
+English app:
+
+- **The Quran reader.** The muṣḥaf reads right-to-left; laying it out the other way for an
+  English reader puts each āyah's closing number on the wrong side of the verse it closes.
+- **The Hijri date banner on Today.** The label is Arabic — "٩ محرم ١٤٤٨ هـ" — and in a
+  left-to-right layout the year and the هـ that qualifies it land on opposite sides of the
+  month name.
+
+Both wrap their content in `LocalLayoutDirection provides LayoutDirection.Rtl` rather than
+relying on the app language.
+
+**Times a reader types are on the 24-hour clock, in both languages,** and are chosen from a
+picker rather than typed. A masjid prints 05:12 and 17:20; a reader copying that should not
+have to translate it into an AM/PM dial on the way in, nor should the app have to guess at
+what shape they wrote. Displayed times elsewhere still follow the language — Arabic writes
+ص and م.
 
 ## 8. Accessibility gates
 

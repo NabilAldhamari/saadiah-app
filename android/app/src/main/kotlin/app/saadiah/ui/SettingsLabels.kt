@@ -1,5 +1,6 @@
 package app.saadiah.ui
 
+import app.saadiah.model.AdhanSound
 import app.saadiah.model.AppTheme
 import app.saadiah.model.BaqarahReminder
 import app.saadiah.model.CombineMode
@@ -67,4 +68,11 @@ internal fun HighLatitudeRule.spelledOutRule(strings: Strings): String =
         HighLatitudeRule.MIDDLE_OF_NIGHT -> strings.middleOfNight
         HighLatitudeRule.SEVENTH_OF_NIGHT -> strings.seventhOfNight
         HighLatitudeRule.TWILIGHT_ANGLE -> strings.twilightAngle
+    }
+
+internal fun AdhanSound.spelledOut(strings: Strings): String =
+    when (this) {
+        AdhanSound.DEFAULT -> strings.adhanDefault
+        AdhanSound.SHORT -> strings.adhanShort
+        AdhanSound.LONG -> strings.adhanLong
     }

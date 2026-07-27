@@ -40,7 +40,7 @@ class PrayerRowTest {
     ) {
         val suffix = if (current) "${variant.suffix}-current" else variant.suffix
         compose.captureVariant(component = "prayer-row", variant = variant.copy(suffix = suffix)) {
-            PrayerRow(name = NAME, time = TIME, isCurrent = current)
+            PrayerRow(name = NAME, time = TIME, isNext = current)
         }
 
         compose.onNodeWithText(NAME).assertIsDisplayed()

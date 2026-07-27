@@ -19,7 +19,16 @@ import java.util.Locale
  */
 @Suppress("TooManyFunctions")
 interface Strings {
+    /**
+     * Whether this table renders Arabic. Bundled content carries its own Arabic separately
+     * from these strings, so a screen showing that content has to know which rendering to
+     * reach for; it is not a layout-direction question and asking [LayoutDirection] for it
+     * would be reading the wrong signal.
+     */
+    val rendersArabic: Boolean
+
     val back: String
+    val cancel: String
     val open: String
     val chosen: String
     val change: String
@@ -41,8 +50,17 @@ interface Strings {
     val todaysReadingHint: String
     val fastingAhead: String
 
+    val nextPrayer: String
+    val whyThisTimeQuestion: String
+
+    /** The half of the clock. Arabic writes ص and م; leaving these Latin was the widest leak. */
+    val ante: String
+    val post: String
+
     val sectionLocation: String
     val sectionLanguage: String
+    val sectionCalculation: String
+    val sectionAlerts: String
     val sectionMadhab: String
     val sectionMadhabWhy: String
     val sectionCombining: String
@@ -108,14 +126,28 @@ interface Strings {
     val baqarahSubtitle: String
     val baqarahNotBundled: String
 
+    /**
+     * A merit card carries its own kind in words. The reflection is a family saying, not a
+     * narration, and reading it in the same card as a ṣaḥīḥ hadith with nothing to tell them
+     * apart is a sourcing failure rather than a cosmetic one.
+     */
+    val meritNarration: String
+    val meritReflection: String
+    val translationOfMeaning: String
+
     val nawafil: String
     val noNawafil: String
     val duaAndAdhkar: String
     val duaWordingWithheld: String
 
+    val checkPassing: String
+    val checkNeedsAttention: String
+
     val calendarList: String
     val calendarGrid: String
     val calendarLegend: String
+    val previousMonth: String
+    val nextMonth: String
     val legendFast: String
     val legendDoNotFast: String
     val legendHijamah: String
@@ -236,6 +268,12 @@ interface Strings {
 
     fun rakah(count: Int): String
 
+    val sectionAdhan: String
+    val sectionAdhanWhy: String
+    val adhanDefault: String
+    val adhanShort: String
+    val adhanLong: String
+
     val prayerChannelName: String
     val prayerChannelWhat: String
     val readingChannelName: String
@@ -253,6 +291,25 @@ interface Strings {
     val readAlImran: String
     val titleAlBaqarah: String
     val titleAlImran: String
+    val backToStart: String
+
+    fun ayahCount(count: Int): String
+
+    fun positionInSet(
+        index: Int,
+        total: Int,
+    ): String
+
+    fun outOf(total: Int): String
+
+    fun counterSpoken(
+        current: Int,
+        target: Int,
+    ): String
+
+    fun alertOnFor(title: String): String
+
+    fun alertOffFor(title: String): String
 
     val myAdhkar: String
     val addDhikr: String
@@ -269,8 +326,16 @@ interface Strings {
     val matchMyMasjidWhy: String
     val applyProfile: String
     val matchedProfile: String
+
+    /** Keyed by [app.saadiah.prayer.Method] name, so a new method fails the table's test. */
+    val methodNames: Map<String, String>
     val lowConfidence: String
     val enterYourMasjidTimes: String
+    val correctWhatYouKnow: String
+    val twentyFourHourNotice: String
+    val nothingCorrectedYet: String
+    val yourMasjidsTime: String
+    val leftAsCalculated: String
 
     fun prayerTodayIn(
         prayer: String,
@@ -278,6 +343,9 @@ interface Strings {
     ): String
 
     val onTime: String
+
+    /** Signed, because a masjid can be earlier than the calculation as easily as later. */
+    fun offsetMinutes(minutes: Long): String
 
     fun lateBy(duration: String): String
 
@@ -298,7 +366,7 @@ fun stringsFor(language: Language): Strings =
     }
 
 fun layoutDirectionFor(language: Language): LayoutDirection =
-    if (stringsFor(language) === ArabicStrings) LayoutDirection.Rtl else LayoutDirection.Ltr
+    if (stringsFor(language).rendersArabic) LayoutDirection.Rtl else LayoutDirection.Ltr
 
 val strings: Strings
     @Composable

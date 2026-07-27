@@ -12,7 +12,10 @@ package app.saadiah.ui
  */
 @Suppress("TooManyFunctions")
 object ArabicStrings : Strings {
+    override val rendersArabic = true
+
     override val back = "رجوع"
+    override val cancel = "إلغاء"
     override val open = "افتح"
     override val chosen = "مختار"
     override val change = "تغيير"
@@ -34,8 +37,16 @@ object ArabicStrings : Strings {
     override val todaysReadingHint = "قراءة اليوم. اضغط لمعرفة سبب المداومة عليها."
     override val fastingAhead = "صيام قادم"
 
+    override val nextPrayer = "الصلاة القادمة"
+    override val whyThisTimeQuestion = "لماذا هذا الوقت؟"
+
+    override val ante = "ص"
+    override val post = "م"
+
     override val sectionLocation = "الموقع"
     override val sectionLanguage = "اللغة"
+    override val sectionCalculation = "حساب أوقات الصلاة"
+    override val sectionAlerts = "التنبيهات"
     override val sectionMadhab = "مذهب العصر"
     override val sectionMadhabWhy = "يغيّر وقت دخول العصر."
     override val sectionCombining = "الجمع بين الصلوات"
@@ -108,14 +119,23 @@ object ArabicStrings : Strings {
             "مفتوح، كل فضيلة مع روايتها. ولا يُعرض شيء في هذه الأثناء، لأن فضيلة تُكتب من الذاكرة " +
             "وتُنسب إلى النبي ﷺ ستبدو تمامًا كفضيلة موثقة."
 
+    override val meritNarration = "حديث"
+    override val meritReflection = "خاطرة"
+    override val translationOfMeaning = "ترجمة المعنى"
+
     override val nawafil = "النوافل"
     override val noNawafil = "لا نوافل مع هذا الوقت."
     override val duaAndAdhkar = "الدعاء والأذكار"
     override val duaWordingWithheld = "لا يُعرض النص حتى تُضاف مجموعة الأذكار من مصدرها."
 
+    override val checkPassing = "سليم"
+    override val checkNeedsAttention = "يحتاج انتباهًا"
+
     override val calendarList = "قائمة"
     override val calendarGrid = "شبكة"
     override val calendarLegend = "كل يوم مميز، حسب الشكل"
+    override val previousMonth = "الشهر السابق"
+    override val nextMonth = "الشهر التالي"
     override val legendFast = "يوم صيام"
     override val legendDoNotFast = "يوم لا يُصام"
     override val legendHijamah = "يوم حجامة"
@@ -280,6 +300,12 @@ object ArabicStrings : Strings {
 
     override fun rakah(count: Int) = "$count ركعات"
 
+    override val sectionAdhan = "الأذان"
+    override val sectionAdhanWhy = "صوت تنبيه الصلاة. يُشغَّل بمستوى المنبه ليُسمع حتى لو أُسكتت الإشعارات."
+    override val adhanDefault = "صوت إشعارات هاتفك"
+    override val adhanShort = "أذان قصير"
+    override val adhanLong = "أذان كامل"
+
     override val prayerChannelName = "أوقات الصلاة"
     override val prayerChannelWhat = "يعلن كل صلاة عند دخول وقتها."
     override val readingChannelName = "تذكير القراءة"
@@ -298,6 +324,25 @@ object ArabicStrings : Strings {
     override val readAlImran = "اقرأ سورة آل عمران"
     override val titleAlBaqarah = "سورة البقرة"
     override val titleAlImran = "سورة آل عمران"
+    override val backToStart = "العودة إلى الآية الأولى"
+
+    override fun ayahCount(count: Int) = "$count آية"
+
+    override fun positionInSet(
+        index: Int,
+        total: Int,
+    ) = "$index من $total"
+
+    override fun outOf(total: Int) = "من $total"
+
+    override fun counterSpoken(
+        current: Int,
+        target: Int,
+    ) = "$current من $target. اضغط للعد."
+
+    override fun alertOnFor(title: String) = "التنبيه مفعّل لـ $title"
+
+    override fun alertOffFor(title: String) = "التنبيه متوقف لـ $title"
 
     override val myAdhkar = "أذكاري"
     override val addDhikr = "أضف ذكرًا"
@@ -314,14 +359,34 @@ object ArabicStrings : Strings {
     override val matchMyMasjidWhy = "أدخل أوقات مسجدك المطبوعة ليجد التطبيق الإعدادات الموافقة لها."
     override val applyProfile = "تطبيق هذه الإعدادات"
     override val matchedProfile = "أقرب تطابق"
+    override val methodNames =
+        mapOf(
+            "MUSLIM_WORLD_LEAGUE" to "رابطة العالم الإسلامي",
+            "NORTH_AMERICA" to "أمريكا الشمالية (ISNA)",
+            "EGYPTIAN" to "الهيئة المصرية العامة للمساحة",
+            "KARACHI" to "جامعة كراتشي",
+            "UMM_AL_QURA" to "أم القرى، مكة المكرمة",
+            "DIYANET" to "الديانة التركية",
+            "TEHRAN" to "معهد الجيوفيزياء، طهران",
+            "JAFARI" to "الجعفري",
+        )
     override val lowConfidence =
         "هذه الأوقات لا توافق حسابًا واحدًا بوضوح. راجع ما أدخلته، أو طبّق هذا واضبط صلاة يدويًا."
     override val enterYourMasjidTimes = "استبدل أي وقت لديك من مسجدك، واترك البقية كما هي."
+    override val correctWhatYouKnow =
+        "صحّح الأوقات التي تعرفها فقط. وقت واحد يكفي — تُعاد بقية الأوقات وفق الحساب الموافق له، " +
+            "وما تتركه دون تغيير لا يُعدّ وقت مسجدك."
+    override val twentyFourHourNotice = "الأوقات بنظام ٢٤ ساعة كما تُطبع في المساجد — ‎18:30 لا ‎6:30 مساءً."
+    override val nothingCorrectedYet = "لم تصحّح أي وقت بعد، فلا شيء لمطابقته."
+    override val yourMasjidsTime = "وقت مسجدك"
+    override val leftAsCalculated = "متروك كما هو محسوب"
 
     override fun prayerTodayIn(
         prayer: String,
         city: String,
     ) = "$prayer اليوم في $city"
+
+    override fun offsetMinutes(minutes: Long) = if (minutes < 0) "${-minutes} دقيقة قبل" else "$minutes دقيقة بعد"
 
     override val onTime = "في وقته"
 

@@ -103,7 +103,7 @@ private fun ObservanceMarker?.tint(colors: SaadiahColors) =
 @Composable
 private fun LegendNamingEveryMarkerInWords() {
     Caption(strings.calendarLegend)
-    Caption("●  ${'$'}{strings.legendFast}")
-    Caption("━  ${'$'}{strings.legendDoNotFast}")
-    Caption("○  ${'$'}{strings.legendHijamah}")
+    Caption("●  ${strings.legendFast}")
+    Caption("━  ${strings.legendDoNotFast}")
+    Caption("○  ${strings.legendHijamah}")
 }

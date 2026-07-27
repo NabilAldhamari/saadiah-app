@@ -43,13 +43,23 @@ fun Prayer.latinName(strings: Strings): String = strings.prayerNames[ordinal]
 
 fun Observance.label(strings: Strings): String = strings.observanceLabels.getValue(name)
 
+/** What a screen reader announces for a row's bell, since the glyph alone does not say. */
+fun alertLabelFor(
+    title: String,
+    enabled: Boolean,
+    strings: Strings,
+): String = if (enabled) strings.alertOnFor(title) else strings.alertOffFor(title)
+
 fun HijriDate.arabicLabel(strings: Strings): String = "$day ${strings.hijriMonths[month - 1]} $year هـ"
 
-fun Instant.asClockTime(zone: TimeZone): String {
+fun Instant.asClockTime(
+    zone: TimeZone,
+    strings: Strings,
+): String {
     val local = toLocalDateTime(zone)
     val hour = if (local.hour % NOON == 0) NOON else local.hour % NOON
     val minute = local.minute.toString().padStart(length = 2, padChar = '0')
-    val suffix = if (local.hour < NOON) "AM" else "PM"
+    val suffix = if (local.hour < NOON) strings.ante else strings.post
     return "$hour:$minute $suffix"
 }
 
@@ -83,7 +93,16 @@ internal val MONTHS =
 fun LocalDate.spelledOut(strings: Strings): String =
     "${strings.weekdays[dayOfWeek.ordinal]} $dayOfMonth ${strings.gregorianMonths[monthNumber - 1]}"
 
-fun LocalDate.shortWeekday(strings: Strings): String = strings.weekdays[dayOfWeek.ordinal].take(n = 3)
+/**
+ * Truncating to three characters is a Latin habit: "الإثنين" cut to three letters is not a
+ * shorter word, it is a broken one. Arabic weekday names are given whole.
+ */
+fun LocalDate.shortWeekday(strings: Strings): String {
+    val name = strings.weekdays[dayOfWeek.ordinal]
+    return if (name.any { it.code in ARABIC_BLOCK }) name else name.take(n = 3)
+}
+
+private val ARABIC_BLOCK = 0x0600..0x06FF
 
 fun LocalDate.dayAndMonth(strings: Strings): String = "$dayOfMonth ${strings.gregorianMonths[monthNumber - 1]}"
 

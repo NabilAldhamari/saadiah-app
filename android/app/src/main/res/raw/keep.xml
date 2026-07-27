@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The release build shrinks resources, and the shrinker does not trace these two: they are
+  named once each in a `when` over AdhanSound and reached from a notification channel, never
+  from a layout. Without this both were dropped from the release APK while remaining in the
+  debug one — the adhān played in testing and was silent in the build that ships.
+-->
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@raw/adhan_short,@raw/adhan_long" />

@@ -28,7 +28,7 @@ class CheckRowAndCounterTest {
     @Test
     fun aPassingCheckIsAnnouncedByShapeNotOnlyColour() {
         compose.captureVariant(component = "check-row-pass", variant = LTR_DEFAULT) {
-            CheckRow(label = PASSING, status = CheckStatus.PASS)
+            CheckRow(label = PASSING, status = CheckStatus.PASS, statusDescription = "Passing")
         }
 
         compose.onNodeWithText(PASSING).assertIsDisplayed()
@@ -41,6 +41,7 @@ class CheckRowAndCounterTest {
             CheckRow(
                 label = FAILING,
                 status = CheckStatus.FAIL,
+                statusDescription = "Needs attention",
                 action = { Text("Fix") },
             )
         }
@@ -54,7 +55,12 @@ class CheckRowAndCounterTest {
     fun theWholeRingCounts() {
         var count = 0
         compose.captureVariant(component = "counter", variant = LTR_DEFAULT) {
-            Counter(current = 3, target = 33, onIncrement = { count++ })
+            Counter(
+                current = 3,
+                outOf = "of 33",
+                spokenDescription = "3 of 33. Tap to count.",
+                onIncrement = { count++ },
+            )
         }
 
         compose.onNodeWithContentDescription("3 of 33. Tap to count.").assertHasClickAction().performClick()
@@ -65,7 +71,12 @@ class CheckRowAndCounterTest {
     @Test
     fun theCounterReadsItsPositionAtDoubleScale() {
         compose.captureVariant(component = "counter-2x", variant = RTL_DOUBLE) {
-            Counter(current = 12, target = 33, onIncrement = {})
+            Counter(
+                current = 12,
+                outOf = "of 33",
+                spokenDescription = "12 of 33. Tap to count.",
+                onIncrement = {},
+            )
         }
 
         compose.onNodeWithText("12").assertIsDisplayed()

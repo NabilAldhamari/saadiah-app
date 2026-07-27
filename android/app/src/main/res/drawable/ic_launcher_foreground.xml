@@ -1,9 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  BRAND.md §1 — the crescent-S. Two offset crescent arcs meeting at the centre of the grid,
+  their union reading as the letter S.
+
+  Stroked rather than filled, with round caps: the caps are what make each arc terminate as a
+  crescent horn instead of a cut-off band, and a stroke keeps the mark one continuous shape
+  with no internal detail, which is what has to survive at 24px.
+
+  The path given in BRAND.md §1 encloses no area and renders blank. Its two arcs are 50 apart
+  with radii 25 and 18; the SVG spec scales an undersized radius up to fit, so the second arc
+  becomes an identical semicircle to the first and the outline retraces itself. This geometry
+  replaces it — the same mark as described, drawn so that it exists.
+
+  Every extent sits inside the 66dp safe circle: the arcs span y 22..86 and x 35..73 on the
+  108 grid, against a safe band of 21..87.
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,36 a18,18 0 1,0 0,36 a18,18 0 1,0 0,-36 Z" />
+        android:pathData="M66.22,36.55 A13,13 0 1,0 54,54 A13,13 0 1,1 41.78,71.45"
+        android:strokeColor="#3A2E12"
+        android:strokeWidth="12"
+        android:strokeLineCap="round" />
 </vector>

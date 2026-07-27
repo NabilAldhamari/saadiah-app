@@ -20,6 +20,7 @@ import app.saadiah.data.Settings
 import app.saadiah.data.SettingsStore
 import app.saadiah.doctor.guidanceIntents
 import app.saadiah.model.Language
+import app.saadiah.prayer.toProfile
 import app.saadiah.ui.AppActions
 import app.saadiah.ui.DEFAULT_CITY
 import app.saadiah.ui.Navigator
@@ -65,7 +66,14 @@ class MainActivity : ComponentActivity() {
                         onOpenBackgroundSettings = ::openBackgroundSettings,
                         onApplyMatchedProfile = { matched ->
                             // Applied only on the reader's explicit confirm, never by the solve.
-                            save(store, alarms) { it.copy(madhab = matched.madhab) }
+                            //
+                            // The whole solved profile is kept, not just the madhhab. Saving
+                            // the madhhab alone discarded the method, the high-latitude rule
+                            // and every per-prayer offset, so a masjid whose timetable did not
+                            // happen to be some other madhhab's changed nothing at all.
+                            save(store, alarms) {
+                                it.copy(madhab = matched.madhab, timingProfile = matched.toProfile())
+                            }
                         },
                     ),
             )

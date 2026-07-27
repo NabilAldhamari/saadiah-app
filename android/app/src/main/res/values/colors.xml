@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#7A5A22</color>
+    <!--
+      BRAND.md §2. The cream is the app's own light background from Tokens.kt, not a value
+      picked for the icon: the launcher mark and the first screen behind it are the same field.
+      The brown mark measures 12.1:1 against it, held by ColorContrastTest alongside every
+      in-app pair.
+    -->
+    <color name="ic_launcher_background">#F7F4EC</color>
 </resources>

@@ -63,64 +63,66 @@ fun AdhkarScreen(
     val entries = remember(collection, tradition) { adhkar(collection, tradition) }
     val colors = SaadiahTheme.colors
 
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(colors.bg)
-                .verticalScroll(rememberScrollState())
-                .pointerInput(drafting) { detectTapGestures { drafting = false } }
-                .padding(horizontal = SaadiahSpacing.screen)
-                .padding(top = SaadiahSpacing.screen),
-    ) {
-        MyAdhkar(
-            custom = custom,
-            drafting = drafting,
-            onDrafting = { drafting = it },
-            onChange = onChangeCustom,
-        )
+    Column(modifier = Modifier.fillMaxSize().background(colors.bg)) {
+        ScreenHeader(title = strings.tabAdhkar)
+        Column(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .pointerInput(drafting) { detectTapGestures { drafting = false } }
+                    .padding(horizontal = SaadiahSpacing.screen),
+        ) {
+            MyAdhkar(
+                custom = custom,
+                drafting = drafting,
+                onDrafting = { drafting = it },
+                onChange = onChangeCustom,
+            )
 
-        Spacer(Modifier.height(SaadiahSpacing.large))
-        SectionDivider()
-        Text(
-            text = strings.bundledAdhkar,
-            color = colors.text,
-            fontSize = SaadiahType.titleMedium.size,
-            lineHeight = SaadiahType.titleMedium.lineHeight,
-        )
-        Spacer(Modifier.height(SaadiahSpacing.small))
-        SetSwitch(collection) {
-            collection = it
-        }
-        if (entries.isEmpty()) {
+            Spacer(Modifier.height(SaadiahSpacing.large))
             SectionDivider()
-            Body(strings.comingSoon)
+            Text(
+                text = strings.bundledAdhkar,
+                color = colors.text,
+                fontSize = SaadiahType.titleMedium.size,
+                lineHeight = SaadiahType.titleMedium.lineHeight,
+            )
             Spacer(Modifier.height(SaadiahSpacing.small))
-            Caption(strings.adhkarNotBundled)
-            Spacer(Modifier.height(SaadiahSpacing.huge))
-            return@Column
-        }
+            SetSwitch(collection) {
+                collection = it
+            }
+            if (entries.isEmpty()) {
+                SectionDivider()
+                Body(strings.comingSoon)
+                Spacer(Modifier.height(SaadiahSpacing.small))
+                Caption(strings.adhkarNotBundled)
+                Spacer(Modifier.height(SaadiahSpacing.huge))
+                return@Column
+            }
 
-        val dhikr = entries[index.coerceIn(0, entries.lastIndex)]
-        Caption("${collection.spelledOut()} · ${index + 1} of ${entries.size}")
-        SectionDivider()
-        DhikrCard(dhikr)
-        Spacer(Modifier.height(SaadiahSpacing.large))
-        Counter(
-            current = count,
-            target = dhikr.repetitions,
-            onIncrement = { if (count < dhikr.repetitions) count++ },
-            modifier = Modifier.fillMaxWidth().minimumTouchTarget(),
-        )
-        Caption(strings.adhkarTapRing, size = SaadiahType.bodySmall.size)
-        Spacer(Modifier.height(SaadiahSpacing.medium))
-        Steps(
-            atStart = index == 0,
-            atEnd = index == entries.lastIndex,
-            onBack = { if (index > 0) index-- },
-            onNext = { if (index < entries.lastIndex) index++ },
-        )
-        Spacer(Modifier.height(SaadiahSpacing.huge))
+            val dhikr = entries[index.coerceIn(0, entries.lastIndex)]
+            Caption("${collection.spelledOut()} · ${strings.positionInSet(index + 1, entries.size)}")
+            SectionDivider()
+            DhikrCard(dhikr)
+            Spacer(Modifier.height(SaadiahSpacing.large))
+            Counter(
+                current = count,
+                outOf = strings.outOf(dhikr.repetitions),
+                spokenDescription = strings.counterSpoken(count, dhikr.repetitions),
+                onIncrement = { if (count < dhikr.repetitions) count++ },
+                modifier = Modifier.fillMaxWidth().minimumTouchTarget(),
+            )
+            Caption(strings.adhkarTapRing, size = SaadiahType.bodySmall.size)
+            Spacer(Modifier.height(SaadiahSpacing.medium))
+            Steps(
+                atStart = index == 0,
+                atEnd = index == entries.lastIndex,
+                onBack = { if (index > 0) index-- },
+                onNext = { if (index < entries.lastIndex) index++ },
+            )
+            Spacer(Modifier.height(SaadiahSpacing.huge))
+        }
     }
 }
 
@@ -329,6 +331,6 @@ private fun DhikrDraft(
             val repetitions = count.toIntOrNull() ?: 1
             if (text.isNotBlank()) onSave(text, maxOf(1, repetitions))
         }
-        Pill(strings.back, selected = false, modifier = Modifier.weight(1f), onSelect = onCancel)
+        Pill(strings.cancel, selected = false, modifier = Modifier.weight(1f), onSelect = onCancel)
     }
 }

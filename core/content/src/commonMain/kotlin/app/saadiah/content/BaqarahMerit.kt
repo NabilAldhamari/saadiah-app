@@ -15,6 +15,7 @@ data class BaqarahMerit(
     val order: Int,
     val arabic: String?,
     val translation: String,
+    val translationArabic: String?,
     val source: String,
     val kind: MeritKind,
     val traditions: Set<Tradition>,
@@ -23,6 +24,10 @@ data class BaqarahMerit(
         require(source.isNotBlank()) { "a merit without its narration cannot be shown" }
         require(translation.isNotBlank()) { "a merit with no text says nothing" }
         require(traditions.isNotEmpty()) { "an untagged merit would reach the wrong reader" }
+        // Blank is not the same as absent. An empty string draws an empty line on the card,
+        // which is how a half-finished entry looks exactly like a finished one.
+        require(arabic?.isNotBlank() != false) { "a blank Arabic original should be null" }
+        require(translationArabic?.isNotBlank() != false) { "a blank Arabic rendering should be null" }
     }
 }
 
@@ -31,15 +36,20 @@ enum class MeritKind { HADITH, SAYING }
 fun baqarahMerits(tradition: Tradition): List<BaqarahMerit> =
     BAQARAH_MERITS.filter { tradition in it.traditions }.sortedBy { it.order }
 
-// The Arabic is deliberately null. These translations were read from sunnah.com; the Arabic
-// originals were not, and typing them from memory is the one thing this file exists to
-// prevent. They are filled in when an openly licensed Arabic corpus is bundled.
+// Every entry carries its original Arabic, supplied and checked by hand rather than typed from
+// memory — which is the one thing this file exists to prevent. `translationArabic` stays null
+// throughout: it is the fallback for an entry whose original has not been sourced yet, and
+// there is no longer such an entry.
 private val BAQARAH_MERITS =
     listOf(
         BaqarahMerit(
             id = "muslim-780",
             order = 1,
-            arabic = null,
+            arabic =
+                "عن أبي هريرة رضي الله عنه قال: قال رسولُ اللهِ صلى الله عليهِ وسلم - لا " +
+                    "تَجعَلوا بُيوتَكُم مَقابِرَ، إنَّ الشَّيطانَ يَنفِرُ مِنَ البَيتِ الذي تُقرَأُ " +
+                    "فيه سورةُ البَقَرةِ.",
+            translationArabic = null,
             translation =
                 "Do not turn your houses into graveyards. Satan runs away from the house " +
                     "in which Sūrat al-Baqarah is recited.",
@@ -50,7 +60,14 @@ private val BAQARAH_MERITS =
         BaqarahMerit(
             id = "muslim-804",
             order = 2,
-            arabic = null,
+            arabic =
+                "عن أبي أمامة الباهلي رضي الله عنه قال: سمعت رسول الله صلى الله عليه وسلم يقول: " +
+                    "«اقْرَؤُوا القُرْآنَ فإنَّه يأتي يَومَ القِيامَةِ شَفيعًا لأصْحابِهِ، اقْرَؤُوا " +
+                    "الزَّهراوينِ: البَقَرَةَ وسُورَةَ آلِ عِمرانَ، فإنَّهما تأتيانِ يَومَ " +
+                    "القِيامَةِ كأنَّهما غَمامَتانِ، أوْ كأنَّهما غَيايَتانِ، أوْ كأنَّهما فِرْقانِ " +
+                    "مِنْ طَيْرٍ صَوافَّ، تُحاجّانِ عَنْ أصْحابِهِما، اقْرَؤُوا سُورَةَ البَقَرَةِ، " +
+                    "فإنَّ أخذَها بَرَكَةٌ، وتَرْكُها حَسْرَةٌ، ولا تَستطيعُها البَطَلَةُ» (قال " +
+                    "معاوية: بلغني أن البطلة السحرة).",
             translation =
                 "Recite the Qurʾān, for on the Day of Resurrection it will come as an " +
                     "intercessor for those who recite it. Recite the two bright ones, " +
@@ -60,13 +77,17 @@ private val BAQARAH_MERITS =
                     "to it is a blessing and to give it up is a cause of grief, and the " +
                     "magicians cannot confront it.",
             source = "Ṣaḥīḥ Muslim 804",
+            translationArabic = null,
             kind = MeritKind.HADITH,
             traditions = setOf(Tradition.SUNNI),
         ),
         BaqarahMerit(
             id = "saadiah-alsabahi",
             order = 3,
-            arabic = null,
+            arabic =
+                "إذا واظبت على سورة البقرة فلن تستطيع التخلي عنها، وستشعر بأن شيئاً كبيراً ينقصك " +
+                    "إذا مر يوم بدون أن تقرأها.",
+            translationArabic = null,
             translation =
                 "If you stick to reading Sūrat al-Baqarah every day, you won't be able to " +
                     "leave it. You'll feel something big is missing if you skip it for one day.",
