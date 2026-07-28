@@ -28,7 +28,7 @@ object ArabicStrings : Strings {
 
     override val titleChooseCity = "اختر مدينتك"
     override val titleAlertCheck = "هل ستصلني التنبيهات؟"
-    override val titleWhyThisTime = "لماذا هذا الوقت"
+    override val titleWhyThisTime = "لماذا هذا التوقيت"
     override val titleBaqarah = "سورة البقرة"
     override val titlePrayer = "الصلاة"
     override val titleSettings = "الإعدادات"
@@ -38,7 +38,7 @@ object ArabicStrings : Strings {
     override val fastingAhead = "صيام قادم"
 
     override val nextPrayer = "الصلاة القادمة"
-    override val whyThisTimeQuestion = "لماذا هذا الوقت؟"
+    override val whyThisTimeQuestion = "لماذا هذا التوقيت؟"
 
     override val ante = "ص"
     override val post = "م"
