@@ -1,6 +1,7 @@
 package app.saadiah.prayer
 
-import app.saadiah.model.CountryCode
+import app.saadiah.model.City
+import app.saadiah.model.HighLatitudeRule
 import app.saadiah.model.Madhab
 import app.saadiah.model.TimingProfile
 
@@ -17,7 +18,16 @@ private val COUNTRY_METHODS: Map<String, Pair<Method, Madhab>> =
         "CA" to (Method.NORTH_AMERICA to Madhab.SHAFI),
     )
 
-fun inferProfile(country: CountryCode): TimingProfile {
-    val (method, madhab) = COUNTRY_METHODS[country.value] ?: (Method.MUSLIM_WORLD_LEAGUE to Madhab.SHAFI)
-    return method.toProfile(madhab)
+/**
+ * The high-latitude rule comes from the latitude rather than a constant, because past roughly
+ * forty-eight degrees it — not the twilight angle — is what sets Fajr and ʿIshāʾ, and holding
+ * the middle of the night there drives the two toward each other until ʿIshāʾ lands near
+ * midnight and Fajr after it.
+ */
+fun inferProfile(city: City): TimingProfile {
+    val (method, madhab) = COUNTRY_METHODS[city.country.value] ?: (Method.MUSLIM_WORLD_LEAGUE to Madhab.SHAFI)
+    return method.toProfile(
+        madhab = madhab,
+        highLatitudeRule = HighLatitudeRule.recommended(city.coordinates.latitude),
+    )
 }

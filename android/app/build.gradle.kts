@@ -53,6 +53,14 @@ android {
     }
 }
 
+// The Compose test manifest that hosts a composable under test is a debug artefact, so the
+// release unit test cannot run the same suite and there is nothing gained by trying.
+androidComponents {
+    beforeVariants(selector().withBuildType("release")) { variant ->
+        variant.enableUnitTest = false
+    }
+}
+
 dependencies {
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
@@ -75,6 +83,9 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(libs.robolectric)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(platform(libs.compose.bom))
+    testImplementation(libs.compose.ui.test.junit4)
+    debugImplementation(libs.compose.ui.test.manifest)
 
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.junit)

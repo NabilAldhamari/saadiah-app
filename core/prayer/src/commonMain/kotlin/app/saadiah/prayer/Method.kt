@@ -38,7 +38,9 @@ enum class Method(
 
     fun toProfile(
         madhab: Madhab,
-        highLatitudeRule: HighLatitudeRule = HighLatitudeRule.recommended(),
+        // The low-latitude answer. inferProfile knows where the reader is and overrides it;
+        // the solver searches all three and keeps whichever reproduced the timetable.
+        highLatitudeRule: HighLatitudeRule = HighLatitudeRule.MIDDLE_OF_NIGHT,
     ): TimingProfile =
         TimingProfile(
             angles =

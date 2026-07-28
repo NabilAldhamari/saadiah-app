@@ -1,5 +1,6 @@
 package app.saadiah.model
 
+import kotlin.math.abs
 import kotlin.time.Duration
 
 enum class MaghribMode {
@@ -24,7 +25,13 @@ enum class HighLatitudeRule {
     ;
 
     companion object {
-        fun recommended(): HighLatitudeRule = MIDDLE_OF_NIGHT
+        // Beyond this the sun stops reaching the twilight angles in summer and the rule, not
+        // the angle, decides Fajr and ʿIshāʾ. Holding the middle of the night that far out
+        // drives the two together; the last seventh keeps them where a timetable puts them.
+        private const val WHERE_TWILIGHT_FAILS = 48.0
+
+        fun recommended(latitude: Double): HighLatitudeRule =
+            if (abs(latitude) > WHERE_TWILIGHT_FAILS) SEVENTH_OF_NIGHT else MIDDLE_OF_NIGHT
     }
 }
 

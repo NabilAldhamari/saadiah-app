@@ -1,0 +1,26 @@
+{
+  "source": "East London Mosque, published London Unified Prayer Timetable for 2026 (eastlondonmosque.org.uk/prayer-times), retrieved 2026-07-28.",
+  "method": {
+    "sunrise": "His Majesty's Nautical Almanac Office, minus 3 minutes for safety across the M25 region.",
+    "zuhr": "HMNAO solar transit, plus 5 minutes to ensure the sun has cleared its zenith.",
+    "asr": "HMNAO. Mithl 1 is the non-Hanafi shadow length, Mithl 2 the Hanafi one.",
+    "maghrib": "HMNAO sunset, plus 3 minutes for safety across the M25 region.",
+    "fajrAndIsha": "Based on the work of Hizbul Ulama. NOT a sun-depression angle, and so not reproducible by any calculation method, madhhab or high-latitude rule. Recorded here as observed values only.",
+    "quotedFrom": "eastlondonmosque.org.uk/prayer-times-and-calendar-explained"
+  },
+  "place": {
+    "latitude": 51.5085,
+    "longitude": -0.1257,
+    "timezone": "Europe/London"
+  },
+  "days": [
+    { "date": "2026-01-15", "sunrise": "07:57", "fajr": "06:20", "zuhr": "12:15", "asr1": "14:02", "asr2": "14:35", "maghrib": "16:24", "isha": "18:01" },
+    { "date": "2026-03-28", "sunrise": "05:42", "fajr": "04:09", "zuhr": "12:11", "asr1": "15:34", "asr2": "16:27", "maghrib": "18:30", "isha": "19:48" },
+    { "date": "2026-07-01", "sunrise": "04:45", "fajr": "02:49", "zuhr": "13:10", "asr1": "17:27", "asr2": "18:41", "maghrib": "21:24", "isha": "22:36" },
+    { "date": "2026-07-15", "sunrise": "04:58", "fajr": "03:08", "zuhr": "13:12", "asr1": "17:25", "asr2": "18:37", "maghrib": "21:15", "isha": "22:23" },
+    { "date": "2026-07-27", "sunrise": "05:14", "fajr": "03:29", "zuhr": "13:12", "asr1": "17:20", "asr2": "18:29", "maghrib": "21:00", "isha": "22:04" },
+    { "date": "2026-07-31", "sunrise": "05:20", "fajr": "03:37", "zuhr": "13:12", "asr1": "17:17", "asr2": "18:25", "maghrib": "20:53", "isha": "21:56" },
+    { "date": "2026-10-31", "sunrise": "06:49", "fajr": "05:12", "zuhr": "11:49", "asr1": "14:08", "asr2": "14:47", "maghrib": "16:39", "isha": "18:06" },
+    { "date": "2026-12-21", "sunrise": "08:01", "fajr": "06:21", "zuhr": "12:04", "asr1": "13:38", "asr2": "14:08", "maghrib": "15:57", "isha": "17:34" }
+  ]
+}

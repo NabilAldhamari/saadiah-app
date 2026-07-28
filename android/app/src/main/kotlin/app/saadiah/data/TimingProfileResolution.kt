@@ -1,7 +1,6 @@
 package app.saadiah.data
 
 import app.saadiah.model.City
-import app.saadiah.model.Madhab
 import app.saadiah.model.TimingProfile
 import app.saadiah.prayer.inferProfile
 
@@ -16,9 +15,10 @@ import app.saadiah.prayer.inferProfile
  * [Settings.combineMode] are layered on top of whichever is used: they are the reader's own
  * choices, still theirs to change afterwards without discarding the match.
  */
-fun Settings.timingProfileFor(city: City): TimingProfile =
-    (timingProfile ?: inferProfile(city.country))
-        .copy(
-            madhab = madhab ?: timingProfile?.madhab ?: Madhab.SHAFI,
-            combineMode = combineMode,
-        )
+fun Settings.timingProfileFor(city: City): TimingProfile {
+    val base = timingProfile ?: inferProfile(city)
+    // An unchosen madhhab keeps whichever the base already carries: the one the solve
+    // recovered, or the one the country implies. Defaulting to Shāfiʿī here discarded the
+    // Ḥanafī that inferProfile had just put there for Pakistan, India and Bangladesh.
+    return base.copy(madhab = madhab ?: base.madhab, combineMode = combineMode)
+}

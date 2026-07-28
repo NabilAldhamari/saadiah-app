@@ -102,12 +102,12 @@ fun SettingsScreen(
 @Composable
 private fun ThemeGroup(
     settings: Settings,
-    onChange: (Settings) -> Unit,
+    onChange: (SettingsEdit) -> Unit,
 ) {
     Group(strings.sectionTheme) {
         for (option in AppTheme.entries) {
             ChoiceRow(option.spelledOut(strings), settings.theme == option) {
-                onChange(settings.copy(theme = option))
+                onChange { it.copy(theme = option) }
             }
         }
     }
@@ -116,12 +116,12 @@ private fun ThemeGroup(
 @Composable
 private fun LanguageGroup(
     settings: Settings,
-    onChange: (Settings) -> Unit,
+    onChange: (SettingsEdit) -> Unit,
 ) {
     Group(strings.sectionLanguage) {
         for (option in Language.entries) {
             ChoiceRow(option.spelledOut(strings), settings.language == option) {
-                onChange(settings.copy(language = option))
+                onChange { it.copy(language = option) }
             }
         }
         Caption(strings.languageHint)
@@ -131,20 +131,20 @@ private fun LanguageGroup(
 @Composable
 private fun CalculationGroup(
     settings: Settings,
-    onChange: (Settings) -> Unit,
+    onChange: (SettingsEdit) -> Unit,
 ) {
     Group(strings.sectionCalculation) {
         Block(strings.sectionMadhab, strings.sectionMadhabWhy) {
             for (option in Madhab.entries) {
                 ChoiceRow(option.spelledOut(strings), settings.madhab == option) {
-                    onChange(settings.copy(madhab = option))
+                    onChange { it.copy(madhab = option) }
                 }
             }
         }
         Block(strings.sectionCombining) {
             for (option in CombineMode.entries) {
                 ChoiceRow(option.spelledOut(strings), settings.combineMode == option) {
-                    onChange(settings.copy(combineMode = option))
+                    onChange { it.copy(combineMode = option) }
                 }
             }
         }
@@ -154,7 +154,7 @@ private fun CalculationGroup(
 @Composable
 private fun AlertGroup(
     settings: Settings,
-    onChange: (Settings) -> Unit,
+    onChange: (SettingsEdit) -> Unit,
 ) {
     Group(strings.sectionAlerts) {
         Block(strings.sectionWhichPrayers) {
@@ -164,7 +164,11 @@ private fun AlertGroup(
                     label = prayer.spelledOut(strings),
                     selected = alerting,
                     stateWord = if (alerting) strings.alerting else strings.silent,
-                    onSelect = { onChange(settings.copy(enabledPrayers = settings.enabledPrayers.toggle(prayer))) },
+                    onSelect = {
+                        onChange { current ->
+                            current.copy(enabledPrayers = current.enabledPrayers.toggle(prayer))
+                        }
+                    },
                 )
             }
             if (settings.enabledPrayers.none { it in settings.alertablePrayers() }) {
@@ -174,21 +178,21 @@ private fun AlertGroup(
         Block(strings.sectionWarnBefore) {
             for (choice in PRE_ALERT_CHOICES) {
                 ChoiceRow(choice.asWarning(strings), settings.preAlert == choice) {
-                    onChange(settings.copy(preAlert = choice))
+                    onChange { it.copy(preAlert = choice) }
                 }
             }
         }
         Block(strings.sectionAdhan, strings.sectionAdhanWhy) {
             for (option in AdhanSound.entries) {
                 ChoiceRow(option.spelledOut(strings), settings.adhanSound == option) {
-                    onChange(settings.copy(adhanSound = option))
+                    onChange { it.copy(adhanSound = option) }
                 }
             }
         }
         Block(strings.sectionWarnClosing) {
             for (choice in END_OF_WINDOW_CHOICES) {
                 ChoiceRow(choice.asClosingWarning(strings), settings.endOfWindow == choice) {
-                    onChange(settings.copy(endOfWindow = choice))
+                    onChange { it.copy(endOfWindow = choice) }
                 }
             }
         }
@@ -203,7 +207,7 @@ private fun BaqarahGroup(
     Group(strings.sectionBaqarah, strings.sectionBaqarahWhy) {
         for (option in BaqarahReminder.entries) {
             ChoiceRow(option.spelledOut(strings), settings.baqarahReminder == option) {
-                actions.onChange(settings.copy(baqarahReminder = option))
+                actions.onChange { it.copy(baqarahReminder = option) }
             }
         }
         ChoiceRow(strings.whyItIsRead, false, strings.open, actions.onOpenBaqarah)
