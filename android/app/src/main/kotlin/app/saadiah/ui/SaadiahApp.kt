@@ -124,7 +124,7 @@ private fun TabRoot(
             AdhkarScreen(
                 tradition = tradition,
                 custom = settings.customAdhkar,
-                onChangeCustom = { actions.onChangeSettings(settings.copy(customAdhkar = it)) },
+                onChangeCustom = { chosen -> actions.onChangeSettings { it.copy(customAdhkar = chosen) } },
             )
         Screen.More ->
             SettingsScreen(
@@ -219,9 +219,9 @@ private fun Reading(
                 onBack = back,
                 startAt = settings.readingPositions[screen.sura] ?: 1,
                 onRemember = { ayah ->
-                    actions.onChangeSettings(
-                        settings.copy(readingPositions = settings.readingPositions + (screen.sura to ayah)),
-                    )
+                    actions.onChangeSettings {
+                        it.copy(readingPositions = it.readingPositions + (screen.sura to ayah))
+                    }
                 },
             )
         is Screen.PrayerDetail -> PrayerDetail(place, screen.prayer, back)

@@ -51,17 +51,21 @@ class MainActivity : ComponentActivity() {
         store: SettingsStore,
         alarms: PrayerAlarmScheduler,
     ) {
-        val settings by store.settings.collectAsStateWithLifecycle(initialValue = Settings())
+        // Null until the stored settings have been read. Drawing the compiled-in default city
+        // in the meantime would show one city's prayer times under another city's name, so
+        // nothing is drawn at all until the reader's own choice is known.
+        val settings by store.settings.collectAsStateWithLifecycle(initialValue = null)
         val navigator = remember { Navigator() }
+        val current = settings ?: return
 
-        SaadiahTheme(language = settings.language, theme = settings.theme) {
+        SaadiahTheme(language = current.language, theme = current.theme) {
             SaadiahApp(
-                city = settings.city ?: DEFAULT_CITY,
-                settings = settings,
+                city = current.city ?: DEFAULT_CITY,
+                settings = current,
                 navigator = navigator,
                 actions =
                     AppActions(
-                        onChangeSettings = { changed -> save(store, alarms) { changed } },
+                        onChangeSettings = { edit -> save(store, alarms, edit) },
                         onChangeCity = { chosen -> save(store, alarms) { it.copy(city = chosen) } },
                         onOpenBackgroundSettings = ::openBackgroundSettings,
                         onApplyMatchedProfile = { matched ->
