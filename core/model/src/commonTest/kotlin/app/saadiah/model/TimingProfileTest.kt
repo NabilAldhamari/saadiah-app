@@ -37,6 +37,9 @@ class TimingProfileTest {
 
     @Test
     fun recommendsHighLatitudeRule() {
-        assertEquals(HighLatitudeRule.MIDDLE_OF_NIGHT, HighLatitudeRule.recommended())
+        assertEquals(HighLatitudeRule.MIDDLE_OF_NIGHT, HighLatitudeRule.recommended(latitude = 21.4), "Makkah")
+        assertEquals(HighLatitudeRule.MIDDLE_OF_NIGHT, HighLatitudeRule.recommended(latitude = 35.8), "Raleigh")
+        assertEquals(HighLatitudeRule.SEVENTH_OF_NIGHT, HighLatitudeRule.recommended(latitude = 51.5), "London")
+        assertEquals(HighLatitudeRule.SEVENTH_OF_NIGHT, HighLatitudeRule.recommended(latitude = -54.8), "Ushuaia")
     }
 }
