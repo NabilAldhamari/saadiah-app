@@ -80,6 +80,11 @@ class SettingsStoreTest {
                     enabledPrayers = setOf(Prayer.FAJR, Prayer.MAGHRIB),
                     preAlert = 15.minutes,
                     endOfWindow = 20.minutes,
+                    fastingReminder = app.saadiah.model.FastingReminderCadence.ALL_NAFILAH,
+                    afterPrayerReminder = app.saadiah.model.AfterPrayerReminderDelay.TEN_MINUTES,
+                    showHomeDuas = true,
+                    quranViewMode = app.saadiah.model.QuranViewMode.READING,
+                    reciter = app.saadiah.model.Reciter.MINSHAWI_MUJAWWAD,
                 )
 
             storeOverItsOwnFreshFile.update { chosen }

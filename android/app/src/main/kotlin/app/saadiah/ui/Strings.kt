@@ -45,6 +45,7 @@ interface Strings {
     val titleBaqarah: String
     val titlePrayer: String
     val titleSettings: String
+    val titleQuran: String
 
     val todaysReading: String
     val todaysReadingHint: String
@@ -118,6 +119,7 @@ interface Strings {
 
     val adhkarMorning: String
     val adhkarEvening: String
+    val adhkarAfterPrayer: String
     val adhkarTapRing: String
     val adhkarPrevious: String
     val adhkarNext: String
@@ -326,6 +328,8 @@ interface Strings {
     val matchMyMasjidWhy: String
     val applyProfile: String
     val matchedProfile: String
+    val resetToAutomatic: String
+    val matchedMasjidActive: String
 
     /** Keyed by [app.saadiah.prayer.Method] name, so a new method fails the table's test. */
     val methodNames: Map<String, String>
@@ -353,6 +357,90 @@ interface Strings {
     val duaEveningAdhkar: String
     val duaAyatAlKursi: String
     val duaTasbih: String
+
+    val fastingChannelName: String
+    val fastingChannelWhat: String
+    val fastingReminderTitle: String
+
+    fun fastingReminderBody(fastName: String): String
+
+    val adhkarChannelName: String
+    val adhkarChannelWhat: String
+    val afterPrayerReminderTitle: String
+
+    fun afterPrayerReminderBody(prayerName: String): String
+
+    val sectionFasting: String
+    val sectionAfterPrayer: String
+    val sectionHomeDuas: String
+    val sectionHomeDuasWhy: String
+    val sectionVoiceContent: String
+    val sectionVoiceContentWhy: String
+
+    val cadenceAllNafilah: String
+    val cadenceWhiteDays: String
+    val cadenceMondayThursday: String
+
+    val delayFiveMinutes: String
+    val delayTenMinutes: String
+    val delayFifteenMinutes: String
+
+    val downloadVoiceContent: String
+    val downloadingVoiceContent: String
+    val voiceContentDownloaded: String
+    val deleteVoiceContent: String
+    val listen: String
+    val stop: String
+
+    val quranViewModeTranslation: String
+    val quranViewModeReading: String
+
+    val copyAyah: String
+    val ayahCopied: String
+    val shareAyah: String
+    val playAyah: String
+    val pauseAyah: String
+
+    val homeDuaCardTitle: String
+    val openInAdhkar: String
+
+    val surahTheCow: String
+    val surahFamilyOfImran: String
+    val surahMedinan: String
+    val surahMeccan: String
+
+    fun surahAyahCount(count: Int): String
+
+    val reciterMishari: String
+
+    val tabAudioDownloads: String
+    val audioDownloadsSubtitle: String
+    val downloadAudio: String
+    val downloadingAudio: String
+    val audioDownloaded: String
+    val audioNotDownloaded: String
+    val cancelDownload: String
+    val audioDeleted: String
+    val audioDownloadSuccess: String
+    val audioDownloadFailed: String
+    val surahBaqarahAudioTitle: String
+    val surahImranAudioTitle: String
+
+    fun downloadingProgress(
+        current: Int,
+        total: Int,
+    ): String
+
+    val reciterHusariMujawwad: String
+    val reciterHusariMurattal: String
+    val reciterMinshawiMujawwad: String
+    val reciterAlafasy: String
+    val sectionReciter: String
+    val sectionReciterWhy: String
+    val deleteReciterAudio: String
+    val storageUsed: String
+    val manageDownloads: String
+    val audioNotAvailable: String
 }
 
 val LocalStrings: ProvidableCompositionLocal<Strings> = staticCompositionLocalOf { EnglishStrings }

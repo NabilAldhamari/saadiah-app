@@ -3,6 +3,8 @@ package app.saadiah.content
 import app.saadiah.content.generated.ADHKAR_CORPUS
 import app.saadiah.model.Tradition
 
+private val ALL_ADHKAR: List<Dhikr> = ADHKAR_CORPUS + AFTER_PRAYER_CORPUS
+
 /**
  * The only way in. Callers name the set and the reader's tradition; nothing tagged for a
  * different tradition can leak out, and the corpus behind this can be replaced wholesale.
@@ -11,7 +13,7 @@ fun adhkar(
     collection: DhikrCollection,
     tradition: Tradition,
 ): List<Dhikr> =
-    ADHKAR_CORPUS
+    ALL_ADHKAR
         .filter { collection in it.collections && tradition in it.traditions }
         .sortedBy { it.order }
 
@@ -22,7 +24,7 @@ fun searchAdhkar(
 ): List<Dhikr> {
     val needle = normalise(query).trim()
     if (needle.isEmpty()) return emptyList()
-    return ADHKAR_CORPUS
+    return ALL_ADHKAR
         .filter { tradition in it.traditions }
         .filter { normalise(it.arabic).contains(needle) || it.matchesLatin(needle) }
         .sortedBy { it.order }

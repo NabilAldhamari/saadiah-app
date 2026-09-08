@@ -16,7 +16,11 @@ fi
 work=$(mktemp -d)
 trap 'rm -rf "${work}"' EXIT
 
-if ! unzip -qq -o "${APK}" -d "${work}"; then
+if command -v unzip >/dev/null 2>&1; then
+  unzip -qq -o "${APK}" -d "${work}"
+elif command -v python3 >/dev/null 2>&1; then
+  python3 -c 'import zipfile, sys; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])' "${APK}" "${work}"
+else
   echo "check-forbidden-strings: could not unpack ${APK}." >&2
   exit 1
 fi
@@ -38,6 +42,7 @@ while IFS= read -r host; do
   case "${host}" in
     *.android.com|schemas.android.com|*.googlesource.com|www.w3.org|xml.org|*.apache.org) continue ;;
     *.jetbrains.com|goo.gle|issuetracker.google.com) continue ;;
+    *.qurancomplex.gov.sa*|*thawte.com*|*verisign.com*) continue ;;
   esac
   echo "check-forbidden-strings: unexpected host in release binary: ${host}" >&2
   status=1

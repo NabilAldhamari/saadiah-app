@@ -16,6 +16,12 @@ private val COUNTRY_METHODS: Map<String, Pair<Method, Madhab>> =
         "IR" to (Method.TEHRAN to Madhab.SHAFI),
         "US" to (Method.NORTH_AMERICA to Madhab.SHAFI),
         "CA" to (Method.NORTH_AMERICA to Madhab.SHAFI),
+        "ID" to (Method.KEMENAG to Madhab.SHAFI),
+        "MY" to (Method.JAKIM to Madhab.SHAFI),
+        "SG" to (Method.JAKIM to Madhab.SHAFI),
+        "AE" to (Method.DUBAI to Madhab.SHAFI),
+        "GB" to (Method.LONDON_UNIFIED to Madhab.SHAFI),
+        "FR" to (Method.PARIS to Madhab.SHAFI),
     )
 
 /**

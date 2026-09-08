@@ -1,2 +1,6 @@
 content.saadiah.app
 api.aladhan.com
+everyayah.com
+verses.quran.com
+saadiah.app
+mirrors.quranicaudio.com

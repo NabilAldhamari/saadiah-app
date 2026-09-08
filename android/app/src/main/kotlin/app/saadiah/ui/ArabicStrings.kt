@@ -32,6 +32,7 @@ object ArabicStrings : Strings {
     override val titleBaqarah = "سورة البقرة"
     override val titlePrayer = "الصلاة"
     override val titleSettings = "الإعدادات"
+    override val titleQuran = "القرآن الكريم"
 
     override val todaysReading = "سورة البقرة"
     override val todaysReadingHint = "قراءة اليوم. اضغط لمعرفة سبب المداومة عليها."
@@ -106,6 +107,7 @@ object ArabicStrings : Strings {
 
     override val adhkarMorning = "الصباح"
     override val adhkarEvening = "المساء"
+    override val adhkarAfterPrayer = "بعد الصلاة"
     override val adhkarTapRing = "اضغط الدائرة للعد"
     override val adhkarPrevious = "السابق"
     override val adhkarNext = "التالي"
@@ -359,6 +361,8 @@ object ArabicStrings : Strings {
     override val matchMyMasjidWhy = "أدخل أوقات مسجدك المطبوعة ليجد التطبيق الإعدادات الموافقة لها."
     override val applyProfile = "تطبيق هذه الإعدادات"
     override val matchedProfile = "أقرب تطابق"
+    override val resetToAutomatic = "إعادة التعيين إلى الحساب التلقائي"
+    override val matchedMasjidActive = "جدول المسجد المخصص مفعّل"
     override val methodNames =
         mapOf(
             "MUSLIM_WORLD_LEAGUE" to "رابطة العالم الإسلامي",
@@ -369,6 +373,12 @@ object ArabicStrings : Strings {
             "DIYANET" to "الديانة التركية",
             "TEHRAN" to "معهد الجيوفيزياء، طهران",
             "JAFARI" to "الجعفري",
+            "KEMENAG" to "وزارة الشؤون الدينية، إندونيسيا",
+            "DUBAI" to "دبي وأوقاف الإمارات",
+            "LONDON_UNIFIED" to "توقيت لندن الموحد",
+            "JAKIM" to "دائرة التنمية الإسلامية بماليزيا (JAKIM)",
+            "PARIS" to "مسجد باريس الكبير",
+            "UOIF" to "مسلمو فرنسا (زاوية ١٢°)",
         )
     override val lowConfidence =
         "هذه الأوقات لا توافق حسابًا واحدًا بوضوح. راجع ما أدخلته، أو طبّق هذا واضبط صلاة يدويًا."
@@ -396,4 +406,88 @@ object ArabicStrings : Strings {
     override val duaEveningAdhkar = "أذكار المساء"
     override val duaAyatAlKursi = "آية الكرسي بعد الصلاة"
     override val duaTasbih = "التسبيح بعد الصلاة"
+
+    override val fastingChannelName = "تذكير الصيام"
+    override val fastingChannelWhat = "تنبيهات عشية أيام الصيام المستحب"
+    override val fastingReminderTitle = "صيام سُنّة غداً"
+
+    override fun fastingReminderBody(fastName: String) = "غداً يوم صيام مستحب: $fastName."
+
+    override val adhkarChannelName = "تذكير الأذكار والدعاء"
+    override val adhkarChannelWhat = "تنبيهات أذكار بعد الصلاة والأذكار اليومية"
+    override val afterPrayerReminderTitle = "أذكار بعد الصلاة"
+
+    override fun afterPrayerReminderBody(prayerName: String) = "حان وقت أذكار ما بعد $prayerName."
+
+    override val sectionFasting = "تذكير الصيام"
+    override val sectionAfterPrayer = "تذكير أذكار بعد الصلاة"
+    override val sectionHomeDuas = "ذكر اليوم في الرئيسية"
+    override val sectionHomeDuasWhy = "عرض دعاء أو ذكر مناسب لوقت اليوم في الشاشة الرئيسية."
+    override val sectionVoiceContent = "التسجيلات الصوتية"
+    override val sectionVoiceContentWhy = "تسجيلات صوتية للأذكار والأدعية."
+
+    override val cadenceAllNafilah = "جميع أيام النوافل (الإثنين والخميس والبيض)"
+    override val cadenceWhiteDays = "الأيام البيض فقط (١٣، ١٤، ١٥)"
+    override val cadenceMondayThursday = "الإثنين والخميس فقط"
+
+    override val delayFiveMinutes = "بعد ٥ دقائق من الصلاة"
+    override val delayTenMinutes = "بعد ١٠ دقائق من الصلاة"
+    override val delayFifteenMinutes = "بعد ١٥ دقيقة من الصلاة"
+
+    override val downloadVoiceContent = "تحميل الصوت (~١٢ م.ب)"
+    override val downloadingVoiceContent = "جارٍ تحميل الصوت…"
+    override val voiceContentDownloaded = "تم تحميل التسجيلات الصوتية"
+    override val deleteVoiceContent = "حذف الصوت لتحرير المساحة"
+    override val listen = "استمع"
+    override val stop = "إيقاف"
+
+    override val quranViewModeTranslation = "عرض الترجمة"
+    override val quranViewModeReading = "عرض القراءة"
+
+    override val copyAyah = "نسخ الآية"
+    override val ayahCopied = "تم نسخ الآية"
+    override val shareAyah = "مشاركة الآية"
+    override val playAyah = "تلاوة"
+    override val pauseAyah = "إيقاف مؤقت"
+
+    override val homeDuaCardTitle = "الذكر اليومي"
+    override val openInAdhkar = "فتح في الأذكار"
+
+    override val surahTheCow = "البقرة"
+    override val surahFamilyOfImran = "آل عمران"
+    override val surahMedinan = "مدنية"
+    override val surahMeccan = "مكية"
+
+    override fun surahAyahCount(count: Int) = "$count آية"
+
+    override val reciterMishari = "مشاري راشد العفاسي"
+
+    override val tabAudioDownloads = "تحميل الصوتيات"
+    override val audioDownloadsSubtitle = "تحميل تلاوات القرآن الكريم للاستماع دون اتصال"
+    override val downloadAudio = "تحميل"
+    override val downloadingAudio = "جارٍ التحميل..."
+    override val audioDownloaded = "تم التحميل"
+    override val audioNotDownloaded = "غير محمل"
+    override val cancelDownload = "إلغاء"
+    override val audioDeleted = "تم حذف الملف الصوتي"
+    override val audioDownloadSuccess = "تم التحميل بنجاح"
+    override val audioDownloadFailed = "فشل التحميل"
+    override val surahBaqarahAudioTitle = "سورة البقرة"
+    override val surahImranAudioTitle = "سورة آل عمران"
+
+    override fun downloadingProgress(
+        current: Int,
+        total: Int,
+    ) = "$current من $total ملف"
+
+    override val reciterHusariMujawwad = "محمود خليل الحصري (مجود)"
+    override val reciterHusariMurattal = "محمود خليل الحصري (مرتل)"
+    override val reciterMinshawiMujawwad = "محمد صديق المنشاوي (مجود)"
+    override val reciterAlafasy = "مشاري راشد العفاسي"
+    override val sectionReciter = "القارئ والتلاوة"
+    override val sectionReciterWhy = "اختر القارئ ورواية التلاوة المفضلة لديك"
+    override val deleteReciterAudio = "حذف التلاوات المحملة"
+    override val storageUsed = "المساحة المستخدمة"
+    override val manageDownloads = "إدارة التنزيلات"
+    override val audioNotAvailable = "التسجيل الصوتي غير متوفر"
 }

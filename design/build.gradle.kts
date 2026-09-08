@@ -20,7 +20,7 @@ android {
 // into the release library to satisfy a duplicate test run would be the wrong trade.
 androidComponents {
     beforeVariants(selector().withBuildType("release")) { variant ->
-        variant.enableUnitTest = false
+        (variant as? com.android.build.api.variant.HasUnitTestBuilder)?.enableUnitTest = false
     }
 }
 

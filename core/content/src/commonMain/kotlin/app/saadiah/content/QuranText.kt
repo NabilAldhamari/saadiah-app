@@ -28,14 +28,16 @@ data class Ayah(
     val sura: Int,
     val number: Int,
     val text: String,
+    val translation: String? = null,
 )
 
 /**
- * The opening as Tanzil writes it, exactly. Compared against, never displayed from here —
- * what a reader sees is the slice of the bundled text, so the verbatim requirement holds
- * even for this line.
+ * The opening as Tanzil writes it, exactly (Shaddah before Fathah). Compared against, never
+ * displayed from here — what a reader sees is the slice of the bundled text, so the verbatim
+ * requirement holds even for this line.
  */
-const val BASMALAH = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"
+const val BASMALAH = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"
+private const val BASMALAH_ALT = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"
 
 private const val AL_FATIHAH = 1
 
@@ -56,10 +58,17 @@ data class SuraReading(
 
 fun List<Ayah>.asReading(): SuraReading {
     val first = firstOrNull() ?: return SuraReading(basmalah = null, ayat = emptyList())
-    if (first.sura == AL_FATIHAH || !first.text.startsWith(BASMALAH)) {
+    if (first.sura == AL_FATIHAH) {
         return SuraReading(basmalah = null, ayat = this)
     }
-    val opened = first.copy(text = first.text.removePrefix(BASMALAH).trimStart())
+    val matchedBasmalah =
+        when {
+            first.text.startsWith(BASMALAH) -> BASMALAH
+            first.text.startsWith(BASMALAH_ALT) -> BASMALAH_ALT
+            else -> null
+        } ?: return SuraReading(basmalah = null, ayat = this)
+
+    val opened = first.copy(text = first.text.removePrefix(matchedBasmalah).trimStart())
     return SuraReading(basmalah = BASMALAH, ayat = listOf(opened) + drop(n = 1))
 }
 

@@ -65,4 +65,14 @@ class SettingsTest {
             actual = Settings().copy(preAlert = 10.minutes),
         )
     }
+
+    @Test
+    fun defaultsForNewPreferences() {
+        val settings = Settings()
+        assertEquals(expected = app.saadiah.model.FastingReminderCadence.OFF, actual = settings.fastingReminder)
+        assertEquals(expected = app.saadiah.model.AfterPrayerReminderDelay.OFF, actual = settings.afterPrayerReminder)
+        assertFalse(settings.showHomeDuas)
+        assertEquals(expected = app.saadiah.model.QuranViewMode.TRANSLATION, actual = settings.quranViewMode)
+        assertEquals(expected = app.saadiah.model.Reciter.HUSARI_MUJAWWAD, actual = settings.reciter)
+    }
 }

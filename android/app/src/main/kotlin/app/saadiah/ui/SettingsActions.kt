@@ -6,4 +6,6 @@ data class SettingsActions(
     val onOpenDoctor: () -> Unit,
     val onOpenBaqarah: () -> Unit,
     val onMatchMasjid: () -> Unit,
+    val onOpenAudioDownloads: () -> Unit = {},
+    val onResetMatchedProfile: () -> Unit = {},
 )

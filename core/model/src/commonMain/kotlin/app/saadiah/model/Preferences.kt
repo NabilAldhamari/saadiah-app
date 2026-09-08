@@ -16,3 +16,41 @@ enum class BaqarahReminder { OFF, DAILY, WEEKLY }
 
 /** [SYSTEM] follows the phone between the dark and light palettes; the rest are explicit. */
 enum class AppTheme { SYSTEM, LIGHT, DARK, GREEN }
+
+enum class FastingReminderCadence { OFF, ALL_NAFILAH, WHITE_DAYS_ONLY, MONDAY_THURSDAY_ONLY }
+
+enum class AfterPrayerReminderDelay { OFF, FIVE_MINUTES, TEN_MINUTES, FIFTEEN_MINUTES }
+
+enum class QuranViewMode { TRANSLATION, READING }
+
+enum class Reciter(
+    val id: String,
+    val everyAyahFolder: String,
+    val zipName: String,
+    val zipType: String,
+) {
+    HUSARI_MUJAWWAD(
+        id = "husari_mujawwad",
+        everyAyahFolder = "Husary_128kbps_Mujawwad",
+        zipName = "husari",
+        zipType = "mujawwad",
+    ),
+    HUSARI_MURATTAL(
+        id = "husari_murattal",
+        everyAyahFolder = "Husary_128kbps",
+        zipName = "husari",
+        zipType = "murattal",
+    ),
+    MINSHAWI_MUJAWWAD(
+        id = "minshawi_mujawwad",
+        everyAyahFolder = "Minshawy_Mujawwad_192kbps",
+        zipName = "minshawi",
+        zipType = "mujawwad",
+    ),
+    ALAFASY(
+        id = "alafasy",
+        everyAyahFolder = "Alafasy_128kbps",
+        zipName = "alafasy",
+        zipType = "murattal",
+    ),
+}

@@ -35,6 +35,8 @@ sealed interface Screen {
     data class PrayerDetail(
         val prayer: Prayer,
     ) : Screen
+
+    data object AudioDownloads : Screen
 }
 
 val Screen.isTabRoot: Boolean

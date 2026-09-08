@@ -80,16 +80,15 @@ class MosqueSolver(
         observed: Map<Prayer, LocalTime>,
         city: City,
         date: LocalDate,
+        baseline: TimingProfile = inferProfile(city),
     ): SolveResult {
         // Spread first — a timetable shifted a constant few minutes is still that method, so
         // how *evenly* a candidate is wrong matters more than by how much. Then the size of
         // that constant, which breaks ties toward the method needing least correction.
-        //
-        // Without the second term one entered time cannot choose anything: a lone error is
-        // its own mean, so every candidate scores a spread of zero and the winner is decided
-        // by the order the enums happen to be declared in.
+        // Ties break toward preserving the baseline method, madhhab and high-latitude rule
+        // rather than arbitrary enum declaration order.
         require(observed.isNotEmpty()) { "there is nothing to match against" }
-        val best = candidates(observed, city, date).minWith(compareBy({ it.spread }, { abs(it.offset) }))
+        val best = candidates(observed, city, date, baseline).minWith(compareBy({ it.spread }, { abs(it.offset) }))
         val confidence =
             if (best.spread / observed.size <= MAX_AVERAGE_SPREAD_MINUTES) {
                 Confidence.HIGH
@@ -125,6 +124,7 @@ class MosqueSolver(
         observed: Map<Prayer, LocalTime>,
         city: City,
         date: LocalDate,
+        baseline: TimingProfile,
     ): List<Candidate> {
         fun evaluate(
             method: Method,
@@ -141,11 +141,12 @@ class MosqueSolver(
             return Candidate(method, madhab, rule, errors.mapValues { it.value.minutes }, spread, offset = mean)
         }
 
-        // The third axis is the point of this search at high latitude: Fajr and Isha are
-        // twilight prayers, and where true twilight does not occur the rule chosen to stand
-        // in for it moves them by more than an hour. Method and madhhab cannot reach that.
+        // When Asr is not observed, the entered times provide no evidence about madhhab,
+        // so retain the baseline's madhhab rather than searching and creating arbitrary ties.
+        val madhabs = if (Prayer.ASR in observed) Madhab.entries else listOf(baseline.madhab)
+
         return Method.entries.flatMap { method ->
-            Madhab.entries.flatMap { madhab ->
+            madhabs.flatMap { madhab ->
                 HighLatitudeRule.entries.map { rule -> evaluate(method, madhab, rule) }
             }
         }

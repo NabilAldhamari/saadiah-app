@@ -1,13 +1,17 @@
 package app.saadiah.data
 
 import app.saadiah.model.AdhanSound
+import app.saadiah.model.AfterPrayerReminderDelay
 import app.saadiah.model.AppTheme
 import app.saadiah.model.BaqarahReminder
 import app.saadiah.model.City
 import app.saadiah.model.CombineMode
+import app.saadiah.model.FastingReminderCadence
 import app.saadiah.model.Language
 import app.saadiah.model.Madhab
 import app.saadiah.model.Prayer
+import app.saadiah.model.QuranViewMode
+import app.saadiah.model.Reciter
 import app.saadiah.model.TimingProfile
 import app.saadiah.model.Tradition
 import kotlin.time.Duration
@@ -48,4 +52,9 @@ data class Settings(
     // per-prayer offsets — everything except [madhab] and [combineMode], which stay above as
     // settings the reader sets directly. Two homes for one value is how they drift apart.
     val timingProfile: TimingProfile? = null,
+    val fastingReminder: FastingReminderCadence = FastingReminderCadence.OFF,
+    val afterPrayerReminder: AfterPrayerReminderDelay = AfterPrayerReminderDelay.OFF,
+    val showHomeDuas: Boolean = false,
+    val quranViewMode: QuranViewMode = QuranViewMode.TRANSLATION,
+    val reciter: Reciter = Reciter.HUSARI_MUJAWWAD,
 )

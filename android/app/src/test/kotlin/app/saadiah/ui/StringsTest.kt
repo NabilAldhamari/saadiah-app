@@ -82,12 +82,28 @@ class StringsTest {
             Tradition.entries.map { it.spelledOut(EnglishStrings) } +
                 Madhab.entries.map { it.spelledOut(EnglishStrings) } +
                 CombineMode.entries.map { it.spelledOut(EnglishStrings) } +
-                Language.entries.map { it.spelledOut(EnglishStrings) }
+                Language.entries.map { it.spelledOut(EnglishStrings) } +
+                app.saadiah.model.FastingReminderCadence.entries
+                    .map { it.spelledOut(EnglishStrings) } +
+                app.saadiah.model.AfterPrayerReminderDelay.entries
+                    .map { it.spelledOut(EnglishStrings) } +
+                app.saadiah.model.QuranViewMode.entries
+                    .map { it.spelledOut(EnglishStrings) } +
+                app.saadiah.model.Reciter.entries
+                    .map { it.spelledOut(EnglishStrings) }
         val arabic =
             Tradition.entries.map { it.spelledOut(ArabicStrings) } +
                 Madhab.entries.map { it.spelledOut(ArabicStrings) } +
                 CombineMode.entries.map { it.spelledOut(ArabicStrings) } +
-                Language.entries.map { it.spelledOut(ArabicStrings) }
+                Language.entries.map { it.spelledOut(ArabicStrings) } +
+                app.saadiah.model.FastingReminderCadence.entries
+                    .map { it.spelledOut(ArabicStrings) } +
+                app.saadiah.model.AfterPrayerReminderDelay.entries
+                    .map { it.spelledOut(ArabicStrings) } +
+                app.saadiah.model.QuranViewMode.entries
+                    .map { it.spelledOut(ArabicStrings) } +
+                app.saadiah.model.Reciter.entries
+                    .map { it.spelledOut(ArabicStrings) }
 
         for ((left, right) in english.zip(arabic)) {
             assertNotEquals(illegal = left, actual = right, message = "'$left' was never translated")

@@ -1,13 +1,17 @@
 package app.saadiah.ui
 
 import app.saadiah.model.AdhanSound
+import app.saadiah.model.AfterPrayerReminderDelay
 import app.saadiah.model.AppTheme
 import app.saadiah.model.BaqarahReminder
 import app.saadiah.model.CombineMode
+import app.saadiah.model.FastingReminderCadence
 import app.saadiah.model.HighLatitudeRule
 import app.saadiah.model.Language
 import app.saadiah.model.Madhab
 import app.saadiah.model.Prayer
+import app.saadiah.model.QuranViewMode
+import app.saadiah.model.Reciter
 import app.saadiah.model.Tradition
 import kotlin.time.Duration
 
@@ -75,4 +79,34 @@ internal fun AdhanSound.spelledOut(strings: Strings): String =
         AdhanSound.DEFAULT -> strings.adhanDefault
         AdhanSound.SHORT -> strings.adhanShort
         AdhanSound.LONG -> strings.adhanLong
+    }
+
+internal fun FastingReminderCadence.spelledOut(strings: Strings): String =
+    when (this) {
+        FastingReminderCadence.OFF -> strings.doNotRemindMe
+        FastingReminderCadence.ALL_NAFILAH -> strings.cadenceAllNafilah
+        FastingReminderCadence.WHITE_DAYS_ONLY -> strings.cadenceWhiteDays
+        FastingReminderCadence.MONDAY_THURSDAY_ONLY -> strings.cadenceMondayThursday
+    }
+
+internal fun AfterPrayerReminderDelay.spelledOut(strings: Strings): String =
+    when (this) {
+        AfterPrayerReminderDelay.OFF -> strings.doNotRemindMe
+        AfterPrayerReminderDelay.FIVE_MINUTES -> strings.delayFiveMinutes
+        AfterPrayerReminderDelay.TEN_MINUTES -> strings.delayTenMinutes
+        AfterPrayerReminderDelay.FIFTEEN_MINUTES -> strings.delayFifteenMinutes
+    }
+
+internal fun QuranViewMode.spelledOut(strings: Strings): String =
+    when (this) {
+        QuranViewMode.TRANSLATION -> strings.quranViewModeTranslation
+        QuranViewMode.READING -> strings.quranViewModeReading
+    }
+
+internal fun Reciter.spelledOut(strings: Strings): String =
+    when (this) {
+        Reciter.HUSARI_MUJAWWAD -> strings.reciterHusariMujawwad
+        Reciter.HUSARI_MURATTAL -> strings.reciterHusariMurattal
+        Reciter.MINSHAWI_MUJAWWAD -> strings.reciterMinshawiMujawwad
+        Reciter.ALAFASY -> strings.reciterAlafasy
     }

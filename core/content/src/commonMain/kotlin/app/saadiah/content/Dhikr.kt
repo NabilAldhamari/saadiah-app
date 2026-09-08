@@ -7,7 +7,7 @@ import app.saadiah.model.Tradition
  * membership is a set rather than a single value — and a larger corpus adds its sets here
  * without disturbing anything that already reads this one.
  */
-enum class DhikrCollection { MORNING, EVENING }
+enum class DhikrCollection { MORNING, EVENING, AFTER_PRAYER }
 
 /**
  * The shape every corpus is mapped into, whatever its own format. Swapping to a larger
@@ -28,6 +28,7 @@ data class Dhikr(
     val source: String,
     val collections: Set<DhikrCollection>,
     val traditions: Set<Tradition>,
+    val audioFileName: String? = null,
 ) {
     init {
         require(source.isNotBlank()) { "a dhikr without a source cannot be shown" }

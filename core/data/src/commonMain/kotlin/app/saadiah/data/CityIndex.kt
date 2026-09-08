@@ -74,10 +74,12 @@ class CityIndex(
     fun search(
         query: String,
         limit: Int = DEFAULT_LIMIT,
+        preferredTimeZone: TimeZone? = null,
     ): List<City> {
         val trimmed = query.trim()
         if (trimmed.isEmpty()) return emptyList()
-        val best = TopByPopulation(limit)
+        val preferredZoneIndex = preferredTimeZone?.let { timeZones.indexOf(it.id) } ?: -1
+        val best = TopByPopulation(limit, preferredZoneIndex)
         if (trimmed.any {
                 it.isArabic()
             }
@@ -221,42 +223,53 @@ class CityIndex(
     )
 
     /**
-     * Keeps the [limit] most populous records seen, without boxing or holding the rest.
-     * Replacements grow rare as the threshold rises, so rescanning for the new smallest is
-     * cheaper here than carrying a heap.
+     * Keeps the [limit] best records seen, without boxing or holding the rest.
+     * Records in [preferredZoneIndex] receive a priority boost so local cities appear before
+     * foreign cities of similar name. Replacements grow rare as the threshold rises, so
+     * rescanning for the new smallest is cheaper here than carrying a heap.
      */
     private inner class TopByPopulation(
         private val limit: Int,
+        private val preferredZoneIndex: Int = -1,
     ) {
         private val records = IntArray(limit)
-        private val populations = IntArray(limit)
+        private val scores = LongArray(limit)
         private var held = 0
         private var smallest = 0
 
         fun offer(record: Int) {
             val population = bytes.u32(recordsAt + record * RECORD_SIZE + RECORD_POPULATION)
+            val zone = bytes.u16(recordsAt + record * RECORD_SIZE + RECORD_TIME_ZONE)
+            val isPreferred = preferredZoneIndex >= 0 && zone == preferredZoneIndex
+            val score =
+                if (isPreferred) {
+                    (1L shl 40) or (population.toLong() and 0xFFFFFFFFL)
+                } else {
+                    population.toLong() and 0xFFFFFFFFL
+                }
+
             if (held < limit) {
                 records[held] = record
-                populations[held] = population
+                scores[held] = score
                 held++
                 if (held == limit) locateSmallest()
                 return
             }
-            if (population <= populations[smallest]) return
+            if (score <= scores[smallest]) return
             records[smallest] = record
-            populations[smallest] = population
+            scores[smallest] = score
             locateSmallest()
         }
 
         fun records(): List<Int> =
             (0 until held)
-                .sortedByDescending { populations[it] }
+                .sortedByDescending { scores[it] }
                 .map { records[it] }
 
         private fun locateSmallest() {
             var at = 0
             for (candidate in 1 until held) {
-                if (populations[candidate] < populations[at]) at = candidate
+                if (scores[candidate] < scores[at]) at = candidate
             }
             smallest = at
         }

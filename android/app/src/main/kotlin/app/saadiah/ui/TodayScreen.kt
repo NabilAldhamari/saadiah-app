@@ -55,6 +55,7 @@ data class TodayActions(
     val onOpenDoctor: () -> Unit,
     val onOpenPrayer: (app.saadiah.model.Prayer) -> Unit = {},
     val onOpenBaqarah: () -> Unit = {},
+    val onOpenAdhkar: () -> Unit = {},
 )
 
 @Composable
@@ -62,6 +63,7 @@ fun TodayScreen(
     city: City,
     profile: TimingProfile,
     tradition: Tradition,
+    showHomeDuas: Boolean = true,
     actions: TodayActions,
 ) {
     val now = rememberTickingNow()
@@ -100,6 +102,13 @@ fun TodayScreen(
             }
             FastingStrip(state.fasting)
             Observances(state)
+            if (showHomeDuas) {
+                HomeDuaCard(
+                    now = now,
+                    tradition = tradition,
+                    onOpen = actions.onOpenAdhkar,
+                )
+            }
             BaqarahCard(onOpen = actions.onOpenBaqarah)
             Spacer(Modifier.height(SaadiahSpacing.huge))
         }

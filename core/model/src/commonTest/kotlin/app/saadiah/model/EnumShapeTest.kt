@@ -45,4 +45,25 @@ class EnumShapeTest {
     fun alarmKindCoversPreAtEndAndReArm() {
         assertEquals(expected = 4, actual = AlarmKind.entries.size)
     }
+
+    @Test
+    fun fastingReminderCadenceCoversExpectedOptions() {
+        assertEquals(expected = 4, actual = FastingReminderCadence.entries.size)
+    }
+
+    @Test
+    fun afterPrayerReminderDelayCoversExpectedOptions() {
+        assertEquals(expected = 4, actual = AfterPrayerReminderDelay.entries.size)
+    }
+
+    @Test
+    fun quranViewModeCoversTranslationAndReading() {
+        assertEquals(expected = 2, actual = QuranViewMode.entries.size)
+    }
+
+    @Test
+    fun reciterCoversExpectedOptions() {
+        assertEquals(expected = 4, actual = Reciter.entries.size)
+        assertEquals(expected = Reciter.HUSARI_MUJAWWAD, actual = Reciter.entries.first())
+    }
 }

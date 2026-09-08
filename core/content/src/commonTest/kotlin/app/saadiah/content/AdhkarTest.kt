@@ -69,6 +69,17 @@ class AdhkarTest {
     }
 
     @Test
+    fun afterPrayerCollectionIsPopulatedAndTagged() {
+        val afterPrayer = adhkar(DhikrCollection.AFTER_PRAYER, Tradition.SUNNI)
+        assertTrue(afterPrayer.isNotEmpty(), "after-prayer adhkār collection must not be empty")
+        for (dhikr in afterPrayer) {
+            assertTrue(dhikr.source.isNotBlank(), "${dhikr.id} has no source")
+            assertTrue(dhikr.arabic.isNotBlank(), "${dhikr.id} has no Arabic")
+            assertTrue(Tradition.SUNNI in dhikr.traditions)
+        }
+    }
+
+    @Test
     fun theSharedEntriesAppearInBothSets() {
         val shared = morning.filter { DhikrCollection.EVENING in it.collections }
 

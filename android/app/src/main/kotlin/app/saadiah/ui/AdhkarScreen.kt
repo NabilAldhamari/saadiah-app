@@ -103,8 +103,7 @@ fun AdhkarScreen(
 
             val dhikr = entries[index.coerceIn(0, entries.lastIndex)]
             Caption("${collection.spelledOut()} · ${strings.positionInSet(index + 1, entries.size)}")
-            SectionDivider()
-            DhikrCard(dhikr)
+            DhikrCard(dhikr = dhikr)
             Spacer(Modifier.height(SaadiahSpacing.large))
             Counter(
                 current = count,
@@ -224,6 +223,7 @@ private fun DhikrCollection.spelledOut(): String =
     when (this) {
         DhikrCollection.MORNING -> strings.adhkarMorning
         DhikrCollection.EVENING -> strings.adhkarEvening
+        DhikrCollection.AFTER_PRAYER -> strings.adhkarAfterPrayer
     }
 
 @Composable

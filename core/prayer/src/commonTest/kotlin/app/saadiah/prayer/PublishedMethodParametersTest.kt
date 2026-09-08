@@ -50,5 +50,27 @@ class PublishedMethodParametersTest {
         )
     }
 
+    @Test
+    fun jakimUsesEighteenDegreeAnglesAndPreIhtiyatAdjustments() {
+        val angles = anglesOf(Method.JAKIM)
+        assertEquals(18.0 to 18.0, angles.pair(), "JAKIM MKI 18/18")
+        val profile = Method.JAKIM.toProfile(Madhab.SHAFI, HighLatitudeRule.MIDDLE_OF_NIGHT)
+        assertEquals(3.minutes, profile.adjustments[app.saadiah.model.Prayer.FAJR])
+        assertEquals(3.minutes, profile.adjustments[app.saadiah.model.Prayer.DHUHR])
+        assertEquals(2.minutes, profile.adjustments[app.saadiah.model.Prayer.ASR])
+        assertEquals(2.minutes, profile.adjustments[app.saadiah.model.Prayer.MAGHRIB])
+        assertEquals(2.minutes, profile.adjustments[app.saadiah.model.Prayer.ISHA])
+    }
+
+    @Test
+    fun frenchMethodsUseCorrectAngles() {
+        assertEquals(18.0 to 18.0, anglesOf(Method.PARIS).pair(), "Grande Mosquee de Paris 18/18")
+        assertEquals(12.0 to 12.0, anglesOf(Method.UOIF).pair(), "UOIF / Musulmans de France 12/12")
+        val parisProfile = Method.PARIS.toProfile(Madhab.SHAFI, HighLatitudeRule.MIDDLE_OF_NIGHT)
+        assertEquals(1.minutes, parisProfile.adjustments[app.saadiah.model.Prayer.DHUHR])
+        val uoifProfile = Method.UOIF.toProfile(Madhab.SHAFI, HighLatitudeRule.MIDDLE_OF_NIGHT)
+        assertEquals(1.minutes, uoifProfile.adjustments[app.saadiah.model.Prayer.DHUHR])
+    }
+
     private fun TwilightAngles.pair(): Pair<Double, Double> = fajr to isha
 }

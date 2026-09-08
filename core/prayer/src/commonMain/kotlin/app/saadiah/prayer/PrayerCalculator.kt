@@ -46,12 +46,12 @@ class PrayerCalculator {
             date = date,
             times =
                 mapOf(
-                    Prayer.FAJR to prayerTimes.fajr,
-                    Prayer.SUNRISE to prayerTimes.sunrise,
-                    Prayer.DHUHR to prayerTimes.dhuhr,
-                    Prayer.ASR to prayerTimes.asr,
-                    Prayer.MAGHRIB to maghrib,
-                    Prayer.ISHA to prayerTimes.isha,
+                    Prayer.FAJR to prayerTimes.fajr.roundedToMinute(),
+                    Prayer.SUNRISE to prayerTimes.sunrise.roundedToMinute(),
+                    Prayer.DHUHR to prayerTimes.dhuhr.roundedToMinute(),
+                    Prayer.ASR to prayerTimes.asr.roundedToMinute(),
+                    Prayer.MAGHRIB to maghrib.roundedToMinute(),
+                    Prayer.ISHA to prayerTimes.isha.roundedToMinute(),
                 ),
         )
     }

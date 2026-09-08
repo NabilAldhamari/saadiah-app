@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -11,6 +12,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import app.saadiah.model.AdhanSound
+import app.saadiah.model.AfterPrayerReminderDelay
 import app.saadiah.model.AppTheme
 import app.saadiah.model.BaqarahReminder
 import app.saadiah.model.City
@@ -18,9 +20,12 @@ import app.saadiah.model.CityId
 import app.saadiah.model.CombineMode
 import app.saadiah.model.Coordinates
 import app.saadiah.model.CountryCode
+import app.saadiah.model.FastingReminderCadence
 import app.saadiah.model.Language
 import app.saadiah.model.Madhab
 import app.saadiah.model.Prayer
+import app.saadiah.model.QuranViewMode
+import app.saadiah.model.Reciter
 import app.saadiah.model.Tradition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -51,6 +56,11 @@ private val BAQARAH_REMINDER = stringPreferencesKey("baqarah.reminder")
 private val ADHAN_SOUND = stringPreferencesKey("alerts.adhan")
 private val CUSTOM_ADHKAR = stringSetPreferencesKey("adhkar.custom")
 private val READING_POSITIONS = stringSetPreferencesKey("reading.positions")
+private val FASTING_REMINDER = stringPreferencesKey("fasting.reminder")
+private val AFTER_PRAYER_REMINDER = stringPreferencesKey("prayer.after.reminder")
+private val SHOW_HOME_DUAS = booleanPreferencesKey("home.duas")
+private val QURAN_VIEW_MODE = stringPreferencesKey("quran.view.mode")
+private val RECITER = stringPreferencesKey("quran.reciter")
 internal const val POSITION_SEPARATOR = ':'
 
 private val Context.settingsStore: DataStore<Preferences> by preferencesDataStore(name = STORE_NAME)
@@ -94,6 +104,12 @@ private fun Preferences.toSettings(): Settings {
         customAdhkar = decodeCustomAdhkar(this[CUSTOM_ADHKAR].orEmpty()),
         readingPositions = readReadingPositions(),
         timingProfile = readTimingProfile(),
+        fastingReminder = enumOrNull<FastingReminderCadence>(FASTING_REMINDER) ?: defaults.fastingReminder,
+        afterPrayerReminder =
+            enumOrNull<AfterPrayerReminderDelay>(AFTER_PRAYER_REMINDER) ?: defaults.afterPrayerReminder,
+        showHomeDuas = this[SHOW_HOME_DUAS] ?: defaults.showHomeDuas,
+        quranViewMode = enumOrNull<QuranViewMode>(QURAN_VIEW_MODE) ?: defaults.quranViewMode,
+        reciter = enumOrNull<Reciter>(RECITER) ?: defaults.reciter,
     )
 }
 
@@ -129,6 +145,11 @@ private fun MutablePreferences.write(settings: Settings) {
     this[CUSTOM_ADHKAR] = encodeCustomAdhkar(settings.customAdhkar)
     this[READING_POSITIONS] =
         settings.readingPositions.map { (sura, ayah) -> "$sura$POSITION_SEPARATOR$ayah" }.toSet()
+    this[FASTING_REMINDER] = settings.fastingReminder.name
+    this[AFTER_PRAYER_REMINDER] = settings.afterPrayerReminder.name
+    this[SHOW_HOME_DUAS] = settings.showHomeDuas
+    this[QURAN_VIEW_MODE] = settings.quranViewMode.name
+    this[RECITER] = settings.reciter.name
     writeTimingProfile(settings.timingProfile)
 }
 

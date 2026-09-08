@@ -20,3 +20,4 @@ DerivedData/
 Pods/
 
 node_modules/
+.aider*

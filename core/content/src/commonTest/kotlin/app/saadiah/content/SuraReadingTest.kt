@@ -75,4 +75,15 @@ class SuraReadingTest {
             actual = "${reading.basmalah} ${reading.ayat.single().text}",
         )
     }
+
+    @Test
+    fun liftsBasmalahFromVerbatimTanzilByteOrder() {
+        val tanzilBaqarah1 = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ $ALIF_LAM_MIM"
+        val stored = listOf(Ayah(AL_BAQARAH, 1, tanzilBaqarah1))
+
+        val reading = stored.asReading()
+
+        assertEquals(expected = BASMALAH, actual = reading.basmalah)
+        assertEquals(expected = ALIF_LAM_MIM, actual = reading.ayat.single().text)
+    }
 }

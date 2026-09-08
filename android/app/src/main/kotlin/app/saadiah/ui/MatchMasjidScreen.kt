@@ -56,6 +56,7 @@ fun MatchMasjidScreen(
     profile: TimingProfile,
     onApply: (SolveResult) -> Unit,
     onBack: () -> Unit,
+    onReset: (() -> Unit)? = null,
 ) {
     val colors = SaadiahTheme.colors
     val today =
@@ -71,12 +72,13 @@ fun MatchMasjidScreen(
             SOLVED_PRAYERS.associateWith { computed[it].toLocalDateTime(city.timeZone).time.withoutSeconds() }
         }
     val typed = remember(asCalculated) { mutableStateMapOf<Prayer, LocalTime>().apply { putAll(asCalculated) } }
+    val confirmed = remember { androidx.compose.runtime.mutableStateListOf<Prayer>() }
     var result by remember { mutableStateOf<SolveResult?>(null) }
 
-    // Only a line the reader actually changed is evidence about their masjid. Sending all five
-    // regardless pinned every prayer to the app's own answer, so correcting one time could
-    // never move the other four — which is the whole reason to correct one time.
-    val corrections = typed.filter { (prayer, text) -> text != asCalculated[prayer] }
+    // Any line the reader explicitly changed or confirmed is evidence about their masjid.
+    // If an entered masjid time matches the pre-calculated time, confirming it preserves it
+    // rather than letting the solver silently shift it away with zero tuning.
+    val corrections = typed.filter { (prayer, text) -> prayer in confirmed || text != asCalculated[prayer] }
 
     Column(modifier = Modifier.fillMaxSize().background(colors.bg)) {
         ScreenHeader(title = strings.matchMyMasjid, onBack = onBack)
@@ -101,6 +103,7 @@ fun MatchMasjidScreen(
                     supporting = if (prayer in corrections) strings.yourMasjidsTime else strings.leftAsCalculated,
                     onPicked = {
                         typed[prayer] = it
+                        if (prayer !in confirmed) confirmed.add(prayer)
                         result = null
                     },
                 )
@@ -112,7 +115,15 @@ fun MatchMasjidScreen(
                 Spacer(Modifier.height(SaadiahSpacing.small))
             }
             Action(strings.matchMyMasjid) {
-                if (corrections.isNotEmpty()) result = MosqueSolver().solve(corrections, city, today)
+                if (corrections.isNotEmpty()) {
+                    result = MosqueSolver().solve(corrections, city, today, baseline = profile)
+                }
+            }
+            if (onReset != null && profile != app.saadiah.prayer.inferProfile(city)) {
+                Spacer(Modifier.height(SaadiahSpacing.small))
+                Action(strings.resetToAutomatic) {
+                    onReset()
+                }
             }
             result?.let { Matched(it, onApply) }
             Spacer(Modifier.height(SaadiahSpacing.huge))

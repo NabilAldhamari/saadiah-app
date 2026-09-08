@@ -16,9 +16,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import app.saadiah.audio.AudioDownloadManager
 import app.saadiah.data.Settings
 import app.saadiah.design.SaadiahRadius
 import app.saadiah.design.SaadiahSpacing
@@ -27,12 +33,16 @@ import app.saadiah.design.SaadiahType
 import app.saadiah.design.SectionDivider
 import app.saadiah.design.minimumTouchTarget
 import app.saadiah.model.AdhanSound
+import app.saadiah.model.AfterPrayerReminderDelay
 import app.saadiah.model.AppTheme
 import app.saadiah.model.BaqarahReminder
 import app.saadiah.model.CombineMode
+import app.saadiah.model.FastingReminderCadence
 import app.saadiah.model.Language
 import app.saadiah.model.Madhab
 import app.saadiah.model.Prayer
+import app.saadiah.model.QuranViewMode
+import app.saadiah.model.Reciter
 import kotlin.time.Duration.Companion.minutes
 
 private val HAIRLINE = 1.dp
@@ -81,6 +91,10 @@ fun SettingsScreen(
             CalculationGroup(settings, actions.onChange)
             AlertGroup(settings, actions.onChange)
             BaqarahGroup(settings, actions)
+            QuranViewGroup(settings, actions.onChange)
+            ReciterGroup(settings, actions.onChange)
+            HomeDuasGroup(settings, actions.onChange)
+            DownloadsManagementGroup(settings, actions.onOpenAudioDownloads)
 
             Group(strings.sectionChecks) {
                 ChoiceRow(strings.alertsArriveQuestion, false, strings.open, actions.onOpenDoctor)
@@ -104,12 +118,14 @@ private fun ThemeGroup(
     settings: Settings,
     onChange: (SettingsEdit) -> Unit,
 ) {
-    Group(strings.sectionTheme) {
-        for (option in AppTheme.entries) {
-            ChoiceRow(option.spelledOut(strings), settings.theme == option) {
-                onChange { it.copy(theme = option) }
-            }
-        }
+    val s = strings
+    Group(s.sectionTheme) {
+        SettingsDropdown(
+            selected = settings.theme,
+            options = AppTheme.entries,
+            labelFor = { it.spelledOut(s) },
+            onSelect = { option -> onChange { it.copy(theme = option) } },
+        )
     }
 }
 
@@ -118,13 +134,16 @@ private fun LanguageGroup(
     settings: Settings,
     onChange: (SettingsEdit) -> Unit,
 ) {
-    Group(strings.sectionLanguage) {
-        for (option in Language.entries) {
-            ChoiceRow(option.spelledOut(strings), settings.language == option) {
-                onChange { it.copy(language = option) }
-            }
-        }
-        Caption(strings.languageHint)
+    val s = strings
+    Group(s.sectionLanguage) {
+        SettingsDropdown(
+            selected = settings.language,
+            options = Language.entries,
+            labelFor = { it.spelledOut(s) },
+            onSelect = { option -> onChange { it.copy(language = option) } },
+        )
+        Spacer(Modifier.height(SaadiahSpacing.tiny))
+        Caption(s.languageHint)
     }
 }
 
@@ -133,20 +152,32 @@ private fun CalculationGroup(
     settings: Settings,
     onChange: (SettingsEdit) -> Unit,
 ) {
-    Group(strings.sectionCalculation) {
-        Block(strings.sectionMadhab, strings.sectionMadhabWhy) {
-            for (option in Madhab.entries) {
-                ChoiceRow(option.spelledOut(strings), settings.madhab == option) {
-                    onChange { it.copy(madhab = option) }
-                }
-            }
+    val s = strings
+    Group(s.sectionCalculation) {
+        Block(s.sectionMadhab, s.sectionMadhabWhy) {
+            SettingsDropdown(
+                selected = settings.madhab,
+                options = Madhab.entries,
+                labelFor = { it?.spelledOut(s) ?: s.change },
+                onSelect = { option -> onChange { it.copy(madhab = option) } },
+            )
         }
-        Block(strings.sectionCombining) {
-            for (option in CombineMode.entries) {
-                ChoiceRow(option.spelledOut(strings), settings.combineMode == option) {
-                    onChange { it.copy(combineMode = option) }
-                }
-            }
+        Block(s.sectionCombining) {
+            SettingsDropdown(
+                selected = settings.combineMode,
+                options = CombineMode.entries,
+                labelFor = { it.spelledOut(s) },
+                onSelect = { option -> onChange { it.copy(combineMode = option) } },
+            )
+        }
+        if (settings.timingProfile != null) {
+            Spacer(Modifier.height(SaadiahSpacing.small))
+            ChoiceRow(
+                label = s.matchedMasjidActive,
+                selected = false,
+                stateWord = s.resetToAutomatic,
+                onSelect = { onChange { it.copy(timingProfile = null) } },
+            )
         }
     }
 }
@@ -156,14 +187,15 @@ private fun AlertGroup(
     settings: Settings,
     onChange: (SettingsEdit) -> Unit,
 ) {
-    Group(strings.sectionAlerts) {
-        Block(strings.sectionWhichPrayers) {
+    val s = strings
+    Group(s.sectionAlerts) {
+        Block(s.sectionWhichPrayers) {
             for (prayer in settings.alertablePrayers()) {
                 val alerting = prayer in settings.enabledPrayers
                 ChoiceRow(
-                    label = prayer.spelledOut(strings),
+                    label = prayer.spelledOut(s),
                     selected = alerting,
-                    stateWord = if (alerting) strings.alerting else strings.silent,
+                    stateWord = if (alerting) s.alerting else s.silent,
                     onSelect = {
                         onChange { current ->
                             current.copy(enabledPrayers = current.enabledPrayers.toggle(prayer))
@@ -172,29 +204,48 @@ private fun AlertGroup(
                 )
             }
             if (settings.enabledPrayers.none { it in settings.alertablePrayers() }) {
-                Body(strings.everyPrayerSilent)
+                Body(s.everyPrayerSilent)
             }
         }
-        Block(strings.sectionWarnBefore) {
-            for (choice in PRE_ALERT_CHOICES) {
-                ChoiceRow(choice.asWarning(strings), settings.preAlert == choice) {
-                    onChange { it.copy(preAlert = choice) }
-                }
-            }
+        Block(s.sectionWarnBefore) {
+            SettingsDropdown(
+                selected = settings.preAlert,
+                options = PRE_ALERT_CHOICES,
+                labelFor = { it.asWarning(s) },
+                onSelect = { option -> onChange { it.copy(preAlert = option) } },
+            )
         }
-        Block(strings.sectionAdhan, strings.sectionAdhanWhy) {
-            for (option in AdhanSound.entries) {
-                ChoiceRow(option.spelledOut(strings), settings.adhanSound == option) {
-                    onChange { it.copy(adhanSound = option) }
-                }
-            }
+        Block(s.sectionAdhan, s.sectionAdhanWhy) {
+            SettingsDropdown(
+                selected = settings.adhanSound,
+                options = AdhanSound.entries,
+                labelFor = { it.spelledOut(s) },
+                onSelect = { option -> onChange { it.copy(adhanSound = option) } },
+            )
         }
-        Block(strings.sectionWarnClosing) {
-            for (choice in END_OF_WINDOW_CHOICES) {
-                ChoiceRow(choice.asClosingWarning(strings), settings.endOfWindow == choice) {
-                    onChange { it.copy(endOfWindow = choice) }
-                }
-            }
+        Block(s.sectionWarnClosing) {
+            SettingsDropdown(
+                selected = settings.endOfWindow,
+                options = END_OF_WINDOW_CHOICES,
+                labelFor = { it.asClosingWarning(s) },
+                onSelect = { option -> onChange { it.copy(endOfWindow = option) } },
+            )
+        }
+        Block(s.sectionFasting, s.fastingChannelWhat) {
+            SettingsDropdown(
+                selected = settings.fastingReminder,
+                options = FastingReminderCadence.entries,
+                labelFor = { it.spelledOut(s) },
+                onSelect = { option -> onChange { it.copy(fastingReminder = option) } },
+            )
+        }
+        Block(s.sectionAfterPrayer, s.adhkarChannelWhat) {
+            SettingsDropdown(
+                selected = settings.afterPrayerReminder,
+                options = AfterPrayerReminderDelay.entries,
+                labelFor = { it.spelledOut(s) },
+                onSelect = { option -> onChange { it.copy(afterPrayerReminder = option) } },
+            )
         }
     }
 }
@@ -204,13 +255,96 @@ private fun BaqarahGroup(
     settings: Settings,
     actions: SettingsActions,
 ) {
-    Group(strings.sectionBaqarah, strings.sectionBaqarahWhy) {
-        for (option in BaqarahReminder.entries) {
-            ChoiceRow(option.spelledOut(strings), settings.baqarahReminder == option) {
-                actions.onChange { it.copy(baqarahReminder = option) }
-            }
-        }
-        ChoiceRow(strings.whyItIsRead, false, strings.open, actions.onOpenBaqarah)
+    val s = strings
+    Group(s.sectionBaqarah, s.sectionBaqarahWhy) {
+        SettingsDropdown(
+            selected = settings.baqarahReminder,
+            options = BaqarahReminder.entries,
+            labelFor = { it.spelledOut(s) },
+            onSelect = { option -> actions.onChange { it.copy(baqarahReminder = option) } },
+        )
+        ChoiceRow(s.whyItIsRead, false, s.open, actions.onOpenBaqarah)
+    }
+}
+
+@Composable
+private fun QuranViewGroup(
+    settings: Settings,
+    onChange: (SettingsEdit) -> Unit,
+) {
+    val s = strings
+    Group(s.titleQuran) {
+        SettingsDropdown(
+            selected = settings.quranViewMode,
+            options = QuranViewMode.entries,
+            labelFor = { it.spelledOut(s) },
+            onSelect = { option -> onChange { it.copy(quranViewMode = option) } },
+        )
+    }
+}
+
+@Composable
+private fun HomeDuasGroup(
+    settings: Settings,
+    onChange: (SettingsEdit) -> Unit,
+) {
+    val s = strings
+    Group(s.sectionHomeDuas, s.sectionHomeDuasWhy) {
+        ChoiceRow(
+            label = s.homeDuaCardTitle,
+            selected = settings.showHomeDuas,
+            stateWord = if (settings.showHomeDuas) s.yes else s.no,
+            onSelect = { onChange { it.copy(showHomeDuas = !it.showHomeDuas) } },
+        )
+    }
+}
+
+@Composable
+private fun ReciterGroup(
+    settings: Settings,
+    onChange: (SettingsEdit) -> Unit,
+) {
+    val s = strings
+    Group(s.sectionReciter, s.sectionReciterWhy) {
+        SettingsDropdown(
+            selected = settings.reciter,
+            options = Reciter.entries,
+            labelFor = { it.spelledOut(s) },
+            onSelect = { option -> onChange { it.copy(reciter = option) } },
+        )
+    }
+}
+
+@Composable
+private fun DownloadsManagementGroup(
+    settings: Settings,
+    onOpenDownloads: () -> Unit,
+) {
+    val context = LocalContext.current
+    val s = strings
+    var refreshKey by remember { mutableStateOf(0) }
+    val totalStorage = remember(refreshKey) { AudioDownloadManager.getTotalStorageUsedBytes(context) }
+    val reciterStorage =
+        remember(refreshKey, settings.reciter) { AudioDownloadManager.getStorageUsedBytes(context, settings.reciter) }
+
+    Group(s.manageDownloads, s.sectionVoiceContentWhy) {
+        ChoiceRow(
+            label = s.tabAudioDownloads,
+            selected = false,
+            stateWord = s.open,
+            onSelect = onOpenDownloads,
+        )
+        ChoiceRow(
+            label = "${s.storageUsed}: ${AudioDownloadManager.formatStorage(totalStorage)}",
+            selected = false,
+            stateWord = if (reciterStorage > 0L) s.deleteReciterAudio else null,
+            onSelect = {
+                if (reciterStorage > 0L) {
+                    AudioDownloadManager.deleteReciter(context, settings.reciter)
+                    refreshKey++
+                }
+            },
+        )
     }
 }
 

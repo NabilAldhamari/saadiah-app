@@ -12,7 +12,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import app.saadiah.alarm.AfterPrayerReminderScheduler
 import app.saadiah.alarm.BaqarahReminderScheduler
+import app.saadiah.alarm.FastingReminderScheduler
 import app.saadiah.alarm.PrayerAlarmScheduler
 import app.saadiah.alarm.canPostNotifications
 import app.saadiah.alarm.ensureChannels
@@ -42,6 +44,8 @@ class MainActivity : ComponentActivity() {
         val alarms = PrayerAlarmScheduler(this)
         alarms.arm()
         BaqarahReminderScheduler(this).arm()
+        FastingReminderScheduler(this).arm()
+        AfterPrayerReminderScheduler(this).arm()
 
         setContent { Saadiah(store, alarms) }
     }
@@ -66,7 +70,11 @@ class MainActivity : ComponentActivity() {
                 actions =
                     AppActions(
                         onChangeSettings = { edit -> save(store, alarms, edit) },
-                        onChangeCity = { chosen -> save(store, alarms) { it.copy(city = chosen) } },
+                        onChangeCity = { chosen ->
+                            save(store, alarms) {
+                                it.copy(city = chosen, timingProfile = null)
+                            }
+                        },
                         onOpenBackgroundSettings = ::openBackgroundSettings,
                         onApplyMatchedProfile = { matched ->
                             // Applied only on the reader's explicit confirm, never by the solve.
@@ -77,6 +85,11 @@ class MainActivity : ComponentActivity() {
                             // happen to be some other madhhab's changed nothing at all.
                             save(store, alarms) {
                                 it.copy(madhab = matched.madhab, timingProfile = matched.toProfile())
+                            }
+                        },
+                        onResetMatchedProfile = {
+                            save(store, alarms) {
+                                it.copy(timingProfile = null)
                             }
                         },
                     ),
@@ -92,6 +105,8 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             store.update(transform)
             BaqarahReminderScheduler(this@MainActivity).arm()
+            FastingReminderScheduler(this@MainActivity).arm()
+            AfterPrayerReminderScheduler(this@MainActivity).arm()
             // The madhhab, the combine mode and the city all move the times an alarm was
             // set for, so arming has to follow the write rather than race it.
             alarms.arm()

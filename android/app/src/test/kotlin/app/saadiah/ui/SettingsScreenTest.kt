@@ -1,6 +1,8 @@
 package app.saadiah.ui
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -47,7 +49,8 @@ class SettingsScreenTest {
 
     private fun editFrom(
         shown: Settings,
-        label: String,
+        currentValue: String,
+        targetValue: String,
     ): SettingsEdit {
         var captured: SettingsEdit? = null
         compose.setContent {
@@ -66,14 +69,24 @@ class SettingsScreenTest {
                 )
             }
         }
-        compose.onNodeWithText(label).performScrollTo().performClick()
+        compose
+            .onAllNodesWithText(currentValue)
+            .onFirst()
+            .performScrollTo()
+            .performClick()
+        compose.onNodeWithText(targetValue).performClick()
         return requireNotNull(captured) { "the screen never reported a change" }
     }
 
     @Test
     fun changingOneSettingLeavesTheStoredCityAlone() {
         // What the screen holds before the stored settings have been read: no city yet.
-        val edit = editFrom(shown = Settings(), label = strings.themeDark)
+        val edit =
+            editFrom(
+                shown = Settings(),
+                currentValue = strings.followMyPhone,
+                targetValue = strings.themeDark,
+            )
 
         val written = edit(Settings(city = LONDON))
 
@@ -83,7 +96,12 @@ class SettingsScreenTest {
 
     @Test
     fun changingOneSettingLeavesAnotherSettingAlone() {
-        val edit = editFrom(shown = Settings(), label = strings.themeDark)
+        val edit =
+            editFrom(
+                shown = Settings(),
+                currentValue = strings.followMyPhone,
+                targetValue = strings.themeDark,
+            )
 
         val written = edit(Settings(madhab = Madhab.HANAFI))
 

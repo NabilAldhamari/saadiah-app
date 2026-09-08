@@ -81,7 +81,7 @@ class PrayerAlarmScheduler(
         val triggerAt = spec.triggerAt.toEpochMilliseconds()
         val pending = pendingIntent(slot, intentFor(slot, spec, lead))
         if (canScheduleExactly()) {
-            alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(triggerAt, pending), pending)
+            alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(triggerAt, openAppIntent(context)), pending)
         } else {
             // Exact alarms revoked: still wake the device, accepting the doze window rather
             // than dropping the alert entirely.

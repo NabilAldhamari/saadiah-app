@@ -19,6 +19,8 @@ import app.saadiah.ui.stringsFor
 
 const val PRAYER_CHANNEL_ID = "prayer-times"
 const val READING_CHANNEL_ID = "reading-reminders"
+const val FASTING_CHANNEL_ID = "fasting-reminders"
+const val ADHKAAR_CHANNEL_ID = "adhkar-reminders"
 
 private const val OPEN_APP_REQUEST = 1000
 
@@ -99,6 +101,26 @@ fun ensureChannels(
             NotificationManager.IMPORTANCE_DEFAULT,
         ).apply {
             description = words.readingChannelWhat
+            setShowBadge(false)
+        },
+    )
+    manager.createNotificationChannel(
+        NotificationChannel(
+            FASTING_CHANNEL_ID,
+            words.fastingChannelName,
+            NotificationManager.IMPORTANCE_DEFAULT,
+        ).apply {
+            description = words.fastingChannelWhat
+            setShowBadge(false)
+        },
+    )
+    manager.createNotificationChannel(
+        NotificationChannel(
+            ADHKAAR_CHANNEL_ID,
+            words.adhkarChannelName,
+            NotificationManager.IMPORTANCE_DEFAULT,
+        ).apply {
+            description = words.adhkarChannelWhat
             setShowBadge(false)
         },
     )

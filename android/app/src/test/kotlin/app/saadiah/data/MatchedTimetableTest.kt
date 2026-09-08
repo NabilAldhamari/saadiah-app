@@ -162,4 +162,53 @@ class MatchedTimetableTest {
                 actual = settings.timingProfileFor(CAIRO).adjustments,
             )
         }
+
+    /** Resetting a matched profile restores the automatic calculation for the city. */
+    @Test
+    fun resettingTimingProfileRestoresAutomaticInference() =
+        runTest {
+            val store = freshStore()
+            val entered = aTimetableUnlikeAnyPublishedMethods()
+            val matched = MosqueSolver(calculator).solve(entered, CAIRO, DATE)
+            store.update { it.copy(city = CAIRO, timingProfile = matched.toProfile()) }
+
+            // User resets matched profile
+            store.update { it.copy(timingProfile = null) }
+            val settings = store.settings.first()
+
+            assertNull(settings.timingProfile)
+            assertEquals(
+                expected = Method.EGYPTIAN.toProfile(Madhab.SHAFI).angles,
+                actual = settings.timingProfileFor(CAIRO).angles,
+            )
+        }
+
+    /** Changing city clears matched timing profile to prevent cross-city contamination. */
+    @Test
+    fun changingCityClearsMatchedTimingProfile() =
+        runTest {
+            val store = freshStore()
+            val entered = aTimetableUnlikeAnyPublishedMethods()
+            val matched = MosqueSolver(calculator).solve(entered, CAIRO, DATE)
+            store.update { it.copy(city = CAIRO, timingProfile = matched.toProfile()) }
+
+            // Changing city as done in MainActivity: timingProfile is cleared
+            val mecca =
+                City(
+                    id = CityId(104515),
+                    name = "Mecca",
+                    country = CountryCode("SA"),
+                    admin1 = "Makkah",
+                    coordinates = Coordinates(latitude = 21.4225, longitude = 39.8262),
+                    timeZone = TimeZone.of("Asia/Riyadh"),
+                )
+            store.update { it.copy(city = mecca, timingProfile = null) }
+            val settings = store.settings.first()
+
+            assertNull(settings.timingProfile)
+            assertEquals(
+                expected = Method.UMM_AL_QURA.toProfile(Madhab.SHAFI).angles,
+                actual = settings.timingProfileFor(mecca).angles,
+            )
+        }
 }

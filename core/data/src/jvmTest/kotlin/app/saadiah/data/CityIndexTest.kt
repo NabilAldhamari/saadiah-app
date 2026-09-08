@@ -60,6 +60,22 @@ class CityIndexTest {
     }
 
     @Test
+    fun searchPrioritizesCitiesInPreferredTimeZone() {
+        // In the fixture, London exists in both GB (Europe/London) and CA (America/Toronto).
+        // With America/Toronto preferred, London CA should rank above London GB despite lower population.
+        val canadianResults =
+            index.search(
+                "London",
+                preferredTimeZone = kotlinx.datetime.TimeZone.of("America/Toronto"),
+            )
+        assertEquals(expected = "CA", actual = canadianResults.first().country.value)
+
+        // With Europe/London preferred, London GB should rank first.
+        val britishResults = index.search("London", preferredTimeZone = kotlinx.datetime.TimeZone.of("Europe/London"))
+        assertEquals(expected = "GB", actual = britishResults.first().country.value)
+    }
+
+    @Test
     fun anUnknownNameFindsNothing() {
         assertTrue(index.search("Zzzznowhere").isEmpty())
     }

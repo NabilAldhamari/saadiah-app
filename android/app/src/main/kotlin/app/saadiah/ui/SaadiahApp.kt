@@ -11,16 +11,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import app.saadiah.audio.AudioDownloadManager
 import app.saadiah.data.Settings
 import app.saadiah.data.timingProfileFor
 import app.saadiah.design.R
+import app.saadiah.design.SaadiahSpacing
 import app.saadiah.design.Tab
 import app.saadiah.design.TabBar
 import app.saadiah.model.City
@@ -47,6 +52,8 @@ fun SaadiahApp(
     val tradition = settings.tradition ?: Tradition.SUNNI
     val profile = androidx.compose.runtime.remember(city, settings) { settings.timingProfileFor(city) }
 
+    val downloadState by AudioDownloadManager.downloadState.collectAsState()
+
     BackHandler(enabled = navigator.canGoBack) { navigator.back() }
 
     // Nothing handled insets before, so every screen drew under the status bar and its
@@ -72,6 +79,15 @@ fun SaadiahApp(
                 Destination(screen, city, settings, profile, tradition, navigator, actions)
             }
         }
+        FloatingDownloadBar(
+            state = downloadState,
+            onClick = {
+                if (navigator.current != Screen.AudioDownloads) {
+                    navigator.go(Screen.AudioDownloads)
+                }
+            },
+            modifier = Modifier.padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.tiny),
+        )
         if (navigator.current.isTabRoot) {
             TabBar(tabs = tabsFor(navigator))
         }
@@ -137,6 +153,8 @@ private fun TabRoot(
                         onOpenDoctor = { navigator.go(Screen.Doctor) },
                         onMatchMasjid = { navigator.go(Screen.MatchMasjid) },
                         onOpenBaqarah = { navigator.go(Screen.Baqarah) },
+                        onOpenAudioDownloads = { navigator.go(Screen.AudioDownloads) },
+                        onResetMatchedProfile = actions.onResetMatchedProfile,
                     ),
             )
         else ->
@@ -144,12 +162,14 @@ private fun TabRoot(
                 city = city,
                 profile = profile,
                 tradition = tradition,
+                showHomeDuas = settings.showHomeDuas,
                 actions =
                     TodayActions(
                         onChangeCity = { navigator.go(Screen.PickingCity) },
                         onOpenDoctor = { navigator.go(Screen.WhyThisTime) },
                         onOpenPrayer = { navigator.go(Screen.PrayerDetail(it)) },
                         onOpenBaqarah = { navigator.go(Screen.Baqarah) },
+                        onOpenAdhkar = { navigator.go(Screen.Adhkar) },
                     ),
             )
     }
@@ -181,6 +201,10 @@ private fun PushedScreen(
                     navigator.back()
                 },
                 onBack = back,
+                onReset = {
+                    actions.onResetMatchedProfile()
+                    navigator.back()
+                },
             )
         Screen.Doctor -> DoctorScreen(onOpenSettings = actions.onOpenBackgroundSettings, onBack = back)
         Screen.PickingCity ->
@@ -198,7 +222,15 @@ private fun PushedScreen(
                 onMatchMasjid = { navigator.go(Screen.MatchMasjid) },
                 onBack = back,
             )
-        else -> Reading(screen, place, settings, actions, back)
+        Screen.AudioDownloads ->
+            AudioDownloadScreen(
+                onBack = back,
+                reciter = settings.reciter,
+                onSelectReciter = { chosen ->
+                    actions.onChangeSettings { it.copy(reciter = chosen) }
+                },
+            )
+        else -> Reading(screen, place, settings, navigator, actions, back)
     }
 }
 
@@ -208,6 +240,7 @@ private fun Reading(
     screen: Screen,
     place: Place,
     settings: Settings,
+    navigator: Navigator,
     actions: AppActions,
     back: () -> Unit,
 ) {
@@ -223,6 +256,12 @@ private fun Reading(
                         it.copy(readingPositions = it.readingPositions + (screen.sura to ayah))
                     }
                 },
+                viewMode = settings.quranViewMode,
+                onViewModeChange = { mode ->
+                    actions.onChangeSettings { it.copy(quranViewMode = mode) }
+                },
+                onNavigateToDownloads = { navigator.go(Screen.AudioDownloads) },
+                reciter = settings.reciter,
             )
         is Screen.PrayerDetail -> PrayerDetail(place, screen.prayer, back)
         else -> Unit

@@ -29,6 +29,7 @@ import app.saadiah.design.MinimumTapTarget
 import app.saadiah.design.SaadiahSpacing
 import app.saadiah.design.SaadiahType
 import app.saadiah.model.City
+import kotlinx.datetime.TimeZone
 
 @Composable
 fun CityPickerScreen(
@@ -40,8 +41,12 @@ fun CityPickerScreen(
     // Reading seven megabytes takes long enough to see, so the field is drawn immediately
     // and the database arrives behind it rather than the screen opening late.
     val index by produceState<CityIndex?>(initialValue = null) { value = loadCityIndex(context) }
+    val preferredZone = remember { runCatching { TimeZone.currentSystemDefault() }.getOrNull() }
     var query by remember { mutableStateOf("") }
-    val results = remember(query, index) { index?.search(query).orEmpty() }
+    val results =
+        remember(query, index, preferredZone) {
+            index?.search(query, preferredTimeZone = preferredZone).orEmpty()
+        }
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(modifier = Modifier.padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.large)) {

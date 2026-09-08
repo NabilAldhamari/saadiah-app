@@ -349,4 +349,14 @@ class MosqueSolverTest {
 
         assertEquals(expected = generating, actual = solved.highLatitudeRule)
     }
+
+    @Test
+    fun correctingOnlyFajrPreservesHanafiMadhab() {
+        val baseHanafi = Method.KARACHI.toProfile(Madhab.HANAFI)
+        val fajr = timetableFor(Method.KARACHI, Madhab.HANAFI).getValue(Prayer.FAJR)
+
+        val result = solver.solve(mapOf(Prayer.FAJR to fajr), cairo, date, baseline = baseHanafi)
+
+        assertEquals(expected = Madhab.HANAFI, actual = result.madhab)
+    }
 }

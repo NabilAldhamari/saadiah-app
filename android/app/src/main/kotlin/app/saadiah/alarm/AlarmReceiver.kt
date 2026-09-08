@@ -65,7 +65,7 @@ class AlarmReceiver : BroadcastReceiver() {
         val words = stringsFor(stored.language)
 
         if (prayer != null) {
-            wordingFor(kind, prayer, lead, words)?.let { announce(context, prayer, it, stored.adhanSound) }
+            wordingFor(kind, prayer, lead, words)?.let { announce(context, prayer, it, stored.adhanSound, kind) }
         }
         if (kind == AlarmKind.AT_TIME && prayer != null) {
             recordDelivery(context, prayer, intent.getLongExtra(EXTRA_EXPECTED_AT, 0L))
@@ -105,23 +105,28 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     // Guarded by canPostNotifications, which lint cannot see through.
+    @Suppress("LongParameterList")
     @SuppressLint("MissingPermission")
     private fun announce(
         context: Context,
         prayer: Prayer,
         wording: String,
         sound: AdhanSound,
+        kind: AlarmKind,
     ) {
         if (!canPostNotifications(context)) return
         ensureChannels(context)
+        val channelId = if (kind == AlarmKind.AT_TIME) prayerChannelFor(sound) else PRAYER_CHANNEL_ID
+        val category =
+            if (kind == AlarmKind.AT_TIME) NotificationCompat.CATEGORY_ALARM else NotificationCompat.CATEGORY_REMINDER
         val notification =
             NotificationCompat
-                .Builder(context, prayerChannelFor(sound))
+                .Builder(context, channelId)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(prayer.announcement)
                 .setContentText(wording)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setCategory(category)
                 .setContentIntent(openAppIntent(context))
                 .setAutoCancel(true)
                 .build()

@@ -19,4 +19,5 @@ data class AppActions(
     val onChangeCity: (City) -> Unit,
     val onOpenBackgroundSettings: () -> Unit,
     val onApplyMatchedProfile: (app.saadiah.prayer.SolveResult) -> Unit,
+    val onResetMatchedProfile: () -> Unit = {},
 )

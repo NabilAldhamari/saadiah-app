@@ -55,6 +55,12 @@ class MethodInferenceTest {
                 "IR" to Method.TEHRAN,
                 "US" to Method.NORTH_AMERICA,
                 "CA" to Method.NORTH_AMERICA,
+                "ID" to Method.KEMENAG,
+                "MY" to Method.JAKIM,
+                "SG" to Method.JAKIM,
+                "AE" to Method.DUBAI,
+                "GB" to Method.LONDON_UNIFIED,
+                "FR" to Method.PARIS,
             )
         for ((code, method) in byCountry) {
             assertEquals(
@@ -67,7 +73,7 @@ class MethodInferenceTest {
 
     @Test
     fun anUnlistedCountryFallsBackToMuslimWorldLeague() {
-        for (code in listOf("GB", "DE", "FR", "YE", "ZZ")) {
+        for (code in listOf("DE", "YE", "ZZ")) {
             assertEquals(
                 expected = Method.MUSLIM_WORLD_LEAGUE.toProfile(Madhab.SHAFI, HighLatitudeRule.MIDDLE_OF_NIGHT),
                 actual = inferProfile(placeIn(country = code)),

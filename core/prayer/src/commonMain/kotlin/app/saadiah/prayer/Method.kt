@@ -34,6 +34,47 @@ enum class Method(
     DIYANET(fajrAngle = 18.0, ishaAngle = 17.0, adjustments = DIYANET_ADJUSTMENTS),
     TEHRAN(fajrAngle = 17.7, ishaAngle = 14.0, maghribAngle = 4.5, midnight = MidnightMode.JAFARI),
     JAFARI(fajrAngle = 16.0, ishaAngle = 14.0, maghribAngle = 4.0, midnight = MidnightMode.JAFARI),
+    KEMENAG(
+        fajrAngle = 20.0,
+        ishaAngle = 18.0,
+        adjustments =
+            mapOf(
+                Prayer.FAJR to 2.minutes,
+                Prayer.DHUHR to 2.minutes,
+                Prayer.ASR to 2.minutes,
+                Prayer.MAGHRIB to 2.minutes,
+                Prayer.ISHA to 2.minutes,
+            ),
+    ),
+    DUBAI(
+        fajrAngle = 18.2,
+        ishaAngle = 18.2,
+        adjustments = mapOf(Prayer.DHUHR to 3.minutes, Prayer.MAGHRIB to 3.minutes),
+    ),
+    LONDON_UNIFIED(
+        fajrAngle = 18.0,
+        ishaAngle = 17.0,
+        adjustments =
+            mapOf(
+                Prayer.SUNRISE to (-3).minutes,
+                Prayer.DHUHR to 5.minutes,
+                Prayer.MAGHRIB to 3.minutes,
+            ),
+    ),
+    JAKIM(
+        fajrAngle = 18.0,
+        ishaAngle = 18.0,
+        adjustments =
+            mapOf(
+                Prayer.FAJR to 3.minutes,
+                Prayer.DHUHR to 3.minutes,
+                Prayer.ASR to 2.minutes,
+                Prayer.MAGHRIB to 2.minutes,
+                Prayer.ISHA to 2.minutes,
+            ),
+    ),
+    PARIS(fajrAngle = 18.0, ishaAngle = 18.0, adjustments = mapOf(Prayer.DHUHR to 1.minutes)),
+    UOIF(fajrAngle = 12.0, ishaAngle = 12.0, adjustments = mapOf(Prayer.DHUHR to 1.minutes)),
     ;
 
     fun toProfile(

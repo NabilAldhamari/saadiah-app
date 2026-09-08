@@ -21,6 +21,8 @@ class SystemChangeReceiver : BroadcastReceiver() {
             -> {
                 PrayerAlarmScheduler(context).arm()
                 BaqarahReminderScheduler(context).arm()
+                FastingReminderScheduler(context).arm()
+                AfterPrayerReminderScheduler(context).arm()
             }
         }
     }

@@ -57,7 +57,7 @@ android {
 // release unit test cannot run the same suite and there is nothing gained by trying.
 androidComponents {
     beforeVariants(selector().withBuildType("release")) { variant ->
-        variant.enableUnitTest = false
+        (variant as? com.android.build.api.variant.HasUnitTestBuilder)?.enableUnitTest = false
     }
 }
 

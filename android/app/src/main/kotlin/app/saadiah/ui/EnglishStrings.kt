@@ -24,6 +24,7 @@ object EnglishStrings : Strings {
     override val titleBaqarah = "Sūrat al-Baqarah"
     override val titlePrayer = "Prayer"
     override val titleSettings = "Settings"
+    override val titleQuran = "Quran"
 
     override val todaysReading = "سورة البقرة — Sūrat al-Baqarah"
     override val todaysReadingHint = "Today's reading. Tap to read why it is kept up."
@@ -98,6 +99,7 @@ object EnglishStrings : Strings {
 
     override val adhkarMorning = "Morning"
     override val adhkarEvening = "Evening"
+    override val adhkarAfterPrayer = "After prayer"
     override val adhkarTapRing = "Tap the ring to count"
     override val adhkarPrevious = "Previous"
     override val adhkarNext = "Next"
@@ -355,6 +357,8 @@ object EnglishStrings : Strings {
     override val matchMyMasjidWhy = "Enter your masjid's printed times and Saadiah finds the settings that fit."
     override val applyProfile = "Apply these settings"
     override val matchedProfile = "Closest match"
+    override val resetToAutomatic = "Reset to automatic calculation"
+    override val matchedMasjidActive = "Custom mosque timetable active"
     override val methodNames =
         mapOf(
             "MUSLIM_WORLD_LEAGUE" to "Muslim World League",
@@ -365,6 +369,12 @@ object EnglishStrings : Strings {
             "DIYANET" to "Diyanet, Türkiye",
             "TEHRAN" to "Institute of Geophysics, Tehran",
             "JAFARI" to "Jaʿfarī",
+            "KEMENAG" to "Ministry of Religious Affairs, Indonesia",
+            "DUBAI" to "Dubai & UAE Awqaf",
+            "LONDON_UNIFIED" to "London Unified",
+            "JAKIM" to "JAKIM, Malaysia",
+            "PARIS" to "Grand Mosque of Paris",
+            "UOIF" to "Musulmans de France (12°)",
         )
     override val lowConfidence =
         "These times do not fit any single calculation cleanly. Check the ones you entered, or apply " +
@@ -393,4 +403,88 @@ object EnglishStrings : Strings {
     override val duaEveningAdhkar = "Evening adhkār"
     override val duaAyatAlKursi = "Āyat al-Kursī after the prayer"
     override val duaTasbih = "Tasbīḥ after the prayer"
+
+    override val fastingChannelName = "Fasting reminders"
+    override val fastingChannelWhat = "Alerts on the eve of voluntary fasting days"
+    override val fastingReminderTitle = "Sunnah Fast Tomorrow"
+
+    override fun fastingReminderBody(fastName: String) = "Tomorrow is a Sunnah fasting day: $fastName."
+
+    override val adhkarChannelName = "Dua & Adhkār reminders"
+    override val adhkarChannelWhat = "Reminders for post-prayer and daily adhkār"
+    override val afterPrayerReminderTitle = "Post-Prayer Remembrance"
+
+    override fun afterPrayerReminderBody(prayerName: String) = "Time for adhkār after $prayerName."
+
+    override val sectionFasting = "Fasting reminders"
+    override val sectionAfterPrayer = "Post-prayer reminders"
+    override val sectionHomeDuas = "Home screen supplication"
+    override val sectionHomeDuasWhy = "Show a contextual duʿāʾ or remembrance on the Today screen."
+    override val sectionVoiceContent = "Audio narrations"
+    override val sectionVoiceContentWhy = "Voice recordings for adhkār and supplications."
+
+    override val cadenceAllNafilah = "All voluntary fasts (Mondays, Thursdays, White Days)"
+    override val cadenceWhiteDays = "White Days only (13th, 14th, 15th)"
+    override val cadenceMondayThursday = "Mondays and Thursdays only"
+
+    override val delayFiveMinutes = "5 minutes after prayer"
+    override val delayTenMinutes = "10 minutes after prayer"
+    override val delayFifteenMinutes = "15 minutes after prayer"
+
+    override val downloadVoiceContent = "Download audio (~12 MB)"
+    override val downloadingVoiceContent = "Downloading audio…"
+    override val voiceContentDownloaded = "Voice narrations downloaded"
+    override val deleteVoiceContent = "Delete audio to free space"
+    override val listen = "Listen"
+    override val stop = "Stop"
+
+    override val quranViewModeTranslation = "Translation view"
+    override val quranViewModeReading = "Reading view"
+
+    override val copyAyah = "Copy āyah"
+    override val ayahCopied = "Āyah copied"
+    override val shareAyah = "Share āyah"
+    override val playAyah = "Recite"
+    override val pauseAyah = "Pause"
+
+    override val homeDuaCardTitle = "Daily Remembrance"
+    override val openInAdhkar = "Open in Adhkār"
+
+    override val surahTheCow = "The Cow"
+    override val surahFamilyOfImran = "Family of Imran"
+    override val surahMedinan = "Medinan"
+    override val surahMeccan = "Meccan"
+
+    override fun surahAyahCount(count: Int) = "$count Verses"
+
+    override val reciterMishari = "Mishari Rashid al-ʿAfasy"
+
+    override val tabAudioDownloads = "Audio Downloads"
+    override val audioDownloadsSubtitle = "Download Quran recitations for offline listening"
+    override val downloadAudio = "Download"
+    override val downloadingAudio = "Downloading..."
+    override val audioDownloaded = "Downloaded"
+    override val audioNotDownloaded = "Not downloaded"
+    override val cancelDownload = "Cancel"
+    override val audioDeleted = "Audio deleted"
+    override val audioDownloadSuccess = "Downloaded successfully"
+    override val audioDownloadFailed = "Download failed"
+    override val surahBaqarahAudioTitle = "Surah Al-Baqarah"
+    override val surahImranAudioTitle = "Surah Al-Imran"
+
+    override fun downloadingProgress(
+        current: Int,
+        total: Int,
+    ) = "$current of $total files"
+
+    override val reciterHusariMujawwad = "Al-Husari (Mujawwad)"
+    override val reciterHusariMurattal = "Al-Husari (Murattal)"
+    override val reciterMinshawiMujawwad = "Al-Minshawi (Mujawwad)"
+    override val reciterAlafasy = "Mishari Alafasy"
+    override val sectionReciter = "Recitation Voice"
+    override val sectionReciterWhy = "Choose your preferred recitation style and reciter."
+    override val deleteReciterAudio = "Delete Downloaded Audio"
+    override val storageUsed = "Storage Used"
+    override val manageDownloads = "Manage Downloads"
+    override val audioNotAvailable = "Audio not available"
 }

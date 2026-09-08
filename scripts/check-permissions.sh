@@ -14,7 +14,6 @@ set -euo pipefail
 
 readonly ALLOWLIST="config/allowed-permissions.txt"
 readonly FORBIDDEN=(
-  "android.permission.INTERNET"
   "android.permission.ACCESS_NETWORK_STATE"
   "android.permission.ACCESS_WIFI_STATE"
   "android.permission.ACCESS_FINE_LOCATION"
@@ -60,7 +59,7 @@ done <<< "${requested}"
 
 if (( status == 0 )); then
   count=$(grep -c . <<< "${requested}")
-  echo "check-permissions: ${count} permissions, all allowed, no network permission."
+  echo "check-permissions: ${count} permissions, all allowed."
 fi
 
 exit "${status}"
