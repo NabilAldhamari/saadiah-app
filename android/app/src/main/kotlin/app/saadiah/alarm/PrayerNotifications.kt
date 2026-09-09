@@ -1,5 +1,6 @@
 package app.saadiah.alarm
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -8,11 +9,13 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.net.Uri
+import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import app.saadiah.MainActivity
 import app.saadiah.R
 import app.saadiah.model.AdhanSound
+import app.saadiah.model.City
 import app.saadiah.model.Language
 import app.saadiah.ui.Strings
 import app.saadiah.ui.stringsFor
@@ -21,8 +24,13 @@ const val PRAYER_CHANNEL_ID = "prayer-times"
 const val READING_CHANNEL_ID = "reading-reminders"
 const val FASTING_CHANNEL_ID = "fasting-reminders"
 const val ADHKAAR_CHANNEL_ID = "adhkar-reminders"
+const val TRAVEL_CHANNEL_ID = "travel-alerts"
+
+const val TRAVEL_NOTIFICATION_ID = 5
+const val EXTRA_OPEN_CITY_PICKER = "app.saadiah.extra.OPEN_CITY_PICKER"
 
 private const val OPEN_APP_REQUEST = 1000
+private const val OPEN_CITY_PICKER_REQUEST = 1005
 
 /**
  * The channel a prayer alert is posted to, which is what decides the sound it plays.
@@ -124,6 +132,16 @@ fun ensureChannels(
             setShowBadge(false)
         },
     )
+    manager.createNotificationChannel(
+        NotificationChannel(
+            TRAVEL_CHANNEL_ID,
+            words.travelChannelName,
+            NotificationManager.IMPORTANCE_HIGH,
+        ).apply {
+            description = words.travelChannelWhat
+            setShowBadge(true)
+        },
+    )
 }
 
 /**
@@ -140,6 +158,45 @@ fun openAppIntent(context: Context): PendingIntent =
         },
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
+
+fun openCityPickerIntent(context: Context): PendingIntent =
+    PendingIntent.getActivity(
+        context,
+        OPEN_CITY_PICKER_REQUEST,
+        Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(EXTRA_OPEN_CITY_PICKER, true)
+        },
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+    )
+
+@SuppressLint("MissingPermission")
+fun postTravelNotification(
+    context: Context,
+    detection: TravelDetection,
+    currentCity: City,
+    words: Strings,
+) {
+    if (!canPostNotifications(context) || !detection.isTraveling) return
+    ensureChannels(context, words)
+    val detectedPlace = detection.suggestedCity?.name ?: detection.detectedZone.id
+    val notification =
+        NotificationCompat
+            .Builder(context, TRAVEL_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle(words.travelNotificationTitle)
+            .setContentText(words.travelNotificationText(detectedPlace, currentCity.name))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setContentIntent(openCityPickerIntent(context))
+            .setAutoCancel(true)
+            .build()
+    NotificationManagerCompat.from(context).notify(TRAVEL_NOTIFICATION_ID, notification)
+}
+
+fun dismissTravelNotification(context: Context) {
+    NotificationManagerCompat.from(context).cancel(TRAVEL_NOTIFICATION_ID)
+}
 
 /**
  * POST_NOTIFICATIONS only exists from API 33, so checking it directly would report denied

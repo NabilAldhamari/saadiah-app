@@ -496,4 +496,24 @@ object ArabicStrings : Strings {
     override val storageUsed = "المساحة المستخدمة"
     override val manageDownloads = "إدارة التنزيلات"
     override val audioNotAvailable = "التسجيل الصوتي غير متوفر"
+
+    override val travelChannelName = "تنبيهات السفر والمنطقة الزمنية"
+    override val travelChannelWhat = "ينبهك عندما يدخل هاتفك منطقة زمنية جديدة لتبقى أوقات الصلاة دقيقة."
+    override val travelNotificationTitle = "تم اكتشاف تغيير في المنطقة الزمنية"
+
+    override fun travelNotificationText(
+        detected: String,
+        current: String,
+    ) = "الهاتف في $detected، وأوقات الصلاة مضبوطة على $current. اضغط لتحديث مدينتك."
+
+    override val travelPromptTitle = "هل أنت مسافر؟"
+
+    override fun travelPromptMessage(
+        detected: String,
+        current: String,
+    ) = "يبدو أن هاتفك في $detected، لكن أوقات صلاتك مضبوطة على $current."
+
+    override fun travelSwitchTo(city: String) = "التبديل إلى $city"
+
+    override val travelDismiss = "تجاهل"
 }

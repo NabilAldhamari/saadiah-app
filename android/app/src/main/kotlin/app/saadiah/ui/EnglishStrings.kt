@@ -493,4 +493,25 @@ object EnglishStrings : Strings {
     override val storageUsed = "Storage Used"
     override val manageDownloads = "Manage Downloads"
     override val audioNotAvailable = "Audio not available"
+
+    override val travelChannelName = "Travel & timezone alerts"
+    override val travelChannelWhat =
+        "Notifies you when your device enters a new timezone so prayer times stay accurate."
+    override val travelNotificationTitle = "Timezone change detected"
+
+    override fun travelNotificationText(
+        detected: String,
+        current: String,
+    ) = "Device is in $detected, but prayers are set to $current. Tap to update your city."
+
+    override val travelPromptTitle = "Traveling?"
+
+    override fun travelPromptMessage(
+        detected: String,
+        current: String,
+    ) = "Your phone appears to be in $detected, but your prayers are set to $current."
+
+    override fun travelSwitchTo(city: String) = "Switch to $city"
+
+    override val travelDismiss = "Dismiss"
 }

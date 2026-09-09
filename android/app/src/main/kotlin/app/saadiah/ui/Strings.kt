@@ -466,6 +466,26 @@ interface Strings {
     val storageUsed: String
     val manageDownloads: String
     val audioNotAvailable: String
+
+    val travelChannelName: String
+    val travelChannelWhat: String
+    val travelNotificationTitle: String
+
+    fun travelNotificationText(
+        detected: String,
+        current: String,
+    ): String
+
+    val travelPromptTitle: String
+
+    fun travelPromptMessage(
+        detected: String,
+        current: String,
+    ): String
+
+    fun travelSwitchTo(city: String): String
+
+    val travelDismiss: String
 }
 
 val LocalStrings: ProvidableCompositionLocal<Strings> = staticCompositionLocalOf { EnglishStrings }

@@ -1,0 +1,88 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CommentOverPrivateFunction:QuranComponents.kt$@Composable private fun CompactActionButton( painter: Painter, contentDescription: String, tint: Color, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>CommentOverPrivateProperty:QuranPages.kt$/** * Medina Mus'haf (604-page standard) page boundaries for Surah 2 (Al-Baqarah) * and Surah 3 (Aal 'Imran). */ private val SURAH_2_PAGE_ENDS = intArrayOf( 5, 16, 24, 29, 37, 48, 57, 61, 69, 76, 83, 88, 93, 101, 105, 112, 119, 126, 134, 141, 145, 153, 163, 169, 176, 181, 186, 190, 196, 202, 210, 215, 219, 224, 230, 233, 237, 245, 248, 252, 256, 259, 264, 269, 274, 281, 282, 286, )</ID>
+    <ID>ComplexCondition:AudioDownloadManager.kt$AudioDownloadManager$readCount &lt; 4 || header[0] != 0x50.toByte() || header[1] != 0x4B.toByte() || header[2] != 0x03.toByte() || header[3] != 0x04.toByte()</ID>
+    <ID>CyclomaticComplexMethod:AudioDownloadManager.kt$AudioDownloadManager$fun downloadSurah( context: Context, reciter: Reciter = Reciter.HUSARI_MUJAWWAD, sura: Int, title: String, verseCount: Int, )</ID>
+    <ID>CyclomaticComplexMethod:AudioDownloadManager.kt$AudioDownloadManager$private fun downloadAndExtractZip( zipUrlStr: String, targetDir: File, ): Boolean</ID>
+    <ID>CyclomaticComplexMethod:AudioDownloadScreen.kt$@Composable private fun DownloadItemCard( title: String, subtitle: String, isDownloaded: Boolean, downloadState: DownloadState, itemId: String, onDownload: () -&gt; Unit, onCancel: () -&gt; Unit, onDelete: () -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:FastingPrompt.kt$fun fastingOutlook( today: LocalDate, hijri: HijriDate, tradition: Tradition, strings: Strings, ): List&lt;FastingPrompt&gt;</ID>
+    <ID>CyclomaticComplexMethod:FastingPrompt.kt$private fun resolveFastingReasons( date: LocalDate, hijri: HijriDate, tradition: Tradition, strings: Strings, ): List&lt;String&gt;</ID>
+    <ID>CyclomaticComplexMethod:FastingReminderScheduler.kt$private fun resolveFastingKind( date: LocalDate, hijri: HijriDate, cadence: FastingReminderCadence, tradition: Tradition, ): FastingKind?</ID>
+    <ID>CyclomaticComplexMethod:MatchMasjidScreen.kt$@Composable fun MatchMasjidScreen( city: City, profile: TimingProfile, onApply: (SolveResult) -&gt; Unit, onBack: () -&gt; Unit, onReset: (() -&gt; Unit)? = null, )</ID>
+    <ID>CyclomaticComplexMethod:QuranComponents.kt$@Composable fun QuranAyahCard( ayah: Ayah, isPlaying: Boolean, onPlay: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>CyclomaticComplexMethod:QuranScreen.kt$@Composable private fun Page( sura: Int, title: String, load: QuranLoad, startAt: Int, onRemember: (Int) -&gt; Unit, viewMode: QuranViewMode, onViewModeChange: (QuranViewMode) -&gt; Unit, onNavigateToDownloads: () -&gt; Unit = {}, reciter: Reciter = Reciter.HUSARI_MUJAWWAD, )</ID>
+    <ID>CyclomaticComplexMethod:SettingsStore.kt$private fun Preferences.toSettings(): Settings</ID>
+    <ID>CyclomaticComplexMethod:TimingProfileStore.kt$internal fun Preferences.readTimingProfile(): TimingProfile?</ID>
+    <ID>CyclomaticComplexMethod:TodayScreen.kt$@Composable fun TodayScreen( city: City, profile: TimingProfile, tradition: Tradition, showHomeDuas: Boolean = true, actions: TodayActions, )</ID>
+    <ID>FunctionNaming:QuranPages.kt$@Composable fun QuranPageBanner( pageNumber: Int, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:QuranPages.kt$@Composable fun QuranPageContent( pageNumber: Int, ayat: List&lt;Ayah&gt;, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:AfterPrayerReminderScheduler.kt$AfterPrayerReminderScheduler$fun arm(from: Instant = Clock.System.now())</ID>
+    <ID>LongMethod:AudioDownloadManager.kt$AudioDownloadManager$fun downloadSurah( context: Context, reciter: Reciter = Reciter.HUSARI_MUJAWWAD, sura: Int, title: String, verseCount: Int, )</ID>
+    <ID>LongMethod:AudioDownloadManager.kt$AudioDownloadManager$private fun downloadAndExtractZip( zipUrlStr: String, targetDir: File, ): Boolean</ID>
+    <ID>LongMethod:FastingOutlookTest.kt$FastingOutlookTest$@Test fun bundlesMondayAndWhiteDaysWhenCoinciding()</ID>
+    <ID>LongMethod:FastingPrompt.kt$fun fastingOutlook( today: LocalDate, hijri: HijriDate, tradition: Tradition, strings: Strings, ): List&lt;FastingPrompt&gt;</ID>
+    <ID>LongMethod:FastingReminderScheduler.kt$private fun resolveFastingKind( date: LocalDate, hijri: HijriDate, cadence: FastingReminderCadence, tradition: Tradition, ): FastingKind?</ID>
+    <ID>LongMethod:PrayerNotifications.kt$fun ensureChannels( context: Context, words: Strings = stringsFor(Language.SYSTEM), )</ID>
+    <ID>LongMethod:QuranAudioPlayer.kt$QuranAudioPlayer$fun playAyah( ayah: Ayah, currentReciter: Reciter = reciter, onComplete: (() -&gt; Unit)? = null, )</ID>
+    <ID>LongMethod:QuranPages.kt$@Composable fun QuranPageBanner( pageNumber: Int, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:StringsTest.kt$StringsTest$@Test fun everySettingLabelHasAnArabicForm()</ID>
+    <ID>LongMethod:TravelDetector.kt$TravelDetector$fun evaluate( systemZone: TimeZone, networkCountry: String?, currentCity: City, now: Instant = Clock.System.now(), ): TravelDetection</ID>
+    <ID>LongParameterList:AfterPrayerReminderScheduler.kt$( delay: AfterPrayerReminderDelay, city: City, profile: TimingProfile, enabledPrayers: Set&lt;Prayer&gt;, now: Instant, calculator: PrayerCalculator = PrayerCalculator(), )</ID>
+    <ID>LongParameterList:AudioDownloadManager.kt$AudioDownloadManager$( context: Context, reciter: Reciter = Reciter.HUSARI_MUJAWWAD, sura: Int, title: String, verseCount: Int, )</ID>
+    <ID>LongParameterList:AudioDownloadScreen.kt$( title: String, subtitle: String, isDownloaded: Boolean, downloadState: DownloadState, itemId: String, onDownload: () -&gt; Unit, onCancel: () -&gt; Unit, onDelete: () -&gt; Unit, )</ID>
+    <ID>LongParameterList:MatchMasjidScreen.kt$( city: City, profile: TimingProfile, onApply: (SolveResult) -&gt; Unit, onBack: () -&gt; Unit, onReset: (() -&gt; Unit)? = null, )</ID>
+    <ID>LongParameterList:MonthGrid.kt$( year: Int, month: Int, tradition: Tradition, strings: Strings, todayHijri: HijriDate? = null, )</ID>
+    <ID>LongParameterList:QuranComponents.kt$( ayah: Ayah, isPlaying: Boolean, reciterName: String, onPlayPause: () -&gt; Unit, onPrevious: () -&gt; Unit, onNext: () -&gt; Unit, onClose: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongParameterList:QuranComponents.kt$( painter: Painter, contentDescription: String, tint: Color, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongParameterList:QuranComponents.kt$( sura: Int, title: String, verseCount: Int, viewMode: QuranViewMode, onViewModeChange: (QuranViewMode) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongParameterList:QuranScreen.kt$( sura: Int, title: String, load: QuranLoad, startAt: Int, onRemember: (Int) -&gt; Unit, viewMode: QuranViewMode, onViewModeChange: (QuranViewMode) -&gt; Unit, onNavigateToDownloads: () -&gt; Unit = {}, reciter: Reciter = Reciter.HUSARI_MUJAWWAD, )</ID>
+    <ID>LongParameterList:TodayScreen.kt$( city: City, profile: TimingProfile, tradition: Tradition, showHomeDuas: Boolean = true, actions: TodayActions, )</ID>
+    <ID>LoopWithTooManyJumpStatements:FastingOutlookTest.kt$FastingOutlookTest$for</ID>
+    <ID>MagicNumber:AudioDownloadManager.kt$AudioDownloadManager$1024</ID>
+    <ID>MagicNumber:AudioDownloadManager.kt$AudioDownloadManager$1024.0</ID>
+    <ID>MagicNumber:AudioDownloadManager.kt$AudioDownloadManager$10_000</ID>
+    <ID>MagicNumber:AudioDownloadManager.kt$AudioDownloadManager$15_000</ID>
+    <ID>MagicNumber:AudioDownloadManager.kt$AudioDownloadManager$200</ID>
+    <ID>MagicNumber:AudioDownloadManager.kt$AudioDownloadManager$20_000</ID>
+    <ID>MagicNumber:AudioDownloadManager.kt$AudioDownloadManager$286</ID>
+    <ID>MagicNumber:AudioDownloadManager.kt$AudioDownloadManager$3</ID>
+    <ID>MagicNumber:AudioDownloadManager.kt$AudioDownloadManager$4</ID>
+    <ID>MagicNumber:AudioDownloadManager.kt$AudioDownloadManager$8192</ID>
+    <ID>MagicNumber:AudioDownloadManager.kt$AudioDownloadManager$8_000</ID>
+    <ID>MagicNumber:AudioDownloadScreen.kt$100</ID>
+    <ID>MagicNumber:AudioDownloadScreen.kt$200</ID>
+    <ID>MagicNumber:AudioDownloadScreen.kt$286</ID>
+    <ID>MagicNumber:AudioDownloadScreen.kt$3</ID>
+    <ID>MagicNumber:FastingPrompt.kt$12</ID>
+    <ID>MagicNumber:FastingPrompt.kt$17</ID>
+    <ID>MagicNumber:FastingReminderScheduler.kt$10</ID>
+    <ID>MagicNumber:FastingReminderScheduler.kt$12</ID>
+    <ID>MagicNumber:FastingReminderScheduler.kt$13</ID>
+    <ID>MagicNumber:FastingReminderScheduler.kt$9</ID>
+    <ID>MagicNumber:FloatingDownloadBar.kt$100</ID>
+    <ID>MagicNumber:QuranAudioPlayer.kt$QuranAudioPlayer$3</ID>
+    <ID>MagicNumber:QuranHubScreen.kt$3</ID>
+    <ID>MagicNumber:QuranPages.kt$3</ID>
+    <ID>MagicNumber:QuranPages.kt$49</ID>
+    <ID>MagicNumber:QuranPages.kt$76</ID>
+    <ID>MaxLineLength:AudioDownloadManager.kt$AudioDownloadManager$"https://saadiah.app/artifacts/recitations/${reciter.zipName}/${reciter.zipType}_sura_$suraPadded.zip"</ID>
+    <ID>NestedBlockDepth:AfterPrayerReminderScheduler.kt$fun nextAfterPrayerReminder( delay: AfterPrayerReminderDelay, city: City, profile: TimingProfile, enabledPrayers: Set&lt;Prayer&gt;, now: Instant, calculator: PrayerCalculator = PrayerCalculator(), ): AfterPrayerReminder?</ID>
+    <ID>NestedBlockDepth:FastingOutlookTest.kt$FastingOutlookTest$@Test fun bundlesMondayAndWhiteDaysWhenCoinciding()</ID>
+    <ID>NestedBlockDepth:FastingPrompt.kt$private fun resolveFastingReasons( date: LocalDate, hijri: HijriDate, tradition: Tradition, strings: Strings, ): List&lt;String&gt;</ID>
+    <ID>NestedBlockDepth:FastingReminderScheduler.kt$private fun resolveFastingKind( date: LocalDate, hijri: HijriDate, cadence: FastingReminderCadence, tradition: Tradition, ): FastingKind?</ID>
+    <ID>NestedBlockDepth:QuranPages.kt$fun medinaMushafPage( sura: Int, ayah: Int, ): Int</ID>
+    <ID>ReturnCount:AudioDownloadManager.kt$AudioDownloadManager$private fun downloadAndExtractZip( zipUrlStr: String, targetDir: File, ): Boolean</ID>
+    <ID>ReturnCount:FastingReminderScheduler.kt$private fun resolveFastingKind( date: LocalDate, hijri: HijriDate, cadence: FastingReminderCadence, tradition: Tradition, ): FastingKind?</ID>
+    <ID>ReturnCount:QuranPages.kt$fun medinaMushafPage( sura: Int, ayah: Int, ): Int</ID>
+    <ID>ReturnCount:TravelDetector.kt$TravelDetector$private fun findSuggestedCity( targetZone: TimeZone, countryCode: String?, now: Instant, ): City?</ID>
+    <ID>TooManyFunctions:AudioDownloadManager.kt$AudioDownloadManager</ID>
+    <ID>TooManyFunctions:SettingsLabels.kt$app.saadiah.ui.SettingsLabels.kt</ID>
+    <ID>TooManyFunctions:SettingsScreen.kt$app.saadiah.ui.SettingsScreen.kt</ID>
+    <ID>UnusedPrivateProperty:AudioDownloadManagerTest.kt$AudioDownloadManagerTest$val minshawiDir = AudioDownloadManager.quranAudioDir(context, Reciter.MINSHAWI_MUJAWWAD)</ID>
+    <ID>UnusedPrivateProperty:MedinaMushafPageTest.kt$MedinaMushafPageTest$val rawUthmani = "\u0623\u064f\u0648\u0652\u0644\u064e\u0640\u0670\u0626\u0650\u0643\u064e" // with U+06DF</ID>
+    <ID>UnusedPrivateProperty:QuranHubScreen.kt$private val QUICK_CHIP_MIN_HEIGHT = 48.dp</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -2,21 +2,27 @@ package app.saadiah
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import app.saadiah.alarm.AfterPrayerReminderScheduler
 import app.saadiah.alarm.BaqarahReminderScheduler
+import app.saadiah.alarm.EXTRA_OPEN_CITY_PICKER
 import app.saadiah.alarm.FastingReminderScheduler
 import app.saadiah.alarm.PrayerAlarmScheduler
 import app.saadiah.alarm.canPostNotifications
+import app.saadiah.alarm.dismissTravelNotification
 import app.saadiah.alarm.ensureChannels
 import app.saadiah.data.Settings
 import app.saadiah.data.SettingsStore
@@ -28,6 +34,7 @@ import app.saadiah.ui.DEFAULT_CITY
 import app.saadiah.ui.Navigator
 import app.saadiah.ui.SaadiahApp
 import app.saadiah.ui.SaadiahTheme
+import app.saadiah.ui.Screen
 import app.saadiah.ui.stringsFor
 import kotlinx.coroutines.launch
 
@@ -35,8 +42,13 @@ class MainActivity : ComponentActivity() {
     private val requestNotifications =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
+    private var openCityPickerRequested by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (intent?.getBooleanExtra(EXTRA_OPEN_CITY_PICKER, false) == true) {
+            openCityPickerRequested = true
+        }
         ensureChannels(this, stringsFor(Language.SYSTEM))
         askForNotificationsOnce()
 
@@ -50,6 +62,14 @@ class MainActivity : ComponentActivity() {
         setContent { Saadiah(store, alarms) }
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (intent.getBooleanExtra(EXTRA_OPEN_CITY_PICKER, false)) {
+            openCityPickerRequested = true
+        }
+    }
+
     @Composable
     private fun Saadiah(
         store: SettingsStore,
@@ -61,6 +81,13 @@ class MainActivity : ComponentActivity() {
         val settings by store.settings.collectAsStateWithLifecycle(initialValue = null)
         val navigator = remember { Navigator() }
         val current = settings ?: return
+
+        LaunchedEffect(openCityPickerRequested) {
+            if (openCityPickerRequested) {
+                navigator.go(Screen.PickingCity)
+                openCityPickerRequested = false
+            }
+        }
 
         SaadiahTheme(language = current.language, theme = current.theme) {
             SaadiahApp(
@@ -76,6 +103,7 @@ class MainActivity : ComponentActivity() {
                             }
                         },
                         onChangeCity = { chosen ->
+                            dismissTravelNotification(this@MainActivity)
                             save(store, alarms) {
                                 it.copy(city = chosen, timingProfile = null)
                             }

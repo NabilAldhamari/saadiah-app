@@ -29,6 +29,14 @@ data class ObservanceState(
     val alertEnabled: Boolean,
 )
 
+data class TravelPromptState(
+    val title: String,
+    val message: String,
+    val suggestedCity: City?,
+    val switchLabel: String?,
+    val dismissLabel: String,
+)
+
 data class TodayState(
     val hijriLabel: String,
     val gregorianLabel: String,
