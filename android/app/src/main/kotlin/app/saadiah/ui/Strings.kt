@@ -38,6 +38,7 @@ interface Strings {
     val tabCalendar: String
     val tabAdhkar: String
     val tabMore: String
+    val tabQuran: String get() = if (rendersArabic) "المصحف" else "Quran"
 
     val titleChooseCity: String
     val titleAlertCheck: String
@@ -46,10 +47,31 @@ interface Strings {
     val titlePrayer: String
     val titleSettings: String
     val titleQuran: String
+    val titleCustomAdhkar: String get() = if (rendersArabic) "أذكاري الخاصة" else "Custom Adhkar"
 
     val todaysReading: String
     val todaysReadingHint: String
     val fastingAhead: String
+    val resumeReading: String get() = if (rendersArabic) "تابع القراءة" else "Continue Reading"
+    val listenAudio: String get() = if (rendersArabic) "استماع" else "Listen"
+    val readSurah: String get() = if (rendersArabic) "قراءة" else "Read"
+    val allSurahs: String get() = if (rendersArabic) "فهرس السور" else "Surah Index"
+    val fastingHeroTitle: String get() = if (rendersArabic) "صيام مستحب" else "Recommended Fasting"
+    val fastingMonday: String get() = if (rendersArabic) "صيام الإثنين" else "Monday Fast"
+    val fastingThursday: String get() = if (rendersArabic) "صيام الخميس" else "Thursday Fast"
+    val hijamahHeroTitle: String get() = if (rendersArabic) "أيام الحجامة النبوية" else "Prophetic Hijamah Days"
+    val suhoorEnds: String get() = if (rendersArabic) "الإمساك" else "Suhoor ends"
+    val iftarTime: String get() = if (rendersArabic) "الإفطار" else "Iftar"
+    val hijamahNotice: String get() =
+        if (rendersArabic) {
+            "تبدأ ليلة الحجامة عند مغرب اليوم السابق"
+        } else {
+            "Hijamah night begins at sunset of preceding day"
+        }
+    val tasbihGoalCompleted: String get() = if (rendersArabic) "تم بحمد الله" else "Goal Completed"
+    val tapAnywhereToCount: String get() = if (rendersArabic) "اضغط في أي مكان للعد" else "Tap anywhere to count"
+    val nextDhikr: String get() = if (rendersArabic) "الذكر التالي" else "Next Dhikr"
+    val prevDhikr: String get() = if (rendersArabic) "الذكر السابق" else "Previous Dhikr"
 
     val nextPrayer: String
     val whyThisTimeQuestion: String
@@ -286,6 +308,9 @@ interface Strings {
     val themeLight: String
     val themeDark: String
     val themeGreen: String
+    val andConjunction: String
+
+    fun pageNumber(page: Int): String
 
     val loadingText: String
     val textFailedVerification: String

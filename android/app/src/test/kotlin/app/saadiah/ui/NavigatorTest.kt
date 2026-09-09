@@ -49,7 +49,7 @@ class NavigatorTest {
     @Test
     fun switchingTabDoesNotPileUpHistory() {
         navigator.switchTab(Screen.Calendar)
-        navigator.switchTab(Screen.Adhkar)
+        navigator.switchTab(Screen.Adhkar())
         navigator.switchTab(Screen.More)
 
         navigator.back()
@@ -76,9 +76,9 @@ class NavigatorTest {
     fun switchingTabAbandonsWhateverWasOpenAboveIt() {
         navigator.go(Screen.PrayerDetail(Prayer.FAJR))
 
-        navigator.switchTab(Screen.Adhkar)
+        navigator.switchTab(Screen.Adhkar())
 
-        assertEquals(expected = Screen.Adhkar, actual = navigator.current)
+        assertEquals(expected = Screen.Adhkar(), actual = navigator.current)
         navigator.back()
         assertEquals(expected = Screen.Today, actual = navigator.current, message = "a stale detail screen survived")
     }

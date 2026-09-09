@@ -1,18 +1,23 @@
 package app.saadiah.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import app.saadiah.design.ObservanceMarker
 import app.saadiah.design.SaadiahColors
+import app.saadiah.design.SaadiahRadius
 import app.saadiah.design.SaadiahSpacing
 import app.saadiah.design.SaadiahTheme
 import app.saadiah.design.SaadiahType
@@ -58,8 +63,32 @@ private fun DayCell(
     modifier: Modifier,
 ) {
     val colors = SaadiahTheme.colors
+    val isToday = cell?.isToday == true
+    val bg =
+        if (isToday) {
+            colors.accent.copy(alpha = 0.15f)
+        } else {
+            when (cell?.marker) {
+                ObservanceMarker.RECOMMENDED_FAST -> colors.sage.copy(alpha = 0.12f)
+                ObservanceMarker.HIJAMAH -> colors.accent.copy(alpha = 0.14f)
+                ObservanceMarker.PROHIBITED_FAST -> colors.warning.copy(alpha = 0.12f)
+                null -> androidx.compose.ui.graphics.Color.Transparent
+            }
+        }
+    val borderModifier =
+        if (isToday) {
+            Modifier.border(2.dp, colors.accent, RoundedCornerShape(SaadiahRadius.button))
+        } else {
+            Modifier
+        }
     Column(
-        modifier = modifier.minimumTouchTarget().padding(vertical = SaadiahSpacing.tiny),
+        modifier =
+            modifier
+                .padding(2.dp)
+                .then(borderModifier)
+                .background(bg, RoundedCornerShape(SaadiahRadius.button))
+                .minimumTouchTarget()
+                .padding(vertical = SaadiahSpacing.tiny),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         if (cell == null) {
@@ -69,7 +98,12 @@ private fun DayCell(
         Text(
             text = cell.hijriDay.toString(),
             color = colors.text,
-            fontSize = SaadiahType.body.size,
+            fontWeight =
+                if (cell.marker != null) {
+                    androidx.compose.ui.text.font.FontWeight.Bold
+                } else {
+                    androidx.compose.ui.text.font.FontWeight.Normal
+                },
         )
         Text(
             text = cell.gregorianDay.toString(),
@@ -81,6 +115,7 @@ private fun DayCell(
             text = cell.marker.glyph(),
             color = cell.marker.tint(colors),
             fontSize = SaadiahType.label.size,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
         )
     }
 }

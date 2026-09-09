@@ -316,8 +316,11 @@ object ArabicStrings : Strings {
     override val sectionTheme = "المظهر"
     override val themeSystem = "حسب إعداد الهاتف"
     override val themeLight = "فاتح دافئ"
-    override val themeDark = "داكن دافئ"
+    override val themeDark = "داكن"
     override val themeGreen = "أبيض وأخضر"
+    override val andConjunction = " و"
+
+    override fun pageNumber(page: Int) = "صفحة $page"
 
     override val loadingText = "جارٍ فتح النص…"
     override val textFailedVerification =
@@ -376,6 +379,9 @@ object ArabicStrings : Strings {
             "KEMENAG" to "وزارة الشؤون الدينية، إندونيسيا",
             "DUBAI" to "دبي وأوقاف الإمارات",
             "LONDON_UNIFIED" to "توقيت لندن الموحد",
+            "UK_REGIONAL" to "المملكة المتحدة الإقليمي (١٨°/١٢°)",
+            "MOONSIGHTING_COMMITTEE" to "لجنة رؤية الهلال",
+            "SINGAPORE" to "مجلس أوغاما إسلام سنغافورة (MUIS)",
             "JAKIM" to "دائرة التنمية الإسلامية بماليزيا (JAKIM)",
             "PARIS" to "مسجد باريس الكبير",
             "UOIF" to "مسلمو فرنسا (زاوية ١٢°)",

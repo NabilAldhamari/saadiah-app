@@ -12,11 +12,19 @@ import app.saadiah.model.Prayer
 sealed interface Screen {
     data object Today : Screen
 
+    data object Quran : Screen
+
+    data class Adhkar(
+        val initialCollection: app.saadiah.content.DhikrCollection = app.saadiah.content.DhikrCollection.MORNING,
+    ) : Screen
+
     data object Calendar : Screen
 
-    data object Adhkar : Screen
-
     data object More : Screen
+
+    data object Settings : Screen
+
+    data object CustomAdhkar : Screen
 
     data object PickingCity : Screen
 
@@ -40,7 +48,7 @@ sealed interface Screen {
 }
 
 val Screen.isTabRoot: Boolean
-    get() = this is Screen.Today || this is Screen.Calendar || this is Screen.Adhkar || this is Screen.More
+    get() = this is Screen.Today || this is Screen.Quran || this is Screen.Adhkar || this is Screen.Calendar
 
 /**
  * One back stack for the whole app, so the phone's back button and the on-screen one can

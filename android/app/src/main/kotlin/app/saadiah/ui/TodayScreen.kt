@@ -2,6 +2,8 @@ package app.saadiah.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,7 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import app.saadiah.design.NextPrayerHero
-import app.saadiah.design.ObservanceRow
 import app.saadiah.design.PrayerRow
 import app.saadiah.design.R
 import app.saadiah.design.SaadiahRadius
@@ -47,7 +48,8 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import androidx.compose.runtime.LaunchedEffect as ComposeLaunchedEffect
 
-private const val TICK_MILLIS = 1_000L
+private const val TICK_MILLIS = 15_000L
+private const val SECONDS_PER_MINUTE = 60L
 private val GLYPH = 28.dp
 
 data class TodayActions(
@@ -56,6 +58,8 @@ data class TodayActions(
     val onOpenPrayer: (app.saadiah.model.Prayer) -> Unit = {},
     val onOpenBaqarah: () -> Unit = {},
     val onOpenAdhkar: () -> Unit = {},
+    val onOpenAdhkarCollection: (app.saadiah.content.DhikrCollection) -> Unit = { onOpenAdhkar() },
+    val onOpenSettings: () -> Unit = {},
 )
 
 @Composable
@@ -68,18 +72,35 @@ fun TodayScreen(
 ) {
     val now = rememberTickingNow()
     val words = strings
-    val state = remember(city, profile, tradition, now, words) { todayState(city, profile, tradition, now, words) }
+    val currentMinute = now.epochSeconds / SECONDS_PER_MINUTE
+    val state =
+        remember(city, profile, tradition, currentMinute, words) {
+            todayState(city, profile, tradition, now, words)
+        }
     val colors = SaadiahTheme.colors
 
     Column(modifier = Modifier.fillMaxSize().background(colors.bg)) {
-        // The Hijri date is this screen's title, so it is what the pinned header carries.
-        // It stays put while the prayer list scrolls under it.
-        //
-        // Always right-to-left: the label is Arabic — "٩ محرم ١٤٤٨ هـ" — and in a left-to-right
-        // layout the year and the هـ that qualifies it end up on opposite sides of the month.
-        // It is Arabic text in an English app, not English text.
+        // Pinned header carries Hijri date and accessible Settings shortcut.
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-            ScreenHeader(title = state.hijriLabel)
+            ScreenHeader(
+                title = state.hijriLabel,
+                action = {
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(48.dp)
+                                .clickable(onClick = actions.onOpenSettings),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_settings),
+                            contentDescription = strings.titleSettings,
+                            tint = colors.textSecondary,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                },
+            )
         }
         Column(
             modifier =
@@ -106,7 +127,7 @@ fun TodayScreen(
                 HomeDuaCard(
                     now = now,
                     tradition = tradition,
-                    onOpen = actions.onOpenAdhkar,
+                    onOpen = { collection -> actions.onOpenAdhkarCollection(collection) },
                 )
             }
             BaqarahCard(onOpen = actions.onOpenBaqarah)
@@ -190,33 +211,117 @@ private fun BaqarahCard(onOpen: () -> Unit) {
 @Composable
 private fun FastingStrip(prompts: List<FastingPrompt>) {
     if (prompts.isEmpty()) return
+    val colors = SaadiahTheme.colors
+    val shape = RoundedCornerShape(SaadiahRadius.sheet)
     SectionDivider()
     Caption(strings.fastingAhead)
     for (prompt in prompts) {
-        ObservanceRow(
-            title = prompt.title,
-            subtitle = prompt.timing,
-            marker = prompt.marker,
-            alertEnabled = true,
-            alertDescription = strings.alertOnFor(prompt.title),
-            onToggleAlert = {},
-        )
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = SaadiahSpacing.tiny)
+                    .background(colors.surface, shape)
+                    .padding(SaadiahSpacing.medium),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                val isHijama = prompt.marker == app.saadiah.design.ObservanceMarker.HIJAMAH
+                val badgeText = if (isHijama) strings.hijamahHeroTitle else strings.fastingHeroTitle
+                val dotColor = if (isHijama) colors.accent else colors.sage
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(10.dp)
+                                .background(dotColor, androidx.compose.foundation.shape.CircleShape),
+                    )
+                    Spacer(Modifier.width(SaadiahSpacing.small))
+                    Text(
+                        text = badgeText,
+                        color = dotColor,
+                        fontSize = SaadiahType.label.size,
+                        fontWeight = SaadiahType.label.weight,
+                    )
+                }
+                Text(
+                    text = prompt.timing,
+                    color = colors.accent,
+                    fontSize = SaadiahType.bodySmall.size,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                )
+            }
+            Spacer(Modifier.height(SaadiahSpacing.tiny))
+            Text(
+                text = prompt.title,
+                color = colors.text,
+                fontSize = SaadiahType.titleMedium.size,
+                lineHeight = SaadiahType.titleMedium.lineHeight,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+            )
+        }
     }
 }
 
 @Composable
 private fun Observances(state: TodayState) {
     if (state.observances.isEmpty()) return
+    val colors = SaadiahTheme.colors
+    val shape = RoundedCornerShape(SaadiahRadius.sheet)
     SectionDivider()
     for (observance in state.observances) {
-        ObservanceRow(
-            title = observance.title,
-            subtitle = observance.subtitle,
-            marker = observance.marker,
-            alertEnabled = observance.alertEnabled,
-            alertDescription = alertLabelFor(observance.title, observance.alertEnabled, strings),
-            onToggleAlert = {},
-        )
+        val isHijamah = observance.marker == app.saadiah.design.ObservanceMarker.HIJAMAH
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = SaadiahSpacing.tiny)
+                    .background(colors.surface, shape)
+                    .padding(SaadiahSpacing.medium),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Box(
+                    modifier =
+                        Modifier
+                            .size(10.dp)
+                            .background(
+                                color = if (isHijamah) colors.warning else colors.accent,
+                                shape = androidx.compose.foundation.shape.CircleShape,
+                            ),
+                )
+                Spacer(Modifier.width(SaadiahSpacing.small))
+                Text(
+                    text = if (isHijamah) strings.hijamahHeroTitle else observance.subtitle,
+                    color = if (isHijamah) colors.warning else colors.accent,
+                    fontSize = SaadiahType.label.size,
+                    fontWeight = SaadiahType.label.weight,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            Spacer(Modifier.height(SaadiahSpacing.tiny))
+            Text(
+                text = observance.title,
+                color = colors.text,
+                fontSize = SaadiahType.titleMedium.size,
+                lineHeight = SaadiahType.titleMedium.lineHeight,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+            )
+            if (isHijamah) {
+                Spacer(Modifier.height(SaadiahSpacing.tiny))
+                Text(
+                    text = strings.hijamahNotice,
+                    color = colors.textSecondary,
+                    fontSize = SaadiahType.bodySmall.size,
+                    lineHeight = SaadiahType.bodySmall.lineHeight,
+                )
+            }
+        }
     }
 }
 

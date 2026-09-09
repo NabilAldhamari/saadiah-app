@@ -57,7 +57,7 @@ class MethodInferenceTest {
                 "CA" to Method.NORTH_AMERICA,
                 "ID" to Method.KEMENAG,
                 "MY" to Method.JAKIM,
-                "SG" to Method.JAKIM,
+                "SG" to Method.SINGAPORE,
                 "AE" to Method.DUBAI,
                 "GB" to Method.LONDON_UNIFIED,
                 "FR" to Method.PARIS,

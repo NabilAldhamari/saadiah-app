@@ -70,6 +70,11 @@ class MainActivity : ComponentActivity() {
                 actions =
                     AppActions(
                         onChangeSettings = { edit -> save(store, alarms, edit) },
+                        onSaveReadingPosition = { sura, ayah ->
+                            lifecycleScope.launch {
+                                store.update { it.copy(readingPositions = it.readingPositions + (sura to ayah)) }
+                            }
+                        },
                         onChangeCity = { chosen ->
                             save(store, alarms) {
                                 it.copy(city = chosen, timingProfile = null)

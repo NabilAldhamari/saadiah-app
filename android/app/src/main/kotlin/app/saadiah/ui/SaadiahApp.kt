@@ -125,24 +125,34 @@ private fun TabRoot(
     actions: AppActions,
 ) {
     when (screen) {
+        Screen.Quran ->
+            QuranHubScreen(
+                settings = settings,
+                onRead = { sura -> navigator.go(Screen.Reading(sura)) },
+                onListen = { sura -> navigator.go(Screen.Reading(sura)) },
+            )
         Screen.Calendar -> {
-            val shown = remember { mutableStateOf(todayHijri(today(city))) }
+            val currentCityToday = today(city)
+            val currentCityHijri = todayHijri(currentCityToday)
+            val shown = remember { mutableStateOf(currentCityHijri) }
             val month = shown.value
             CalendarScreen(
                 state = calendarState(month.year, month.month, tradition, strings),
-                page = monthGrid(month.year, month.month, tradition, strings),
-                onJumpToToday = { shown.value = todayHijri(today(city)) },
+                page = monthGrid(month.year, month.month, tradition, strings, todayHijri = currentCityHijri),
+                todayHijri = currentCityHijri,
+                onJumpToToday = { shown.value = currentCityHijri },
                 onPreviousMonth = { shown.value = month.previousMonth() },
                 onNextMonth = { shown.value = month.nextMonth() },
             )
         }
-        Screen.Adhkar ->
+        is Screen.Adhkar ->
             AdhkarScreen(
                 tradition = tradition,
                 custom = settings.customAdhkar,
+                initialCollection = screen.initialCollection,
                 onChangeCustom = { chosen -> actions.onChangeSettings { it.copy(customAdhkar = chosen) } },
             )
-        Screen.More ->
+        Screen.More, Screen.Settings ->
             SettingsScreen(
                 settings = settings,
                 cityName = city.name,
@@ -169,7 +179,9 @@ private fun TabRoot(
                         onOpenDoctor = { navigator.go(Screen.WhyThisTime) },
                         onOpenPrayer = { navigator.go(Screen.PrayerDetail(it)) },
                         onOpenBaqarah = { navigator.go(Screen.Baqarah) },
-                        onOpenAdhkar = { navigator.go(Screen.Adhkar) },
+                        onOpenAdhkar = { navigator.switchTab(Screen.Adhkar()) },
+                        onOpenAdhkarCollection = { collection -> navigator.switchTab(Screen.Adhkar(collection)) },
+                        onOpenSettings = { navigator.go(Screen.Settings) },
                     ),
             )
     }
@@ -186,6 +198,21 @@ private fun PushedScreen(
 ) {
     val back: () -> Unit = { navigator.back() }
     when (screen) {
+        Screen.Settings, Screen.More ->
+            SettingsScreen(
+                settings = settings,
+                cityName = place.city.name,
+                actions =
+                    SettingsActions(
+                        onChange = actions.onChangeSettings,
+                        onChangeCity = { navigator.go(Screen.PickingCity) },
+                        onOpenDoctor = { navigator.go(Screen.Doctor) },
+                        onMatchMasjid = { navigator.go(Screen.MatchMasjid) },
+                        onOpenBaqarah = { navigator.go(Screen.Baqarah) },
+                        onOpenAudioDownloads = { navigator.go(Screen.AudioDownloads) },
+                        onResetMatchedProfile = actions.onResetMatchedProfile,
+                    ),
+            )
         Screen.Baqarah ->
             BaqarahScreen(
                 onBack = back,
@@ -248,13 +275,11 @@ private fun Reading(
         is Screen.Reading ->
             QuranScreen(
                 sura = screen.sura,
-                title = if (screen.sura == BAQARAH_SURA) strings.titleAlBaqarah else strings.titleAlImran,
+                title = SurahCatalog.forNumber(screen.sura).arabicName,
                 onBack = back,
                 startAt = settings.readingPositions[screen.sura] ?: 1,
                 onRemember = { ayah ->
-                    actions.onChangeSettings {
-                        it.copy(readingPositions = it.readingPositions + (screen.sura to ayah))
-                    }
+                    actions.onSaveReadingPosition(screen.sura, ayah)
                 },
                 viewMode = settings.quranViewMode,
                 onViewModeChange = { mode ->
@@ -304,14 +329,14 @@ private fun tabsFor(navigator: Navigator): List<Tab> {
         Tab(strings.tabToday, painterResource(R.drawable.ic_today), current == Screen.Today) {
             navigator.switchTab(Screen.Today)
         },
+        Tab(strings.tabQuran, painterResource(R.drawable.ic_quran), current == Screen.Quran) {
+            navigator.switchTab(Screen.Quran)
+        },
+        Tab(strings.tabAdhkar, painterResource(R.drawable.ic_adhkar), current is Screen.Adhkar) {
+            navigator.switchTab(Screen.Adhkar())
+        },
         Tab(strings.tabCalendar, painterResource(R.drawable.ic_calendar), current == Screen.Calendar) {
             navigator.switchTab(Screen.Calendar)
-        },
-        Tab(strings.tabAdhkar, painterResource(R.drawable.ic_adhkar), current == Screen.Adhkar) {
-            navigator.switchTab(Screen.Adhkar)
-        },
-        Tab(strings.tabMore, painterResource(R.drawable.ic_more), current == Screen.More) {
-            navigator.switchTab(Screen.More)
         },
     )
 }

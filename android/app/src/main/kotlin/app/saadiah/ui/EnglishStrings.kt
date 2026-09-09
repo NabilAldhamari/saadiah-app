@@ -313,6 +313,9 @@ object EnglishStrings : Strings {
     override val themeLight = "Warm light"
     override val themeDark = "Warm dark"
     override val themeGreen = "White and green"
+    override val andConjunction = " & "
+
+    override fun pageNumber(page: Int) = "Page $page"
 
     override val loadingText = "Opening the text…"
     override val textFailedVerification =
@@ -372,6 +375,9 @@ object EnglishStrings : Strings {
             "KEMENAG" to "Ministry of Religious Affairs, Indonesia",
             "DUBAI" to "Dubai & UAE Awqaf",
             "LONDON_UNIFIED" to "London Unified",
+            "UK_REGIONAL" to "UK Regional (18°/12°)",
+            "MOONSIGHTING_COMMITTEE" to "Moonsighting Committee",
+            "SINGAPORE" to "MUIS, Singapore",
             "JAKIM" to "JAKIM, Malaysia",
             "PARIS" to "Grand Mosque of Paris",
             "UOIF" to "Musulmans de France (12°)",

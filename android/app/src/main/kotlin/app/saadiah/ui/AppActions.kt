@@ -16,6 +16,7 @@ typealias SettingsEdit = (Settings) -> Settings
  */
 data class AppActions(
     val onChangeSettings: (SettingsEdit) -> Unit,
+    val onSaveReadingPosition: (Int, Int) -> Unit = { _, _ -> },
     val onChangeCity: (City) -> Unit,
     val onOpenBackgroundSettings: () -> Unit,
     val onApplyMatchedProfile: (app.saadiah.prayer.SolveResult) -> Unit,

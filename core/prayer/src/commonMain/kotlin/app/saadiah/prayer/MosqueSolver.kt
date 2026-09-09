@@ -82,12 +82,10 @@ class MosqueSolver(
         date: LocalDate,
         baseline: TimingProfile = inferProfile(city),
     ): SolveResult {
+        require(observed.isNotEmpty()) { "there is nothing to match against" }
         // Spread first — a timetable shifted a constant few minutes is still that method, so
         // how *evenly* a candidate is wrong matters more than by how much. Then the size of
         // that constant, which breaks ties toward the method needing least correction.
-        // Ties break toward preserving the baseline method, madhhab and high-latitude rule
-        // rather than arbitrary enum declaration order.
-        require(observed.isNotEmpty()) { "there is nothing to match against" }
         val best = candidates(observed, city, date, baseline).minWith(compareBy({ it.spread }, { abs(it.offset) }))
         val confidence =
             if (best.spread / observed.size <= MAX_AVERAGE_SPREAD_MINUTES) {

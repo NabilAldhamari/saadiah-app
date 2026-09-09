@@ -23,8 +23,8 @@ class TypeScaleTest {
     }
 
     @Test
-    fun readingBodyStartsAtSeventeen() {
-        assertEquals(expected = 17f, actual = SaadiahType.body.size.value)
+    fun readingBodyStartsAtEighteen() {
+        assertEquals(expected = 18f, actual = SaadiahType.body.size.value)
     }
 
     @Test
@@ -40,12 +40,12 @@ class TypeScaleTest {
 
     @Test
     fun theDisplayStyleIsReservedForOneValue() {
-        assertEquals(expected = 54f, actual = SaadiahType.display.size.value)
+        assertEquals(expected = 56f, actual = SaadiahType.display.size.value)
     }
 
     @Test
     fun quranicTextHasItsOwnScale() {
-        assertEquals(expected = 26f, actual = SaadiahType.quran.size.value)
+        assertEquals(expected = 28f, actual = SaadiahType.quran.size.value)
         assertEquals(expected = 2.0f, actual = SaadiahType.quran.lineHeightRatio)
     }
 

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,6 +34,7 @@ import app.saadiah.design.SaadiahTheme
 import app.saadiah.design.SaadiahType
 import app.saadiah.design.SectionDivider
 import app.saadiah.design.minimumTouchTarget
+import app.saadiah.model.HijriDate
 
 private val LEADING_COLUMN = 44.dp
 private val HAIRLINE = 1.dp
@@ -44,11 +46,12 @@ enum class CalendarView { LIST, GRID }
 fun CalendarScreen(
     state: CalendarState,
     page: MonthPage,
+    todayHijri: HijriDate? = null,
     onJumpToToday: () -> Unit,
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
 ) {
-    var view by remember { mutableStateOf(CalendarView.LIST) }
+    var view by remember { mutableStateOf(CalendarView.GRID) }
     val colors = SaadiahTheme.colors
 
     // fillMaxSize, not fillMaxWidth: the background has to reach the bottom of the window
@@ -61,7 +64,7 @@ fun CalendarScreen(
             ViewSwitch(selected = view, onSelect = { view = it })
             SectionDivider()
             when (view) {
-                CalendarView.LIST -> DayList(state)
+                CalendarView.LIST -> DayList(state, todayHijri)
                 CalendarView.GRID -> MonthGrid(page)
             }
         }
@@ -145,17 +148,40 @@ private fun SwitchOption(
 }
 
 @Composable
-private fun DayList(state: CalendarState) {
-    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        items(state.days) { DayRow(it) }
+private fun DayList(
+    state: CalendarState,
+    todayHijri: HijriDate? = null,
+) {
+    val initialIndex =
+        if (todayHijri != null) {
+            state.days.indexOfFirst { it.hijriDay >= todayHijri.day }.coerceAtLeast(0)
+        } else {
+            0
+        }
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialIndex)
+    LazyColumn(state = listState, modifier = Modifier.fillMaxWidth()) {
+        items(state.days) { DayRow(it, isToday = todayHijri != null && it.hijriDay == todayHijri.day) }
         state.conflictNote?.let { note -> item { ConflictNote(note) } }
     }
 }
 
 @Composable
-private fun DayRow(day: CalendarDay) {
+private fun DayRow(
+    day: CalendarDay,
+    isToday: Boolean = false,
+) {
     val colors = SaadiahTheme.colors
-    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    val rowModifier =
+        if (isToday) {
+            Modifier
+                .fillMaxWidth()
+                .background(colors.accent.copy(alpha = 0.10f), RoundedCornerShape(SaadiahRadius.button))
+                .border(HAIRLINE, colors.accent, RoundedCornerShape(SaadiahRadius.button))
+                .padding(horizontal = SaadiahSpacing.tiny, vertical = 2.dp)
+        } else {
+            Modifier.fillMaxWidth()
+        }
+    Row(modifier = rowModifier, verticalAlignment = Alignment.CenterVertically) {
         Column(modifier = Modifier.width(LEADING_COLUMN)) {
             Text("${day.hijriDay}", color = colors.text, fontSize = SaadiahType.titleSmall.size)
             Text(day.weekday, color = colors.textSecondary, fontSize = SaadiahType.bodySmall.size)

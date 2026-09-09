@@ -29,6 +29,7 @@ import app.saadiah.design.MinimumTapTarget
 import app.saadiah.design.SaadiahSpacing
 import app.saadiah.design.SaadiahType
 import app.saadiah.model.City
+import app.saadiah.model.EXTENDED_CITIES
 import kotlinx.datetime.TimeZone
 
 @Composable
@@ -63,7 +64,11 @@ fun CityPickerScreen(
             Spacer(Modifier.height(SaadiahSpacing.medium))
             when {
                 index == null -> Body(strings.loadingCityList)
-                query.isBlank() -> Body(strings.typeYourCity)
+                query.isBlank() -> {
+                    Caption(strings.typeYourCity)
+                    Spacer(Modifier.height(SaadiahSpacing.small))
+                    CityResults(results = EXTENDED_CITIES, selected = selected, onPick = onPick)
+                }
                 else -> CityResults(results = results, selected = selected, onPick = onPick)
             }
         }
@@ -94,6 +99,12 @@ private fun CityRow(
     isSelected: Boolean,
     onPick: (City) -> Unit,
 ) {
+    val subtitle =
+        if (city.admin1.isNotBlank()) {
+            "${city.admin1}, ${city.country.value} (${city.timeZone.id})"
+        } else {
+            "${city.country.value} (${city.timeZone.id})"
+        }
     Column(
         modifier =
             Modifier
@@ -108,6 +119,6 @@ private fun CityRow(
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
             color = MaterialTheme.colorScheme.onBackground,
         )
-        Caption("${city.admin1}, ${city.country.value}")
+        Caption(subtitle)
     }
 }

@@ -48,7 +48,7 @@ private const val NOON_HOUR = 12
 fun HomeDuaCard(
     now: Instant,
     tradition: Tradition,
-    onOpen: () -> Unit,
+    onOpen: (DhikrCollection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = SaadiahTheme.colors
@@ -70,7 +70,7 @@ fun HomeDuaCard(
                 .fillMaxWidth()
                 .background(colors.surface, RoundedCornerShape(SaadiahRadius.sheet))
                 .border(CARD_HAIRLINE, colors.line, RoundedCornerShape(SaadiahRadius.sheet))
-                .clickable(onClick = onOpen)
+                .clickable(onClick = { onOpen(collection) })
                 .padding(SaadiahSpacing.medium),
     ) {
         Row(

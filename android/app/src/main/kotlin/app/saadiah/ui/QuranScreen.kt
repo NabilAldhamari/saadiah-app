@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import app.saadiah.audio.AudioDownloadManager
 import app.saadiah.audio.QuranAudioPlayer
-import app.saadiah.content.Ayah
 import app.saadiah.content.QuranText
 import app.saadiah.content.SuraReading
 import app.saadiah.content.asReading
@@ -178,18 +177,39 @@ private fun Page(
         onDispose { audioPlayer.stop() }
     }
 
-    val lead = 1
-    val listState =
-        rememberLazyListState(
-            initialFirstVisibleItemIndex = (ayat.indexOfFirst { it.number == startAt } + lead).coerceAtLeast(0),
-        )
+    val pageMap = remember(ayat) { ayat.groupBy { medinaMushafPage(it.sura, it.number) } }
+    val pageEntries = remember(pageMap) { pageMap.entries.toList() }
+    val hasBasmalah = load.reading.basmalah != null
+    val lead = if (hasBasmalah) 2 else 1
 
-    ComposeLaunchedEffect(listState, ayat) {
+    val initialIndex =
+        remember {
+            if (currentMode == QuranViewMode.READING) {
+                val targetPage = medinaMushafPage(sura, startAt)
+                val pageIdx = pageEntries.indexOfFirst { it.key == targetPage }.coerceAtLeast(0)
+                (pageIdx + lead).coerceAtLeast(0)
+            } else {
+                (ayat.indexOfFirst { it.number == startAt } + lead).coerceAtLeast(0)
+            }
+        }
+
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialIndex)
+
+    ComposeLaunchedEffect(listState, ayat, currentMode) {
         snapshotFlow { listState.firstVisibleItemIndex }
             .distinctUntilChanged()
             .collectLatest { index ->
                 delay(SETTLE_MILLIS)
-                ayat.getOrNull(index - lead)?.let { onRemember(it.number) }
+                if (currentMode == QuranViewMode.READING) {
+                    val pageIdx = (index - lead).coerceAtLeast(0)
+                    pageEntries
+                        .getOrNull(pageIdx)
+                        ?.value
+                        ?.firstOrNull()
+                        ?.let { onRemember(it.number) }
+                } else {
+                    ayat.getOrNull(index - lead)?.let { onRemember(it.number) }
+                }
             }
     }
 
@@ -222,7 +242,14 @@ private fun Page(
                 }
 
                 if (currentMode == QuranViewMode.READING) {
-                    itemsIndexed(ayat) { index, ayah -> Verse(ayah, isOpening = index == 0) }
+                    for ((pageNumber, pageAyat) in pageEntries) {
+                        item(key = "page_$pageNumber") {
+                            QuranPageContent(
+                                pageNumber = pageNumber,
+                                ayat = pageAyat,
+                            )
+                        }
+                    }
                 } else {
                     itemsIndexed(ayat) { _, ayah ->
                         val isDownloaded = AudioDownloadManager.isSurahDownloaded(context, reciter, sura)
@@ -344,27 +371,6 @@ private fun Basmalah(text: String) {
                     .background(colors.lineSubtle, RoundedCornerShape(ORNAMENT_RULE)),
         )
     }
-}
-
-@Composable
-private fun Verse(
-    ayah: Ayah,
-    isOpening: Boolean,
-) {
-    val colors = SaadiahTheme.colors
-    Text(
-        text = ayah.withClosingNumber(colors.accent),
-        color = colors.text,
-        fontFamily = SaadiahType.quran.fontFamily ?: FontFamily.Serif,
-        fontSize = SaadiahType.quran.size,
-        lineHeight = SaadiahType.quran.lineHeight,
-        textAlign = TextAlign.Start,
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(top = if (isOpening) SaadiahSpacing.tiny else SaadiahSpacing.small)
-                .padding(horizontal = SaadiahSpacing.tiny),
-    )
 }
 
 @Composable

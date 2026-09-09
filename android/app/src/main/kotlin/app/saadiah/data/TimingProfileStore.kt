@@ -14,6 +14,7 @@ import app.saadiah.model.MaghribMode
 import app.saadiah.model.MidnightMode
 import app.saadiah.model.Prayer
 import app.saadiah.model.TimingProfile
+import app.saadiah.model.TimingRounding
 import app.saadiah.model.TwilightAngles
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -25,6 +26,7 @@ private val TIMING_ISHA_INTERVAL = longPreferencesKey("timing.isha.interval.minu
 private val TIMING_MAGHRIB_MODE = stringPreferencesKey("timing.maghrib.mode")
 private val TIMING_MIDNIGHT_MODE = stringPreferencesKey("timing.midnight.mode")
 private val TIMING_HIGH_LATITUDE = stringPreferencesKey("timing.highlatitude.rule")
+private val TIMING_ROUNDING = stringPreferencesKey("timing.rounding")
 private val TIMING_ADJUSTMENTS = stringSetPreferencesKey("timing.adjustments")
 
 // A matched timetable, or null when nothing has been matched. Every scalar must be present
@@ -37,6 +39,7 @@ internal fun Preferences.readTimingProfile(): TimingProfile? {
     val maghribMode = enumOrNull<MaghribMode>(TIMING_MAGHRIB_MODE)
     val midnightMode = enumOrNull<MidnightMode>(TIMING_MIDNIGHT_MODE)
     val rule = enumOrNull<HighLatitudeRule>(TIMING_HIGH_LATITUDE)
+    val rounding = enumOrNull<TimingRounding>(TIMING_ROUNDING) ?: TimingRounding.NEAREST
     if (fajr == null || isha == null || maghribAngle == null) return null
     if (maghribMode == null || midnightMode == null || rule == null) return null
     return TimingProfile(
@@ -55,6 +58,7 @@ internal fun Preferences.readTimingProfile(): TimingProfile? {
         madhab = enumOrNull<Madhab>(MADHAB) ?: Madhab.SHAFI,
         adjustments = readTimingAdjustments(),
         combineMode = enumOrNull<CombineMode>(COMBINE_MODE) ?: CombineMode.NONE,
+        rounding = rounding,
     )
 }
 
@@ -75,6 +79,7 @@ internal fun MutablePreferences.writeTimingProfile(profile: TimingProfile?) {
     setOrRemoveWhenUnchosen(TIMING_MAGHRIB_MODE, profile?.maghribMode?.name)
     setOrRemoveWhenUnchosen(TIMING_MIDNIGHT_MODE, profile?.midnightMode?.name)
     setOrRemoveWhenUnchosen(TIMING_HIGH_LATITUDE, profile?.highLatitudeRule?.name)
+    setOrRemoveWhenUnchosen(TIMING_ROUNDING, profile?.rounding?.name)
     setOrRemoveWhenUnchosen(
         TIMING_ADJUSTMENTS,
         profile

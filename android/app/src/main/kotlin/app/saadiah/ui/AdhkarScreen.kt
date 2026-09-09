@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -32,7 +34,7 @@ import app.saadiah.content.Dhikr
 import app.saadiah.content.DhikrCollection
 import app.saadiah.content.adhkar
 import app.saadiah.data.CustomDhikr
-import app.saadiah.design.Counter
+import app.saadiah.design.GrandTasbih
 import app.saadiah.design.SaadiahRadius
 import app.saadiah.design.SaadiahSpacing
 import app.saadiah.design.SaadiahTheme
@@ -51,13 +53,12 @@ private const val MAX_COUNT_DIGITS = 4
 fun AdhkarScreen(
     tradition: Tradition,
     custom: List<CustomDhikr> = emptyList(),
+    initialCollection: DhikrCollection = DhikrCollection.MORNING,
     onChangeCustom: (List<CustomDhikr>) -> Unit = {},
 ) {
-    var collection by rememberSaveable { mutableStateOf(DhikrCollection.MORNING) }
+    var collection by rememberSaveable(initialCollection) { mutableStateOf(initialCollection) }
     var index by rememberSaveable(collection) { mutableIntStateOf(0) }
     var count by rememberSaveable(collection, index) { mutableIntStateOf(0) }
-    // Held here rather than inside the section, because a tap anywhere else on the screen
-    // has to be able to close the form, and only this level sees those taps.
     var drafting by rememberSaveable { mutableStateOf(false) }
 
     val entries = remember(collection, tradition) { adhkar(collection, tradition) }
@@ -73,52 +74,80 @@ fun AdhkarScreen(
                     .pointerInput(drafting) { detectTapGestures { drafting = false } }
                     .padding(horizontal = SaadiahSpacing.screen),
         ) {
-            MyAdhkar(
-                custom = custom,
-                drafting = drafting,
-                onDrafting = { drafting = it },
-                onChange = onChangeCustom,
-            )
-
-            Spacer(Modifier.height(SaadiahSpacing.large))
-            SectionDivider()
-            Text(
-                text = strings.bundledAdhkar,
-                color = colors.text,
-                fontSize = SaadiahType.titleMedium.size,
-                lineHeight = SaadiahType.titleMedium.lineHeight,
-            )
             Spacer(Modifier.height(SaadiahSpacing.small))
             SetSwitch(collection) {
                 collection = it
+                index = 0
+                count = 0
             }
+            Spacer(Modifier.height(SaadiahSpacing.medium))
+
             if (entries.isEmpty()) {
                 SectionDivider()
                 Body(strings.comingSoon)
                 Spacer(Modifier.height(SaadiahSpacing.small))
                 Caption(strings.adhkarNotBundled)
                 Spacer(Modifier.height(SaadiahSpacing.huge))
-                return@Column
+            } else {
+                val dhikr = entries[index.coerceIn(0, entries.lastIndex)]
+                Caption("${collection.spelledOut()} · ${strings.positionInSet(index + 1, entries.size)}")
+                Spacer(Modifier.height(SaadiahSpacing.tiny))
+                DhikrCard(dhikr = dhikr)
+                Spacer(Modifier.height(SaadiahSpacing.large))
+
+                // Grand 200dp Haptic Tasbih
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    GrandTasbih(
+                        current = count,
+                        target = dhikr.repetitions,
+                        outOfText = strings.outOf(dhikr.repetitions),
+                        spokenDescription = strings.counterSpoken(count, dhikr.repetitions),
+                        hintText =
+                            if (count >=
+                                dhikr.repetitions
+                            ) {
+                                strings.tasbihGoalCompleted
+                            } else {
+                                strings.tapAnywhereToCount
+                            },
+                        onIncrement = {
+                            if (count < dhikr.repetitions) {
+                                count++
+                            }
+                        },
+                    )
+                }
+
+                Spacer(Modifier.height(SaadiahSpacing.large))
+                Steps(
+                    atStart = index == 0,
+                    atEnd = index == entries.lastIndex,
+                    onBack = {
+                        if (index > 0) {
+                            index--
+                            count = 0
+                        }
+                    },
+                    onNext = {
+                        if (index < entries.lastIndex) {
+                            index++
+                            count = 0
+                        }
+                    },
+                )
             }
 
-            val dhikr = entries[index.coerceIn(0, entries.lastIndex)]
-            Caption("${collection.spelledOut()} · ${strings.positionInSet(index + 1, entries.size)}")
-            DhikrCard(dhikr = dhikr)
-            Spacer(Modifier.height(SaadiahSpacing.large))
-            Counter(
-                current = count,
-                outOf = strings.outOf(dhikr.repetitions),
-                spokenDescription = strings.counterSpoken(count, dhikr.repetitions),
-                onIncrement = { if (count < dhikr.repetitions) count++ },
-                modifier = Modifier.fillMaxWidth().minimumTouchTarget(),
-            )
-            Caption(strings.adhkarTapRing, size = SaadiahType.bodySmall.size)
-            Spacer(Modifier.height(SaadiahSpacing.medium))
-            Steps(
-                atStart = index == 0,
-                atEnd = index == entries.lastIndex,
-                onBack = { if (index > 0) index-- },
-                onNext = { if (index < entries.lastIndex) index++ },
+            Spacer(Modifier.height(SaadiahSpacing.huge))
+            SectionDivider()
+            Spacer(Modifier.height(SaadiahSpacing.small))
+            MyAdhkar(
+                custom = custom,
+                drafting = drafting,
+                onDrafting = { drafting = it },
+                onChange = onChangeCustom,
             )
             Spacer(Modifier.height(SaadiahSpacing.huge))
         }
@@ -213,7 +242,7 @@ private fun Steps(
 ) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Pill(strings.adhkarPrevious, selected = false, modifier = Modifier.weight(1f)) { if (!atStart) onBack() }
-        Spacer(Modifier.height(SaadiahSpacing.small))
+        Spacer(Modifier.width(SaadiahSpacing.medium))
         Pill(strings.adhkarNext, selected = false, modifier = Modifier.weight(1f)) { if (!atEnd) onNext() }
     }
 }

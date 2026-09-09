@@ -6,6 +6,7 @@ import app.saadiah.model.MaghribMode
 import app.saadiah.model.MidnightMode
 import app.saadiah.model.Prayer
 import app.saadiah.model.TimingProfile
+import app.saadiah.model.TimingRounding
 import app.saadiah.model.TwilightAngles
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -25,6 +26,7 @@ enum class Method(
     private val maghribAngle: Double? = null,
     private val midnight: MidnightMode = MidnightMode.STANDARD,
     private val adjustments: Map<Prayer, Duration> = emptyMap(),
+    private val rounding: TimingRounding = TimingRounding.NEAREST,
 ) {
     MUSLIM_WORLD_LEAGUE(fajrAngle = 18.0, ishaAngle = 17.0, adjustments = mapOf(Prayer.DHUHR to 1.minutes)),
     NORTH_AMERICA(fajrAngle = 15.0, ishaAngle = 15.0, adjustments = mapOf(Prayer.DHUHR to 1.minutes)),
@@ -45,6 +47,7 @@ enum class Method(
                 Prayer.MAGHRIB to 2.minutes,
                 Prayer.ISHA to 2.minutes,
             ),
+        rounding = TimingRounding.UP,
     ),
     DUBAI(
         fajrAngle = 18.2,
@@ -53,13 +56,29 @@ enum class Method(
     ),
     LONDON_UNIFIED(
         fajrAngle = 18.0,
-        ishaAngle = 17.0,
+        ishaAngle = 12.0,
         adjustments =
             mapOf(
                 Prayer.SUNRISE to (-3).minutes,
                 Prayer.DHUHR to 5.minutes,
                 Prayer.MAGHRIB to 3.minutes,
             ),
+    ),
+    UK_REGIONAL(
+        fajrAngle = 18.0,
+        ishaAngle = 12.0,
+        adjustments = mapOf(Prayer.DHUHR to 5.minutes),
+    ),
+    MOONSIGHTING_COMMITTEE(
+        fajrAngle = 18.0,
+        ishaAngle = 18.0,
+        adjustments = mapOf(Prayer.DHUHR to 5.minutes, Prayer.MAGHRIB to 3.minutes),
+    ),
+    SINGAPORE(
+        fajrAngle = 20.0,
+        ishaAngle = 18.0,
+        adjustments = mapOf(Prayer.DHUHR to 1.minutes),
+        rounding = TimingRounding.UP,
     ),
     JAKIM(
         fajrAngle = 18.0,
@@ -72,6 +91,7 @@ enum class Method(
                 Prayer.MAGHRIB to 2.minutes,
                 Prayer.ISHA to 2.minutes,
             ),
+        rounding = TimingRounding.UP,
     ),
     PARIS(fajrAngle = 18.0, ishaAngle = 18.0, adjustments = mapOf(Prayer.DHUHR to 1.minutes)),
     UOIF(fajrAngle = 12.0, ishaAngle = 12.0, adjustments = mapOf(Prayer.DHUHR to 1.minutes)),
@@ -96,5 +116,6 @@ enum class Method(
             highLatitudeRule = highLatitudeRule,
             madhab = madhab,
             adjustments = adjustments,
+            rounding = rounding,
         )
 }

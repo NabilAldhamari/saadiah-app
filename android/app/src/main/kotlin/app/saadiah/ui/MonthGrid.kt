@@ -19,6 +19,7 @@ data class GridCell(
     val hijriDay: Int,
     val gregorianDay: Int,
     val marker: ObservanceMarker?,
+    val isToday: Boolean = false,
 )
 
 /**
@@ -37,11 +38,19 @@ fun monthGrid(
     month: Int,
     tradition: Tradition,
     strings: Strings,
+    todayHijri: HijriDate? = null,
 ): MonthPage {
     val cells =
         (1..LONGEST_HIJRI_MONTH).mapNotNull { day ->
             val hijri = runCatching { HijriDate(year = year, month = month, day = day) }.getOrNull()
-            hijri?.let { GridCell(day, it.toGregorianDate().dayOfMonth, it.markerFor(tradition)) }
+            hijri?.let {
+                val isToday =
+                    todayHijri != null &&
+                        it.year == todayHijri.year &&
+                        it.month == todayHijri.month &&
+                        it.day == todayHijri.day
+                GridCell(day, it.toGregorianDate().dayOfMonth, it.markerFor(tradition), isToday)
+            }
         }
     // dayOfWeek is Monday-first and the headings are written the same way, so the column
     // index is the ordinal directly rather than an offset that has to be kept in step.

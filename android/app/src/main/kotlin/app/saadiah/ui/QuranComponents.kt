@@ -18,12 +18,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -31,7 +29,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import app.saadiah.content.Ayah
 import app.saadiah.design.R
@@ -42,7 +39,6 @@ import app.saadiah.design.SaadiahType
 import app.saadiah.model.QuranViewMode
 
 private val CARD_HAIRLINE = 1.dp
-private val BANNER_RULE = 2.dp
 
 /**
  * Surah header banner styled with Quran.com's aesthetic:
@@ -197,7 +193,7 @@ private fun CompactActionButton(
     Box(
         modifier =
             modifier
-                .size(32.dp)
+                .size(48.dp)
                 .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
@@ -205,7 +201,7 @@ private fun CompactActionButton(
             painter = painter,
             contentDescription = contentDescription,
             tint = tint,
-            modifier = Modifier.size(18.dp),
+            modifier = Modifier.size(22.dp),
         )
     }
 }
@@ -241,6 +237,7 @@ fun QuranAyahCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            val pageNum = medinaMushafPage(ayah.sura, ayah.number)
             Box(
                 modifier =
                     Modifier
@@ -254,7 +251,7 @@ fun QuranAyahCard(
                         ).padding(horizontal = SaadiahSpacing.snug, vertical = 3.dp),
             ) {
                 Text(
-                    text = "${ayah.sura}:${ayah.number}",
+                    text = "${ayah.sura}:${ayah.number} · ${strings.pageNumber(pageNum)}",
                     color = if (isPlaying) colors.bg else colors.textSecondary,
                     fontSize = SaadiahType.label.size,
                     fontWeight = FontWeight.SemiBold,
@@ -264,12 +261,12 @@ fun QuranAyahCard(
             Box(
                 modifier =
                     Modifier
-                        .size(44.dp)
+                        .size(52.dp)
                         .background(
                             color = if (isPlaying) colors.accent else colors.bg,
                             shape = CircleShape,
                         ).border(
-                            width = if (isPlaying) 1.5.dp else 1.dp,
+                            width = if (isPlaying) 2.dp else 1.dp,
                             color = if (isPlaying) colors.accent else colors.lineSubtle,
                             shape = CircleShape,
                         ).clickable(onClick = onPlay),
@@ -277,9 +274,9 @@ fun QuranAyahCard(
             ) {
                 Icon(
                     painter = painterResource(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play),
-                    contentDescription = if (isPlaying) strings.pauseAyah else strings.playAyah,
+                    contentDescription = null,
                     tint = if (isPlaying) colors.bg else colors.accent,
-                    modifier = Modifier.size(22.dp),
+                    modifier = Modifier.size(24.dp),
                 )
             }
         }
@@ -298,32 +295,30 @@ fun QuranAyahCard(
 
         ayah.translation?.let { translationText ->
             Spacer(Modifier.height(SaadiahSpacing.small))
-            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                Text(
-                    text = translationText,
-                    color = colors.textSecondary,
-                    fontSize = SaadiahType.bodySmall.size,
-                    lineHeight = SaadiahType.bodySmall.lineHeight,
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = SaadiahSpacing.tiny),
-                )
-            }
+            Text(
+                text = translationText,
+                color = colors.textSecondary,
+                fontSize = SaadiahType.bodySmall.size,
+                lineHeight = SaadiahType.bodySmall.lineHeight,
+                textAlign = TextAlign.Start,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = SaadiahSpacing.tiny),
+            )
         }
     }
 }
 
 /**
- * Floating bottom audio playback bar for Quran ayah recitation.
+ * Floating Audio reciter bar.
  */
 @Composable
 fun QuranAudioBar(
     ayah: Ayah,
     isPlaying: Boolean,
+    reciterName: String,
     onPlayPause: () -> Unit,
     onPrevious: () -> Unit,
     onNext: () -> Unit,
     onClose: () -> Unit,
-    reciterName: String = strings.reciterHusariMujawwad,
     modifier: Modifier = Modifier,
 ) {
     val colors = SaadiahTheme.colors
@@ -336,12 +331,15 @@ fun QuranAudioBar(
                     RoundedCornerShape(topStart = SaadiahRadius.sheet, topEnd = SaadiahRadius.sheet),
                 ).border(
                     CARD_HAIRLINE,
-                    colors.lineSubtle,
+                    colors.line,
                     RoundedCornerShape(topStart = SaadiahRadius.sheet, topEnd = SaadiahRadius.sheet),
-                ).padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.snug),
+                ),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = SaadiahSpacing.screen, vertical = SaadiahSpacing.snug),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -365,28 +363,28 @@ fun QuranAudioBar(
             ) {
                 CompactActionButton(
                     painter = painterResource(R.drawable.ic_back),
-                    contentDescription = strings.adhkarPrevious,
+                    contentDescription = "Previous",
                     tint = colors.text,
                     onClick = onPrevious,
                 )
                 Box(
                     modifier =
                         Modifier
-                            .size(36.dp)
-                            .background(colors.accent, RoundedCornerShape(SaadiahRadius.pill))
+                            .size(52.dp)
+                            .background(colors.accent, CircleShape)
                             .clickable(onClick = onPlayPause),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         painter = painterResource(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play),
-                        contentDescription = if (isPlaying) strings.pauseAyah else strings.playAyah,
+                        contentDescription = null,
                         tint = colors.bg,
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier.size(24.dp),
                     )
                 }
                 CompactActionButton(
                     painter = painterResource(R.drawable.ic_forward),
-                    contentDescription = strings.adhkarNext,
+                    contentDescription = "Next",
                     tint = colors.text,
                     onClick = onNext,
                 )
@@ -404,7 +402,7 @@ fun QuranAudioBar(
 
 internal fun Ayah.withClosingNumber(accent: Color) =
     buildAnnotatedString {
-        append(text)
+        append(text.cleanUthmaniDisplay())
         append(' ')
         withStyle(
             SpanStyle(

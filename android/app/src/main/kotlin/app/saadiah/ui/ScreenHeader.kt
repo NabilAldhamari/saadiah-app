@@ -45,6 +45,7 @@ private val BACK_GLYPH = 24.dp
 fun ScreenHeader(
     title: String,
     onBack: (() -> Unit)? = null,
+    action: (@Composable () -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val colors = SaadiahTheme.colors
@@ -74,6 +75,8 @@ fun ScreenHeader(
             color = colors.text,
             fontSize = SaadiahType.titleMedium.size,
             lineHeight = SaadiahType.titleMedium.lineHeight,
+            modifier = Modifier.weight(1f),
         )
+        action?.invoke()
     }
 }

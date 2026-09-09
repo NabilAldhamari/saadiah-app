@@ -35,6 +35,12 @@ enum class HighLatitudeRule {
     }
 }
 
+enum class TimingRounding {
+    NEAREST,
+    UP,
+    NONE,
+}
+
 data class TwilightAngles(
     val fajr: Double,
     val isha: Double,
@@ -51,4 +57,5 @@ data class TimingProfile(
     val adjustments: Map<Prayer, Duration> = emptyMap(),
     // Whether Zuhrayn and Ishaayn are prayed together. A timing concern, never a tradition one.
     val combineMode: CombineMode = CombineMode.NONE,
+    val rounding: TimingRounding = TimingRounding.NEAREST,
 )

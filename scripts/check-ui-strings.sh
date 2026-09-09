@@ -23,7 +23,7 @@ readonly DESIGN="design/src/main/kotlin/app/saadiah"
 found=0
 while IFS= read -r file; do
   case "$(basename "${file}")" in
-    Strings.kt|EnglishStrings.kt|ArabicStrings.kt|ArabicNames.kt) continue ;;
+    Strings.kt|EnglishStrings.kt|ArabicStrings.kt|ArabicNames.kt|SurahMetadata.kt) continue ;;
   esac
   # Two or more Latin words in a row inside a double-quoted literal.
   hits=$(grep -nE '"[^"]*[A-Za-z]{2,}[ ][A-Za-z]{2,}[^"]*"' "${file}" \
