@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/NabilAldhamari/saadiah-app/compare/saadiah-v0.2.0...saadiah-v0.3.0) (2026-09-09)
+
+
+### Features
+
+* audio library and improved quran view, fixed calcuation ([597f45b](https://github.com/NabilAldhamari/saadiah-app/commit/597f45b952ba58d11fd945a8898ea82821fa82a1))
+* ergonomic analysis + prayer time 96% accuracy all timezones ([51ea8c9](https://github.com/NabilAldhamari/saadiah-app/commit/51ea8c9c5b15eb9b06bbcbbef44b684f048b18bf))
+
 ## [0.2.0](https://github.com/NabilAldhamari/saadiah-app/compare/saadiah-v0.1.0...saadiah-v0.2.0) (2026-07-28)
 
 
