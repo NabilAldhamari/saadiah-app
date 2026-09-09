@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>MagicNumber:CityIndex.kt$CityIndex.TopByPopulation$0xFFFFFFFFL</ID>
+    <ID>MagicNumber:CityIndex.kt$CityIndex.TopByPopulation$40</ID>
+  </CurrentIssues>
+</SmellBaseline>

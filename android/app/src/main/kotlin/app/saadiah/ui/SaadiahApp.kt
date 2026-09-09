@@ -176,6 +176,7 @@ private fun TabRoot(
                 actions =
                     TodayActions(
                         onChangeCity = { navigator.go(Screen.PickingCity) },
+                        onSelectCity = { chosen -> actions.onChangeCity(chosen) },
                         onOpenDoctor = { navigator.go(Screen.WhyThisTime) },
                         onOpenPrayer = { navigator.go(Screen.PrayerDetail(it)) },
                         onOpenBaqarah = { navigator.go(Screen.Baqarah) },

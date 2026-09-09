@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:MethodInference.kt$fun inferProfile(city: City): TimingProfile</ID>
+    <ID>LongMethod:EveryTimezoneAccuracyBenchmarkTest.kt$EveryTimezoneAccuracyBenchmarkTest$@Test fun benchmarkAccuracyAcrossAllWorldTimezonesExceedsNinetySixPercent()</ID>
+    <ID>LongMethod:MethodInference.kt$fun inferProfile(city: City): TimingProfile</ID>
+    <ID>LongParameterList:Method.kt$Method$( private val fajrAngle: Double, private val ishaAngle: Double, private val ishaInterval: Duration? = null, private val maghribAngle: Double? = null, private val midnight: MidnightMode = MidnightMode.STANDARD, private val adjustments: Map&lt;Prayer, Duration&gt; = emptyMap(), private val rounding: TimingRounding = TimingRounding.NEAREST, )</ID>
+    <ID>MagicNumber:Method.kt$Method.LONDON_UNIFIED$3</ID>
+    <ID>MagicNumber:MethodInference.kt$2643743</ID>
+    <ID>MagicNumber:MethodInference.kt$2649808</ID>
+    <ID>MaxLineLength:EveryTimezoneAccuracyBenchmarkTest.kt$EveryTimezoneAccuracyBenchmarkTest$"Accuracy was $accuracyPercentage% ($totalWithinOneMinute / $totalPrayersChecked within 1 minute, exact: $exactPercentage%)"</ID>
+    <ID>MaxLineLength:EveryTimezoneAccuracyBenchmarkTest.kt$EveryTimezoneAccuracyBenchmarkTest$"DIFF &gt; 1 in ${city.name} (${city.timeZone.id}) for $prayer: actual $actualTime, expected $expectedTime (diff: $diffMinutes min)"</ID>
+    <ID>NestedBlockDepth:EveryTimezoneAccuracyBenchmarkTest.kt$EveryTimezoneAccuracyBenchmarkTest$@Test fun benchmarkAccuracyAcrossAllWorldTimezonesExceedsNinetySixPercent()</ID>
+    <ID>NestedBlockDepth:MultiCityAccuracyBenchmarkTest.kt$MultiCityAccuracyBenchmarkTest$@Test fun benchmarkAccuracyAcrossWorldCitiesExceedsNinetySixPercent()</ID>
+    <ID>ReturnCount:MethodInference.kt$fun inferProfile(city: City): TimingProfile</ID>
+  </CurrentIssues>
+</SmellBaseline>

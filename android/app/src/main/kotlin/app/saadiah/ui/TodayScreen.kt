@@ -26,11 +26,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import app.saadiah.alarm.TravelDetector
+import app.saadiah.alarm.dismissTravelNotification
+import app.saadiah.design.ActionChip
 import app.saadiah.design.NextPrayerHero
 import app.saadiah.design.PrayerRow
 import app.saadiah.design.R
@@ -54,6 +59,7 @@ private val GLYPH = 28.dp
 
 data class TodayActions(
     val onChangeCity: () -> Unit,
+    val onSelectCity: (City) -> Unit = {},
     val onOpenDoctor: () -> Unit,
     val onOpenPrayer: (app.saadiah.model.Prayer) -> Unit = {},
     val onOpenBaqarah: () -> Unit = {},
@@ -78,6 +84,28 @@ fun TodayScreen(
             todayState(city, profile, tradition, now, words)
         }
     val colors = SaadiahTheme.colors
+
+    val context = LocalContext.current
+    var travelDismissed by remember(city) { mutableStateOf(false) }
+    val travelDetection =
+        remember(city, currentMinute) {
+            TravelDetector.detectTravel(context, city, now)
+        }
+    val travelPrompt =
+        remember(travelDetection, travelDismissed, words) {
+            if (travelDetection.isTraveling && !travelDismissed) {
+                val detectedName = travelDetection.suggestedCity?.name ?: travelDetection.detectedZone.id
+                TravelPromptState(
+                    title = words.travelPromptTitle,
+                    message = words.travelPromptMessage(detectedName, city.name),
+                    suggestedCity = travelDetection.suggestedCity,
+                    switchLabel = travelDetection.suggestedCity?.let { words.travelSwitchTo(it.name) },
+                    dismissLabel = words.travelDismiss,
+                )
+            } else {
+                null
+            }
+        }
 
     Column(modifier = Modifier.fillMaxSize().background(colors.bg)) {
         // Pinned header carries Hijri date and accessible Settings shortcut.
@@ -110,6 +138,21 @@ fun TodayScreen(
                     .padding(horizontal = SaadiahSpacing.screen),
         ) {
             PlaceLine(state, actions.onChangeCity)
+            if (travelPrompt != null) {
+                Spacer(Modifier.height(SaadiahSpacing.medium))
+                TravelCard(
+                    prompt = travelPrompt,
+                    onSwitch = {
+                        travelPrompt.suggestedCity?.let {
+                            actions.onSelectCity(it)
+                        } ?: actions.onChangeCity()
+                    },
+                    onDismiss = {
+                        travelDismissed = true
+                        dismissTravelNotification(context)
+                    },
+                )
+            }
             SectionDivider()
             Hero(state, actions.onOpenDoctor)
             SectionDivider()
@@ -335,4 +378,76 @@ private fun rememberTickingNow(): Instant {
         }
     }
     return now
+}
+
+@Composable
+private fun TravelCard(
+    prompt: TravelPromptState,
+    onSwitch: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val colors = SaadiahTheme.colors
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(colors.surface, RoundedCornerShape(SaadiahRadius.sheet))
+                .padding(SaadiahSpacing.medium),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                painter = painterResource(R.drawable.ic_info),
+                contentDescription = null,
+                tint = colors.accent,
+                modifier = Modifier.size(GLYPH),
+            )
+            Spacer(Modifier.width(SaadiahSpacing.snug))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = prompt.title,
+                    color = colors.text,
+                    fontSize = SaadiahType.body.size,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Spacer(Modifier.height(SaadiahSpacing.tiny))
+                Text(
+                    text = prompt.message,
+                    color = colors.textSecondary,
+                    fontSize = SaadiahType.bodySmall.size,
+                    lineHeight = SaadiahType.bodySmall.lineHeight,
+                )
+            }
+        }
+        Spacer(Modifier.height(SaadiahSpacing.medium))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = prompt.dismissLabel,
+                color = colors.textSecondary,
+                fontSize = SaadiahType.bodySmall.size,
+                modifier =
+                    Modifier
+                        .clickable(onClick = onDismiss)
+                        .minimumTouchTarget()
+                        .padding(horizontal = SaadiahSpacing.small, vertical = SaadiahSpacing.tiny),
+            )
+            Spacer(Modifier.width(SaadiahSpacing.medium))
+            if (prompt.switchLabel != null) {
+                ActionChip(
+                    label = prompt.switchLabel,
+                    icon = painterResource(R.drawable.ic_check),
+                    onClick = onSwitch,
+                )
+            } else {
+                ActionChip(
+                    label = strings.searchForYourCity,
+                    icon = painterResource(R.drawable.ic_forward),
+                    onClick = onSwitch,
+                )
+            }
+        }
+    }
 }
