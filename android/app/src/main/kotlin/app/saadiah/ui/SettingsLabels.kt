@@ -108,5 +108,7 @@ internal fun Reciter.spelledOut(strings: Strings): String =
         Reciter.HUSARI_MUJAWWAD -> strings.reciterHusariMujawwad
         Reciter.HUSARI_MURATTAL -> strings.reciterHusariMurattal
         Reciter.MINSHAWI_MUJAWWAD -> strings.reciterMinshawiMujawwad
-        Reciter.ALAFASY -> strings.reciterAlafasy
+        Reciter.MINSHAWI_MURATTAL -> strings.reciterMinshawiMurattal
+        Reciter.ABDULBASIT_MUJAWWAD -> strings.reciterAbdulbasitMujawwad
+        Reciter.ABDULBASIT_MURATTAL -> strings.reciterAbdulbasitMurattal
     }

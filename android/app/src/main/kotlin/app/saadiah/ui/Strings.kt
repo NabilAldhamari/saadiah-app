@@ -47,7 +47,7 @@ interface Strings {
     val titlePrayer: String
     val titleSettings: String
     val titleQuran: String
-    val titleCustomAdhkar: String get() = if (rendersArabic) "أذكاري الخاصة" else "Custom Adhkar"
+    val titleCustomAdhkar: String get() = if (rendersArabic) "أذكاري المخصصة" else "Custom Adhkar"
 
     val todaysReading: String
     val todaysReadingHint: String
@@ -436,8 +436,6 @@ interface Strings {
 
     fun surahAyahCount(count: Int): String
 
-    val reciterMishari: String
-
     val tabAudioDownloads: String
     val audioDownloadsSubtitle: String
     val downloadAudio: String
@@ -459,7 +457,9 @@ interface Strings {
     val reciterHusariMujawwad: String
     val reciterHusariMurattal: String
     val reciterMinshawiMujawwad: String
-    val reciterAlafasy: String
+    val reciterMinshawiMurattal: String
+    val reciterAbdulbasitMujawwad: String
+    val reciterAbdulbasitMurattal: String
     val sectionReciter: String
     val sectionReciterWhy: String
     val deleteReciterAudio: String

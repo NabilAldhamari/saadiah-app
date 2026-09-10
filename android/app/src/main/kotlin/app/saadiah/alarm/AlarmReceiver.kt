@@ -122,7 +122,7 @@ class AlarmReceiver : BroadcastReceiver() {
         val notification =
             NotificationCompat
                 .Builder(context, channelId)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(prayer.announcement)
                 .setContentText(wording)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)

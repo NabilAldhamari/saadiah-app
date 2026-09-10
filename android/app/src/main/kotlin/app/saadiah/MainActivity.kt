@@ -31,6 +31,7 @@ import app.saadiah.model.Language
 import app.saadiah.prayer.toProfile
 import app.saadiah.ui.AppActions
 import app.saadiah.ui.DEFAULT_CITY
+import app.saadiah.ui.LoadingScreen
 import app.saadiah.ui.Navigator
 import app.saadiah.ui.SaadiahApp
 import app.saadiah.ui.SaadiahTheme
@@ -77,10 +78,14 @@ class MainActivity : ComponentActivity() {
     ) {
         // Null until the stored settings have been read. Drawing the compiled-in default city
         // in the meantime would show one city's prayer times under another city's name, so
-        // nothing is drawn at all until the reader's own choice is known.
+        // the loading screen is displayed until the reader's own choice is known.
         val settings by store.settings.collectAsStateWithLifecycle(initialValue = null)
         val navigator = remember { Navigator() }
-        val current = settings ?: return
+        val current =
+            settings ?: run {
+                LoadingScreen()
+                return
+            }
 
         LaunchedEffect(openCityPickerRequested) {
             if (openCityPickerRequested) {

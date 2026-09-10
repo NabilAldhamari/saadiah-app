@@ -63,7 +63,7 @@ class EnumShapeTest {
 
     @Test
     fun reciterCoversExpectedOptions() {
-        assertEquals(expected = 4, actual = Reciter.entries.size)
+        assertEquals(expected = 6, actual = Reciter.entries.size)
         assertEquals(expected = Reciter.HUSARI_MUJAWWAD, actual = Reciter.entries.first())
     }
 }
