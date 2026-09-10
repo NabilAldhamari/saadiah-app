@@ -30,7 +30,9 @@ import app.saadiah.design.SaadiahSpacing
 import app.saadiah.design.SaadiahType
 import app.saadiah.model.City
 import app.saadiah.model.EXTENDED_CITIES
+import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.offsetAt
 
 @Composable
 fun CityPickerScreen(
@@ -47,6 +49,22 @@ fun CityPickerScreen(
     val results =
         remember(query, index, preferredZone) {
             index?.search(query, preferredTimeZone = preferredZone).orEmpty()
+        }
+    val defaultCities =
+        remember(preferredZone) {
+            if (preferredZone == null) {
+                EXTENDED_CITIES
+            } else {
+                val now = Clock.System.now()
+                val targetOffset = runCatching { preferredZone.offsetAt(now) }.getOrNull()
+                EXTENDED_CITIES.sortedWith(
+                    compareByDescending<City> { it.timeZone.id == preferredZone.id }
+                        .thenByDescending {
+                            targetOffset != null &&
+                                runCatching { it.timeZone.offsetAt(now) == targetOffset }.getOrDefault(false)
+                        },
+                )
+            }
         }
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -67,7 +85,7 @@ fun CityPickerScreen(
                 query.isBlank() -> {
                     Caption(strings.typeYourCity)
                     Spacer(Modifier.height(SaadiahSpacing.small))
-                    CityResults(results = EXTENDED_CITIES, selected = selected, onPick = onPick)
+                    CityResults(results = defaultCities, selected = selected, onPick = onPick)
                 }
                 else -> CityResults(results = results, selected = selected, onPick = onPick)
             }

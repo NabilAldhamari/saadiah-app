@@ -4,6 +4,7 @@ import app.saadiah.model.City
 import app.saadiah.model.CityId
 import app.saadiah.model.Coordinates
 import app.saadiah.model.CountryCode
+import app.saadiah.model.CountryNames
 import kotlinx.datetime.TimeZone
 
 private const val HEADER_SIZE = 48
@@ -50,7 +51,7 @@ private val MAGIC = "SDCITY01".encodeToByteArray()
  * binary search plus a byte comparison per candidate rather than 170,000 string decodes.
  */
 class CityIndex(
-    private val bytes: ByteArray,
+    internal val bytes: ByteArray,
 ) {
     init {
         require(bytes.size >= HEADER_SIZE && MAGIC.indices.all { bytes[it] == MAGIC[it] }) {
@@ -60,8 +61,8 @@ class CityIndex(
 
     val size: Int = bytes.u32(CITY_COUNT)
 
-    private val recordsAt = bytes.u32(RECORDS_OFFSET)
-    private val namePoolAt = bytes.u32(NAME_POOL_OFFSET)
+    internal val recordsAt = bytes.u32(RECORDS_OFFSET)
+    internal val namePoolAt = bytes.u32(NAME_POOL_OFFSET)
     private val countries = bytes.readStringTable(bytes.u32(COUNTRY_TABLE_OFFSET))
     private val timeZones = bytes.readStringTable(bytes.u32(TIME_ZONE_TABLE_OFFSET))
     private val admin1s = bytes.readStringTable(bytes.u32(ADMIN1_TABLE_OFFSET))
@@ -80,10 +81,13 @@ class CityIndex(
         if (trimmed.isEmpty()) return emptyList()
         val preferredZoneIndex = preferredTimeZone?.let { timeZones.indexOf(it.id) } ?: -1
         val best = TopByPopulation(limit, preferredZoneIndex)
-        if (trimmed.any {
-                it.isArabic()
-            }
-        ) {
+
+        val countryCodes = CountryNames.resolveCountryCodes(trimmed)
+        if (countryCodes.isNotEmpty()) {
+            forEachCountryMatch(countryCodes, best::offer)
+        }
+
+        if (trimmed.any { it.isArabic() }) {
             forEachArabicMatch(trimmed, best::offer)
         } else {
             forEachPrefixMatch(trimmed, best::offer)
@@ -104,6 +108,29 @@ class CityIndex(
         val nameAt = bytes.u32(recordsAt + record * RECORD_SIZE)
         val length = bytes.u8(namePoolAt + nameAt + 1)
         return bytes.decodeToString(namePoolAt + nameAt + 2, namePoolAt + nameAt + 2 + length).lowercase()
+    }
+
+    private fun forEachCountryMatch(
+        countryCodes: Set<CountryCode>,
+        onMatch: (Int) -> Unit,
+    ) {
+        val matches = BooleanArray(countries.size)
+        var hasMatch = false
+        for (code in countryCodes) {
+            val idx = countries.indexOf(code.value)
+            if (idx >= 0) {
+                matches[idx] = true
+                hasMatch = true
+            }
+        }
+        if (!hasMatch) return
+
+        for (record in 0 until size) {
+            val countryIdx = bytes.u8(recordsAt + record * RECORD_SIZE + RECORD_COUNTRY)
+            if (matches[countryIdx]) {
+                onMatch(record)
+            }
+        }
     }
 
     private fun forEachPrefixMatch(
@@ -131,16 +158,6 @@ class CityIndex(
             if (start < 0 || bytes.u8(start) < needle.size) continue
             if (needle.indices.all { bytes[start + 1 + it] == needle[it] }) onMatch(record)
         }
-    }
-
-    private fun arabicNameStart(record: Int): Int {
-        // The offset of the Arabic name's length byte, or -1 when the record has none.
-        var at = namePoolAt + bytes.u32(recordsAt + record * RECORD_SIZE)
-        val flags = bytes.u8(at)
-        if (flags and HAS_ARABIC_NAME == 0) return -1
-        at += 2 + bytes.u8(at + 1)
-        if (flags and HAS_DISPLAY_NAME != 0) at += 1 + bytes.u8(at)
-        return at
     }
 
     private fun lowerBound(needle: ByteArray): Int {
@@ -248,6 +265,22 @@ class CityIndex(
                     population.toLong() and 0xFFFFFFFFL
                 }
 
+            if (held == limit && score <= scores[smallest]) return
+            if (isDuplicate(record)) return
+            insertRecord(record, score)
+        }
+
+        private fun isDuplicate(record: Int): Boolean {
+            for (i in 0 until held) {
+                if (records[i] == record) return true
+            }
+            return false
+        }
+
+        private fun insertRecord(
+            record: Int,
+            score: Long,
+        ) {
             if (held < limit) {
                 records[held] = record
                 scores[held] = score
@@ -255,7 +288,6 @@ class CityIndex(
                 if (held == limit) locateSmallest()
                 return
             }
-            if (score <= scores[smallest]) return
             records[smallest] = record
             scores[smallest] = score
             locateSmallest()
@@ -274,6 +306,16 @@ class CityIndex(
             smallest = at
         }
     }
+}
+
+private fun CityIndex.arabicNameStart(record: Int): Int {
+    // The offset of the Arabic name's length byte, or -1 when the record has none.
+    var at = namePoolAt + bytes.u32(recordsAt + record * RECORD_SIZE)
+    val flags = bytes.u8(at)
+    if (flags and HAS_ARABIC_NAME == 0) return -1
+    at += 2 + bytes.u8(at + 1)
+    if (flags and HAS_DISPLAY_NAME != 0) at += 1 + bytes.u8(at)
+    return at
 }
 
 private fun ByteArray.readStringTable(at: Int): List<String> {
