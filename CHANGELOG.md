@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/NabilAldhamari/saadiah-app/compare/saadiah-v0.5.0...saadiah-v0.6.0) (2026-09-10)
+
+
+### Features
+
+* **android:** target android 16 api level 36 ([#21](https://github.com/NabilAldhamari/saadiah-app/issues/21)) ([436bd98](https://github.com/NabilAldhamari/saadiah-app/commit/436bd983d143a59079d2d85b4b85bbf0b6eeaa79))
+
 ## [0.5.0](https://github.com/NabilAldhamari/saadiah-app/compare/saadiah-v0.4.0...saadiah-v0.5.0) (2026-09-10)
 
 
