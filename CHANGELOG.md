@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0](https://github.com/NabilAldhamari/saadiah-app/compare/saadiah-v0.4.0...saadiah-v0.5.0) (2026-09-10)
+
+
+### Features
+
+* **android:** country search and timezone-optimized city picker ([#20](https://github.com/NabilAldhamari/saadiah-app/issues/20)) ([1ce3a4a](https://github.com/NabilAldhamari/saadiah-app/commit/1ce3a4a723fddb63b0e10cd0307360c556bea4a7))
+* productionize app for google play store release ([#18](https://github.com/NabilAldhamari/saadiah-app/issues/18)) ([6752533](https://github.com/NabilAldhamari/saadiah-app/commit/6752533d020a5dc9a5c8f45f52f7ce634d28e27d))
+
 ## [0.4.0](https://github.com/NabilAldhamari/saadiah-app/compare/saadiah-v0.3.0...saadiah-v0.4.0) (2026-09-10)
 
 
