@@ -10,7 +10,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
         pluginManager.apply("io.gitlab.arturbosch.detekt")
 
         extensions.configure(LibraryExtension::class.java) {
-            compileSdk = 35
+            compileSdk = 36
             defaultConfig {
                 minSdk = 26
             }

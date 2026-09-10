@@ -59,7 +59,7 @@ future work; when it arrives it will be optional, and it is not requested today.
 
 ## Building and Testing
 
-Requirements: JDK 21, Android SDK 35. The Gradle wrapper is committed; always use `./gradlew` rather than a local Gradle.
+Requirements: JDK 21, Android SDK 36. The Gradle wrapper is committed; always use `./gradlew` rather than a local Gradle.
 
 ### Development and Quality Gates
 

@@ -22,8 +22,8 @@ benchmark = "1.3.4"
 androidx-test-runner = "1.6.2"
 androidx-test-junit = "1.2.1"
 minSdk = "26"
-targetSdk = "35"
-compileSdk = "35"
+targetSdk = "36"
+compileSdk = "36"
 
 [libraries]
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
