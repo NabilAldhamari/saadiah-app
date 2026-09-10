@@ -104,9 +104,20 @@ class MethodInferenceTest {
 
     @Test
     fun anUnlistedCountryFallsBackToMuslimWorldLeague() {
-        for (code in listOf("DE", "YE", "ZZ")) {
+        for (code in listOf("NZ", "BR", "ZZ")) {
             assertEquals(
                 expected = Method.MUSLIM_WORLD_LEAGUE.toProfile(Madhab.SHAFI, HighLatitudeRule.MIDDLE_OF_NIGHT),
+                actual = inferProfile(placeIn(country = code)),
+                message = code,
+            )
+        }
+    }
+
+    @Test
+    fun gulfAndYemenUseUmmAlQura() {
+        for (code in listOf("SA", "YE", "KW", "QA", "OM", "BH")) {
+            assertEquals(
+                expected = Method.UMM_AL_QURA.toProfile(Madhab.SHAFI, HighLatitudeRule.MIDDLE_OF_NIGHT),
                 actual = inferProfile(placeIn(country = code)),
                 message = code,
             )

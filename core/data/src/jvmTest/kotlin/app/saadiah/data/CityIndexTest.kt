@@ -76,6 +76,45 @@ class CityIndexTest {
     }
 
     @Test
+    fun searchByCountryCodeReturnsCitiesInThatCountry() {
+        val egyptianCities = index.search("EG")
+        assertTrue(egyptianCities.isNotEmpty(), "expected cities in EG")
+        assertTrue(egyptianCities.all { it.country.value == "EG" })
+
+        val saudiCities = index.search("SA")
+        assertTrue(saudiCities.isNotEmpty(), "expected cities in SA")
+        assertTrue(saudiCities.all { it.country.value == "SA" })
+    }
+
+    @Test
+    fun searchByEnglishCountryNameReturnsCities() {
+        val results = index.search("Egypt")
+        assertTrue(results.any { it.name == "Cairo" && it.country.value == "EG" })
+
+        val saudiResults = index.search("Saudi Arabia")
+        assertTrue(saudiResults.any { it.name == "Makkah" && it.country.value == "SA" })
+
+        val ukResults = index.search("United Kingdom")
+        assertTrue(ukResults.any { it.name == "London" && it.country.value == "GB" })
+    }
+
+    @Test
+    fun searchByArabicCountryNameReturnsCities() {
+        val egyptianResults = index.search("مصر")
+        assertTrue(egyptianResults.any { it.name == "Cairo" && it.country.value == "EG" })
+
+        val saudiResults = index.search("السعودية")
+        assertTrue(saudiResults.any { it.name == "Makkah" && it.country.value == "SA" })
+    }
+
+    @Test
+    fun searchByCountryDoesNotProduceDuplicates() {
+        val results = index.search("United Kingdom")
+        val ids = results.map { it.id }
+        assertEquals(expected = ids.distinct().size, actual = ids.size, "results must not contain duplicate cities")
+    }
+
+    @Test
     fun anUnknownNameFindsNothing() {
         assertTrue(index.search("Zzzznowhere").isEmpty())
     }
