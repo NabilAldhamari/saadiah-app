@@ -11,10 +11,10 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         pluginManager.apply("io.gitlab.arturbosch.detekt")
 
         extensions.configure(ApplicationExtension::class.java) {
-            compileSdk = 35
+            compileSdk = 36
             defaultConfig {
                 minSdk = 26
-                targetSdk = 35
+                targetSdk = 36
                 versionCode = Versions.code(target)
                 versionName = Versions.name(target)
             }
