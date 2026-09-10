@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/NabilAldhamari/saadiah-app/compare/saadiah-v0.3.0...saadiah-v0.4.0) (2026-09-10)
+
+
+### Features
+
+* **android:** update reciter options to husary, minshawi and abdulbasit only ([#17](https://github.com/NabilAldhamari/saadiah-app/issues/17)) ([b4a57a7](https://github.com/NabilAldhamari/saadiah-app/commit/b4a57a758147fb0a74a6855c796bd207816038fd))
+* **android:** zero-permission travel and timezone detection with notifications ([#15](https://github.com/NabilAldhamari/saadiah-app/issues/15)) ([c48eee9](https://github.com/NabilAldhamari/saadiah-app/commit/c48eee9cb31e3e765a946b43b0f3fb97c0360810))
+
 ## [0.3.0](https://github.com/NabilAldhamari/saadiah-app/compare/saadiah-v0.2.0...saadiah-v0.3.0) (2026-09-09)
 
 
