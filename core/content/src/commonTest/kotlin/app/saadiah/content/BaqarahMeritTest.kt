@@ -79,4 +79,52 @@ class BaqarahMeritTest {
             )
         }
     }
+
+    @Test
+    fun aBlankSourceIsRefused() {
+        assertFailsWith<IllegalArgumentException> {
+            BaqarahMerit(
+                id = "blank",
+                order = 1,
+                arabic = null,
+                translationArabic = null,
+                translation = "something",
+                source = "   ",
+                kind = MeritKind.HADITH,
+                traditions = setOf(Tradition.SUNNI),
+            )
+        }
+    }
+
+    @Test
+    fun aBlankTranslationIsRefused() {
+        assertFailsWith<IllegalArgumentException> {
+            BaqarahMerit(
+                id = "blank",
+                order = 1,
+                arabic = null,
+                translationArabic = null,
+                translation = "   ",
+                source = "somewhere",
+                kind = MeritKind.HADITH,
+                traditions = setOf(Tradition.SUNNI),
+            )
+        }
+    }
+
+    @Test
+    fun emptyTraditionsAreRefused() {
+        assertFailsWith<IllegalArgumentException> {
+            BaqarahMerit(
+                id = "blank",
+                order = 1,
+                arabic = null,
+                translationArabic = null,
+                translation = "something",
+                source = "somewhere",
+                kind = MeritKind.HADITH,
+                traditions = emptySet(),
+            )
+        }
+    }
 }

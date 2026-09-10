@@ -14,7 +14,7 @@ private const val NANOS_PER_MILLI = 1_000_000.0
 
 /**
  * Exercises the database the app actually ships rather than the fixture, because the
- * budget in IMPLEMENTATION-PLAN.md is stated against the real one and a thirty-row file
+ * budget in README.md is stated against the real one and a thirty-row file
  * would meet it no matter how the search were written.
  */
 class CityDatabaseTest {
