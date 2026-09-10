@@ -1,4 +1,4 @@
-﻿package app.saadiah.alarm
+package app.saadiah.alarm
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
@@ -147,7 +147,7 @@ class AfterPrayerReminderReceiver : BroadcastReceiver() {
             val notification =
                 NotificationCompat
                     .Builder(context, ADHKAAR_CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_launcher_foreground)
+                    .setSmallIcon(R.drawable.ic_notification)
                     .setContentTitle(words.afterPrayerReminderTitle)
                     .setContentText(words.afterPrayerReminderBody(prayer.spelledOut(words)))
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)

@@ -150,7 +150,7 @@ private fun QuickResumeCard(
                     fontWeight = FontWeight.Medium,
                 )
                 Text(
-                    text = "${sura.arabicName} · آية $ayahNumber",
+                    text = "${sura.arabicName} · الآية $ayahNumber",
                     color = colors.text,
                     fontSize = SaadiahType.titleMedium.size,
                     fontWeight = FontWeight.Bold,
@@ -213,14 +213,15 @@ private fun SurahCard(
                     fontSize = SaadiahType.titleMedium.size,
                     fontWeight = FontWeight.Bold,
                 )
+                val origin = if (surah.isMadani) strings.surahMedinan else strings.surahMeccan
                 Text(
-                    text = "${if (surah.isMadani) "مدنية" else "مكية"} · ${surah.ayahCount} آية",
+                    text = "$origin · ${strings.surahAyahCount(surah.ayahCount)}",
                     color = colors.textSecondary,
                     fontSize = SaadiahType.bodySmall.size,
                 )
                 if (savedAyah != null && savedAyah > 1) {
                     Text(
-                        text = "وصلت إلى الآية $savedAyah من ${surah.ayahCount}",
+                        text = "وصلت إلى الآية $savedAyah من أصل ${surah.ayahCount}",
                         color = colors.accent,
                         fontSize = SaadiahType.label.size,
                         fontWeight = FontWeight.Medium,

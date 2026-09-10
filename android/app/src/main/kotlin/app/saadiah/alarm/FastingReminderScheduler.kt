@@ -1,4 +1,4 @@
-﻿package app.saadiah.alarm
+package app.saadiah.alarm
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
@@ -206,7 +206,7 @@ class FastingReminderReceiver : BroadcastReceiver() {
             val notification =
                 NotificationCompat
                     .Builder(context, FASTING_CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_launcher_foreground)
+                    .setSmallIcon(R.drawable.ic_notification)
                     .setContentTitle(words.fastingReminderTitle)
                     .setContentText(words.fastingReminderBody(fastName))
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)

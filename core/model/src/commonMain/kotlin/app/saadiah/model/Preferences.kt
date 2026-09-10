@@ -47,10 +47,22 @@ enum class Reciter(
         zipName = "minshawi",
         zipType = "mujawwad",
     ),
-    ALAFASY(
-        id = "alafasy",
-        everyAyahFolder = "Alafasy_128kbps",
-        zipName = "alafasy",
+    MINSHAWI_MURATTAL(
+        id = "minshawi_murattal",
+        everyAyahFolder = "Minshawy_Murattal_128kbps",
+        zipName = "minshawi",
+        zipType = "murattal",
+    ),
+    ABDULBASIT_MUJAWWAD(
+        id = "abdulbasit_mujawwad",
+        everyAyahFolder = "Abdul_Basit_Mujawwad_128kbps",
+        zipName = "abdulbasit",
+        zipType = "mujawwad",
+    ),
+    ABDULBASIT_MURATTAL(
+        id = "abdulbasit_murattal",
+        everyAyahFolder = "Abdul_Basit_Murattal_192kbps",
+        zipName = "abdulbasit",
         zipType = "murattal",
     ),
 }

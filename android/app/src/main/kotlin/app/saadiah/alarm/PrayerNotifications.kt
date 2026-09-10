@@ -183,7 +183,7 @@ fun postTravelNotification(
     val notification =
         NotificationCompat
             .Builder(context, TRAVEL_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(words.travelNotificationTitle)
             .setContentText(words.travelNotificationText(detectedPlace, currentCity.name))
             .setPriority(NotificationCompat.PRIORITY_HIGH)

@@ -463,8 +463,6 @@ object EnglishStrings : Strings {
 
     override fun surahAyahCount(count: Int) = "$count Verses"
 
-    override val reciterMishari = "Mishari Rashid al-ʿAfasy"
-
     override val tabAudioDownloads = "Audio Downloads"
     override val audioDownloadsSubtitle = "Download Quran recitations for offline listening"
     override val downloadAudio = "Download"
@@ -486,7 +484,9 @@ object EnglishStrings : Strings {
     override val reciterHusariMujawwad = "Al-Husari (Mujawwad)"
     override val reciterHusariMurattal = "Al-Husari (Murattal)"
     override val reciterMinshawiMujawwad = "Al-Minshawi (Mujawwad)"
-    override val reciterAlafasy = "Mishari Alafasy"
+    override val reciterMinshawiMurattal = "Al-Minshawi (Murattal)"
+    override val reciterAbdulbasitMujawwad = "Abdulbasit (Mujawwad)"
+    override val reciterAbdulbasitMurattal = "Abdulbasit (Murattal)"
     override val sectionReciter = "Recitation Voice"
     override val sectionReciterWhy = "Choose your preferred recitation style and reciter."
     override val deleteReciterAudio = "Delete Downloaded Audio"
