@@ -8,7 +8,18 @@ if [[ -z "${APK}" ]]; then
   exit 1
 fi
 
-if unzip -l "${APK}" | grep -q 'assets/dexopt/baseline.prof'; then
+if command -v unzip >/dev/null 2>&1; then
+  entries=$(unzip -l "${APK}")
+elif command -v jar >/dev/null 2>&1; then
+  entries=$(jar tf "${APK}")
+elif command -v python3 >/dev/null 2>&1; then
+  entries=$(python3 -c 'import zipfile, sys; print("\n".join(zipfile.ZipFile(sys.argv[1]).namelist()))' "${APK}")
+else
+  echo "check-baseline-profile: could not find unzip, jar, or python3 to inspect ${APK}." >&2
+  exit 1
+fi
+
+if grep -q 'assets/dexopt/baseline.prof' <<< "${entries}"; then
   echo "check-baseline-profile: baseline profile present."
   exit 0
 fi

@@ -6,9 +6,12 @@ import app.saadiah.model.Coordinates
 import app.saadiah.model.CountryCode
 import app.saadiah.model.HighLatitudeRule
 import app.saadiah.model.Madhab
+import app.saadiah.model.Prayer
+import app.saadiah.model.TwilightAngles
 import kotlinx.datetime.TimeZone
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.minutes
 
 // Low enough that the high-latitude rule never binds, so a test not about it is not about it.
 private const val WHERE_THE_RULE_IS_IDLE = 30.0
@@ -16,10 +19,12 @@ private const val WHERE_THE_RULE_IS_IDLE = 30.0
 private fun placeIn(
     country: String,
     latitude: Double = WHERE_THE_RULE_IS_IDLE,
+    name: String = country,
+    id: Int = 1,
 ): City =
     City(
-        id = CityId(value = 1),
-        name = country,
+        id = CityId(value = id),
+        name = name,
         country = CountryCode(value = country),
         admin1 = "",
         coordinates = Coordinates(latitude = latitude, longitude = 0.0),
@@ -69,6 +74,32 @@ class MethodInferenceTest {
                 message = code,
             )
         }
+    }
+
+    @Test
+    fun ukCitiesHaveSpecialisedProfiles() {
+        val highLat = HighLatitudeRule.SEVENTH_OF_NIGHT
+        val exeter = placeIn(country = "GB", latitude = 50.7, name = "Exeter")
+        val expectedExeter =
+            Method.UK_REGIONAL
+                .toProfile(madhab = Madhab.SHAFI, highLatitudeRule = highLat)
+                .copy(
+                    angles = TwilightAngles(fajr = 15.0, isha = 11.0),
+                    adjustments = mapOf(Prayer.DHUHR to 5.minutes, Prayer.FAJR to 3.minutes),
+                )
+        assertEquals(expected = expectedExeter, actual = inferProfile(exeter))
+
+        val birmingham = placeIn(country = "GB", latitude = 52.5, name = "Birmingham")
+        val expectedBirmingham = Method.UK_REGIONAL.toProfile(madhab = Madhab.HANAFI, highLatitudeRule = highLat)
+        assertEquals(expected = expectedBirmingham, actual = inferProfile(birmingham))
+
+        val manchester = placeIn(country = "GB", latitude = 53.5, name = "Manchester")
+        val expectedManchester = Method.UK_REGIONAL.toProfile(madhab = Madhab.SHAFI, highLatitudeRule = highLat)
+        assertEquals(expected = expectedManchester, actual = inferProfile(manchester))
+
+        val london = placeIn(country = "GB", latitude = 51.5, name = "London", id = 2643743)
+        val expectedLondon = Method.LONDON_UNIFIED.toProfile(madhab = Madhab.SHAFI, highLatitudeRule = highLat)
+        assertEquals(expected = expectedLondon, actual = inferProfile(london))
     }
 
     @Test

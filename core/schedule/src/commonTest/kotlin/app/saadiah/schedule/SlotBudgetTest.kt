@@ -7,6 +7,7 @@ import kotlinx.datetime.Instant
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 private const val SEED = 20_260_725
@@ -85,6 +86,16 @@ class SlotBudgetTest {
 
         assertEquals(expected = 1, actual = budgeted.size)
         assertEquals(expected = AlarmKind.RE_ARM, actual = budgeted.single().kind)
+    }
+
+    @Test
+    fun requiresPositiveMaxSlots() {
+        assertFailsWith<IllegalArgumentException> {
+            budget(specs(10), max = 0)
+        }
+        assertFailsWith<IllegalArgumentException> {
+            budget(specs(10), max = -5)
+        }
     }
 
     @Test

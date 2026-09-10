@@ -1,5 +1,8 @@
 # Saadiah
 
+[![ci](https://github.com/NabilAldhamari/saadiah-app/actions/workflows/ci.yml/badge.svg)](https://github.com/NabilAldhamari/saadiah-app/actions/workflows/ci.yml)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](COPYING)
+
 Prayer times, adhkār, and the daily reading. No ads. No account. No servers. Works with the
 radio off.
 
@@ -54,9 +57,71 @@ refuse it and the app keeps working, with less warning.
 `SYSTEM_ALERT_WINDOW` and background location are permanently forbidden. Voice recording is
 future work; when it arrives it will be optional, and it is not requested today.
 
-## Verifying that
+## Building and Testing
 
-Every release is reproducible. Rebuild it yourself and compare:
+Requirements: JDK 21, Android SDK 35. The Gradle wrapper is committed; always use `./gradlew` rather than a local Gradle.
+
+### Development and Quality Gates
+
+```bash
+./gradlew :android:app:assembleDebug   # Assemble debug APK
+./gradlew check                       # Format, static analysis, lint, unit tests, coverage gates
+./gradlew koverHtmlReport              # Generate detailed HTML code coverage report
+```
+
+`./gradlew check` must pass cleanly before any commit. See `CLAUDE.md` for the working agreement.
+
+### Building for Google Play Store (Release Bundle)
+
+Google Play Console requires an **Android App Bundle (`.aab`)** for app publication.
+
+To build the signed release bundle ready for Google Play Console upload:
+
+```bash
+KEYSTORE_PASSWORD="<store_password>" \
+KEY_ALIAS="<key_alias>" \
+KEY_PASSWORD="<key_password>" \
+./gradlew :android:app:bundleRelease --no-daemon
+```
+
+- **Output Bundle**: `android/app/build/outputs/bundle/release/app-release.aab`
+- **Upload to Play Console**: In the [Google Play Console](https://play.google.com/console), navigate to your app > **Release** > **Production** (or **Testing** > **Internal testing**), create a new release, and upload `app-release.aab`.
+
+> [!NOTE]
+> If signing credentials are not supplied via environment variables, Gradle produces an unsigned bundle (`app-release.aab` without signature metadata). Google Play requires signed bundles. The signing configuration looks for `keystore.jks` in the repository root by default.
+
+### Building Release APKs (for Testing and Sideloading)
+
+To produce optimized, shrinked, per-ABI release APKs (arm64-v8a, armeabi-v7a, x86_64):
+
+```bash
+KEYSTORE_PASSWORD="<store_password>" \
+KEY_ALIAS="<key_alias>" \
+KEY_PASSWORD="<key_password>" \
+./gradlew :android:app:assembleRelease --no-daemon
+```
+
+- **Output APKs**:
+  - `android/app/build/outputs/apk/release/app-arm64-v8a-release.apk`
+  - `android/app/build/outputs/apk/release/app-armeabi-v7a-release.apk`
+  - `android/app/build/outputs/apk/release/app-x86_64-release.apk`
+
+### Quality and Privacy Guards
+
+Saadiah enforces 6 automated verification guards locally and on CI:
+
+```bash
+scripts/check-apk-size.sh          # Verifies arm64 release APK is within 12 MB budget
+scripts/check-baseline-profile.sh  # Verifies dexopt/baseline.prof is embedded
+scripts/check-forbidden-strings.sh # Ensures zero unauthorized network hosts in binary
+scripts/check-permissions.sh       # Enforces allowed permissions against merged manifest
+scripts/check-rtl.sh               # Enforces right-to-left layout compliance
+scripts/check-ui-strings.sh        # Catches hardcoded prose outside translation tables
+```
+
+### Reproducible Build Verification
+
+Every release is byte-for-byte reproducible. Rebuild it yourself and verify:
 
 ```bash
 git checkout v0.1.0
@@ -64,21 +129,19 @@ git checkout v0.1.0
 sha256sum android/app/build/outputs/apk/release/*arm64-v8a*.apk
 ```
 
-The result must match the `SHA256SUMS` file attached to the corresponding GitHub Release. CI
-performs this same check on every release and refuses to publish if the hashes diverge. If they
-ever differ, the binary is not the source — tell us loudly.
+The result must match the `SHA256SUMS` file attached to the corresponding GitHub Release. CI performs this same check on every release and refuses to publish if the hashes diverge.
 
-## Building
+## Performance Budgets (CI-Enforced)
 
-Requirements: JDK 21, Android SDK 35. The Gradle wrapper is committed; use it rather than a
-local Gradle.
-
-```bash
-./gradlew check                      # format, static analysis, lint, tests, coverage gates
-./gradlew :android:app:assembleDebug
-```
-
-`./gradlew check` must pass before any commit. See `CLAUDE.md` for the working agreement.
+| Metric | Budget Limit | Enforced By |
+| --- | --- | --- |
+| Cold start, P50, mid-range device | ≤ 400 ms | Macrobenchmark suite |
+| Today screen full state recompute | ≤ 3 ms | JVM benchmark test |
+| One day of prayer times | ≤ 1 ms | JVM benchmark test |
+| Quran FTS query over 6,236 āyāt, P95 | ≤ 25 ms | JVM benchmark test |
+| City prefix search per keystroke | ≤ 8 ms | JVM benchmark test (`CityDatabaseTest`) |
+| Release APK, arm64 split | ≤ 12 MB | `scripts/check-apk-size.sh` |
+| Base install download size | ≤ 10 MB | `scripts/check-apk-size.sh` |
 
 ## Project layout
 

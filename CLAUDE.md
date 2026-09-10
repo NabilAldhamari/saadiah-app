@@ -9,7 +9,7 @@ Saadiah is a free, offline-first Islamic companion app. It has no servers, no ac
 ## The five rules
 
 1. **Test first.** Write the failing test, watch it fail, write the minimum code to pass, then refactor. Build files, resources and generated data are the only exceptions.
-2. **Performance is the primary quality attribute.** Budgets are in `IMPLEMENTATION-PLAN.md` and enforced in CI. Do not regress one to make code prettier.
+2. **Performance is the primary quality attribute.** Budgets are in `README.md` and enforced in CI. Do not regress one to make code prettier.
 3. **Do not over-engineer.** No abstraction for a single implementation. No interface without two real callers. No framework where a function will do. When in doubt, write the simpler thing.
 4. **Comments are a failure signal.** Name things so the code reads without them. A comment may explain *why* a non-obvious decision was made; it may never explain *what* the code does. Delete stale comments the moment you see one.
 5. **Dependencies point inward.** `model` depends on nothing. Nothing depends on `app`. No cycles, ever.
@@ -19,13 +19,17 @@ Saadiah is a free, offline-first Islamic companion app. It has no servers, no ac
 ## Commands
 
 ```bash
-./gradlew check                 # format, static analysis, lint, tests, coverage gates
-./gradlew allTests              # tests only
-./gradlew koverHtmlReport       # coverage report
-./gradlew :android:app:assembleRelease
+./gradlew check                         # format, static analysis, lint, tests, coverage gates
+./gradlew allTests                      # tests only
+./gradlew koverHtmlReport               # coverage report
+./gradlew :android:app:assembleRelease  # release APKs
+./gradlew :android:app:bundleRelease    # Play Store bundle (.aab)
 scripts/check-apk-size.sh
+scripts/check-baseline-profile.sh
 scripts/check-forbidden-strings.sh
+scripts/check-permissions.sh
 scripts/check-rtl.sh
+scripts/check-ui-strings.sh
 ```
 
 `./gradlew check` must be green before every commit. Not before every PR — before every commit.

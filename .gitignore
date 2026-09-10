@@ -1,23 +1,75 @@
+# Gradle
 .gradle/
 build/
+**/build/
+.gradletasknamecache
+
+# Android & C/C++ build artifacts
 captures/
 local.properties
+.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Kotlin & Java compilation
+*.class
+.kotlin/
+out/
+**/out/
+bin/
+
+# IntelliJ IDEA & Android Studio
 *.iml
 .idea/
-.kotlin/
-.cxx/
+*.iws
+*.ipr
+.idea_modules/
 
+# VS Code & editors
+.vscode/
+*.swp
+*.swo
+*~
+
+# AI agent & tooling scratch
+.claude/
+.aider*
+.antigravity/
+.gemini/
+
+# Signing keys & secrets
 *.jks
 *.keystore
+*.key
+*.p12
+*.pepk
 keystore.properties
+google-services.json
 
+# Fastlane & Reports
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+**/build/reports/
+
+# Operating System files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+Desktop.ini
 
+# iOS / Xcode (Milestone 2)
 xcuserdata/
 *.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
 DerivedData/
 Pods/
 
+# Node / JS
 node_modules/
-.aider*

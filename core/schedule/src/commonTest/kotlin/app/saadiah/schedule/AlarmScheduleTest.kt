@@ -164,6 +164,34 @@ class AlarmScheduleTest {
     }
 
     @Test
+    fun emitsEndOfWindowAlertsForCombinedPrayers() {
+        val lead = 15.minutes
+        val calculator = PrayerCalculator()
+        val day = calculator.compute(cairo, LocalDate(2024, 3, 11), profile)
+        val nextDay = calculator.compute(cairo, LocalDate(2024, 3, 12), profile)
+
+        val specs =
+            schedule(
+                settings(endOfWindow = lead, combineMode = CombineMode.ZUHRAYN_ISHAAYN),
+                from = from,
+                horizon = 2.days,
+            ).filter { it.kind == AlarmKind.END_OF_WINDOW }
+
+        val expected =
+            mapOf(
+                Prayer.FAJR to day[Prayer.SUNRISE],
+                Prayer.DHUHR to day[Prayer.MAGHRIB],
+                Prayer.MAGHRIB to nextDay[Prayer.FAJR],
+            )
+        for ((prayer, closesAt) in expected) {
+            assertTrue(
+                specs.any { it.prayer == prayer && it.triggerAt == closesAt - lead },
+                "no combined end-of-window alert for $prayer at ${closesAt - lead}",
+            )
+        }
+    }
+
+    @Test
     fun isDeterministic() {
         val settings = settings(preAlert = 10.minutes, endOfWindow = 20.minutes)
 
